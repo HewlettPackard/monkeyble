@@ -1,0 +1,16 @@
+
+
+config:
+  - name: "replace-test"
+    assert_args_in:
+      - input: datacenter
+        mode: equal # contains,
+        expected: cmsgvc1.gre.hpecorp.net
+    mock_result:
+      output: "test_updated"
+
+
+tasks:
+- task_name: "Test"
+  monkeyble:
+    config: "replace-test"

@@ -1,0 +1,16 @@
+
+
+- name: "Test"
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+
+  vars:
+    my_var: "var1"
+
+  tasks:
+
+    - name: "Test"
+      debug:
+        msg: "This is a test {{ my_var }}"
