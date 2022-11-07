@@ -79,7 +79,7 @@ def main():
                                 "assert_dict_equal": {
                                     "result_value": "result.ansible_facts",
                                     "expected": {
-                                        "new_var": "new_valdd"
+                                        "new_var": "new_val"
                                     }
                                 }
                             }

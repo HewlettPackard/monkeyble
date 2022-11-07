@@ -39,39 +39,3 @@ monkeyble_scenarios:
               result_value: "result.ansible_facts"
               expected:
                 new_var: new_val
-
-
-#mock_configs:
-#  replace_debug:
-#    monkeyble_module:
-#      consider_changed: false
-#      args_tests:
-##        - assert_equal:
-##            arg_name: msg
-###            expected: "hello there"
-##            expected: "this is test_role 1"
-#        - assert_in:
-#            arg_name: msg
-#            expected:
-#              - "hello there"
-#              - "this is test_role 1"
-#      result_dict:
-#        output_key: "output_value"
-#
-#
-#tasks_to_patch:
-#  - task: "test_name2" # need to be set
-##    play: "Ansible Play" # all if not set
-#    should_be_changed: True
-#    should_be_skipped: True
-#    mock:
-#      config: "replace_debug"
-#  - task: "debug test role 1" # need to be set
-#    role: "test_role"
-#    play: "Play1"
-#    mock:
-#      config: "replace_debug"
-#    task_expected_state: changed
-#  - task: "Task test 1" # need to be set
-#    mock:
-#      config: "replace_debug"

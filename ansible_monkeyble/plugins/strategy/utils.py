@@ -1,6 +1,8 @@
 import unittest
 
 from ansible.errors import AnsibleError
+from ansible.playbook.task import Task
+
 from ansible_monkeyble.plugins.strategy.const import *
 
 
@@ -65,3 +67,34 @@ def switch_test_method(test_name, tested_value, expected=None):
     except AssertionError:
         print(f"{test_name} failed. tested_value: {tested_value}. expected: {expected}")
         return FAILED_TEST, json_output
+
+
+def get_task_config(ansible_task: Task, monkeyble_config: dict):
+    """
+    Check if the task name is present in the Monkey config of the current strategy
+    Return the config if:
+    - the config exist
+    - if the role filter is ok
+    - if the play filter is ok
+    :ansible_task: AnsibleTask object
+    :ty
+    """
+    task_name = ansible_task.get_name()
+    play_name = ansible_task.play.name
+    role_name = None
+    # print(f"get_task_config task: {task_name}")
+    # print(f"get_task_config play: {play_name}")
+    if ansible_task._role is not None:
+        role_name = ansible_task._role._role_name
+    # print(f"get_task_config role: {role_name}")
+    for task_config in monkeyble_config["tasks_to_test"]:
+        if task_config["task"] == task_name:
+            # we've found a task name
+            if "play" in task_config:
+                if task_config["play"] != play_name:
+                    return None
+            if "role" in task_config:
+                if role_name is None or task_config["role"] != role_name:
+                    return None
+            return task_config
+    return None

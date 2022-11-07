@@ -1,14 +1,14 @@
 import os
 import sys
-import unittest
 
 from ansible.errors import AnsibleError, AnsibleAssertionError
 from ansible.plugins.strategy.linear import StrategyModule as LinearStrategyModule
 from ansible.template import Templar
 from ansible.utils.display import Display
+from ansible import constants as C
 
 from ansible_monkeyble.plugins.strategy.const import PASSED_TEST, FAILED_TEST
-from ansible_monkeyble.plugins.strategy.utils import str_to_bool, switch_test_method
+from ansible_monkeyble.plugins.strategy.utils import switch_test_method, get_task_config
 
 BASE_DIR = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '../../..')
@@ -26,27 +26,6 @@ class MonkeybleTestFailed(AnsibleError):
 
 class MonkeybleConfigError(AnsibleError):
     pass
-
-
-def get_task_config(play_name=None, role_name=None, task_name=None, monkeyble_config=None):
-    """
-    Check if the 'task_name' is present in the config.
-    Return the config mapped in 'mocks' if:
-    - the config exist
-    - if the role is the right one
-    - if the play is the right one
-    """
-    for task_config in monkeyble_config["tasks_to_test"]:
-        if task_config["task"] == task_name:
-            # we've found a task name. Check play and role filter
-            if "play" in task_config:
-                if task_config["play"] != play_name:
-                    return None
-            if "role" in task_config:
-                if role_name is None or task_config["role"] != role_name:
-                    return None
-            return task_config
-    return None
 
 
 class StrategyModule(LinearStrategyModule):
@@ -71,11 +50,11 @@ class StrategyModule(LinearStrategyModule):
         except KeyError:
             raise AnsibleAssertionError(f"The Monkeyble scenario name'{monkeyble_scenario}' "
                                         f"not found in 'monkeyble_scenarios'")
-        print(f"Monkeyble selected scenario: {monkeyble_scenario}")
+        display.display(f"Monkeyble selected scenario: {monkeyble_scenario}", color=C.COLOR_OK)
         # template the scenario with extra vars
         templar = Templar(loader=self._loader, variables=iterator._variable_manager._extra_vars)
         self.monkeyble_config = templar.template(self.monkeyble_config)
-        print(self.monkeyble_config)
+        # print(self.monkeyble_config)
 
         # # apply extra vars from task config
         # if "extra_vars" in self.monkeyble_config:
@@ -87,7 +66,8 @@ class StrategyModule(LinearStrategyModule):
     def mock_task_module(self, mock_config, ansible_task):
         new_action_name = next(iter(mock_config["config"]))
         original_module_name = ansible_task.action
-        print(f"Monkeyble mock module - Before: '{original_module_name}' Now: '{new_action_name}'")
+        msg = f"Monkeyble mock module - Before: '{original_module_name}' Now: '{new_action_name}'"
+        self._display.display(msg=str(msg), color=C.COLOR_CHANGED)
         ansible_task.action = new_action_name
         if new_action_name == "monkeyble_module":
             original_module_args = ansible_task.args
@@ -103,22 +83,9 @@ class StrategyModule(LinearStrategyModule):
 
     def _queue_task(self, host, task, task_vars, play_context):
         display.debug("Monkeyble strategy _queue_task called")
-        print("Monkeyble strategy _queue_task called")
 
-        task_name = task.name
-        play_name = task.play.name
-        role_name = None
-        if task._role is not None:
-            role_name = task._role._role_name
-        print(f"Play name: {play_name}")
-        print(f"Role name: {role_name}")
-        print(f"Task name: {task_name}")
-
-        # update task if
-        task_config = get_task_config(play_name=play_name,
-                                      task_name=task_name,
-                                      role_name=role_name,
-                                      monkeyble_config=self.monkeyble_config)
+        # get the Monkeyble task config if exist
+        task_config = get_task_config(ansible_task=task, monkeyble_config=self.monkeyble_config)
 
         if task_config is not None:
             # TODO apply extra vars
@@ -129,7 +96,8 @@ class StrategyModule(LinearStrategyModule):
 
             # check input
             if "test_input" in task_config:
-                self.check_input(task_config["test_input"], ansible_task_args=templated_module_args)
+                result = self.check_input(task_config["test_input"], ansible_task_args=templated_module_args)
+                self._display.display(msg=str(result), color=C.COLOR_CHANGED)
 
             if "mock" in task_config:
                 task = self.mock_task_module(task_config["mock"], ansible_task=task)
@@ -152,7 +120,6 @@ class StrategyModule(LinearStrategyModule):
                 returned_tuple = switch_test_method(test_name, argument_value, expected)
                 test_result[returned_tuple[0]].append(returned_tuple[1])
 
-        print(test_result)
         if len(test_result[FAILED_TEST]) >= 1:
             raise MonkeybleTestFailed(message=str(test_result))
         return test_result
