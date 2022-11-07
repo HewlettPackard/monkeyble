@@ -1,16 +1,36 @@
+# ANSIBLE_CONFIG="ansible.cfg" ansible-playbook test_strategy_playbook.yml
 
-
-- name: "Test"
+- name: "Play1"
   hosts: localhost
   connection: local
   gather_facts: false
   become: false
-
+  any_errors_fatal: true
   vars:
-    my_var: "var1"
-
+    my_var: "general kenobi"
   tasks:
-
-    - name: "Test"
+#    - when: my_var == "var1"
+#      name: "test_name2"
+#      debug:
+#        msg: "{{ my_var }}"
+    - name: "test_name2"
       debug:
-        msg: "This is a test {{ my_var }}"
+        msg: "{{ my_var }}"
+
+#  roles:
+#    - role: test_role
+#    - role: test_role2
+
+#- name: "Play2"
+#  hosts: localhost
+#  connection: local
+#  gather_facts: false
+#  become: false
+#
+#  vars:
+#    my_var: "var2"
+#
+#  tasks:
+#    - name: "Task test 2"
+#      debug:
+#        msg: "This is another test {{ my_var }}"

@@ -1,16 +1,77 @@
+# playbook base extra var
+my_variable_1: "my_value_1"
+hello_there: "general kenobi"
+
+# test input
+test_input_config_1:
+  - assert_equal:
+      arg_name: msg
+      expected: "general kenobi"
+
+# mocks
+replace_debug_mock:
+  monkeyble_module:
+    consider_changed: false
+    result_dict:
+      msg: "output_value"
 
 
-config:
-  - name: "replace-test"
-    assert_args_in:
-      - input: datacenter
-        mode: equal # contains,
-        expected: cmsgvc1.gre.hpecorp.net
-    mock_result:
-      output: "test_updated"
+monkeyble_scenarios:
+  validate_test_1:
+    name: "Validate that bla bla"
+    tasks_to_test:
+      - task: "test_name2"
+#        play: "play"
+#        role: "ddzdz"
+#        should_be_changed: true
+        should_be_skipped: false
+#        should_failed: false
+        test_input: "{{ test_input_config_1 }}"
+        mock:
+          config: "{{ replace_debug_mock }}"
+#        test_output:
+#          - assert_equal:
+#              value: "{{ monkeyble_result["key"] }}
+#              expected: "hello there"
+      - task: "test_name3"
+        test_output:
+          - assert_dict_equal:
+              result_value: "result.ansible_facts"
+              expected:
+                new_var: new_val
 
 
-tasks:
-- task_name: "Test"
-  monkeyble:
-    config: "replace-test"
+#mock_configs:
+#  replace_debug:
+#    monkeyble_module:
+#      consider_changed: false
+#      args_tests:
+##        - assert_equal:
+##            arg_name: msg
+###            expected: "hello there"
+##            expected: "this is test_role 1"
+#        - assert_in:
+#            arg_name: msg
+#            expected:
+#              - "hello there"
+#              - "this is test_role 1"
+#      result_dict:
+#        output_key: "output_value"
+#
+#
+#tasks_to_patch:
+#  - task: "test_name2" # need to be set
+##    play: "Ansible Play" # all if not set
+#    should_be_changed: True
+#    should_be_skipped: True
+#    mock:
+#      config: "replace_debug"
+#  - task: "debug test role 1" # need to be set
+#    role: "test_role"
+#    play: "Play1"
+#    mock:
+#      config: "replace_debug"
+#    task_expected_state: changed
+#  - task: "Task test 1" # need to be set
+#    mock:
+#      config: "replace_debug"
