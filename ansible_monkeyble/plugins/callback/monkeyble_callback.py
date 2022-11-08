@@ -2,7 +2,7 @@ import os
 import sys
 from copy import copy
 
-from ansible.errors import AnsibleError
+from ansible.errors import AnsibleError, AnsibleUndefinedVariable
 from ansible.parsing.dataloader import DataLoader
 from ansible.plugins.callback import CallbackBase
 from ansible import constants as C
@@ -40,6 +40,7 @@ class CallbackModule(CallbackBase):
         self.monkeyble_config = None
         self._last_task_config = None
         self._last_task_name = None
+        self._last_check_output_result = dict()
 
     def v2_playbook_on_play_start(self, play):
         vm = play.get_variable_manager()
@@ -74,7 +75,6 @@ class CallbackModule(CallbackBase):
         self._display.debug("Run v2_runner_on_failed")
         host = result._host
         self.host_failed[host.get_name()] = result
-        task_config = get_task_config(ansible_task=result._task, monkeyble_config=self.monkeyble_config)
         self.check_if_task_should_have_failed(task_has_actually_failed=True)
 
     def v2_runner_on_skipped(self, result, **kwargs):
@@ -92,23 +92,29 @@ class CallbackModule(CallbackBase):
                 }
                 for result_value_to_test in self._last_task_config["test_output"]:
                     for test_name, result_value_and_expected in result_value_to_test.items():
-                        result_value = result_value_and_expected['result_value']
+                        result_value = result_value_and_expected['result_key']
                         # template the result to get the real value
                         template_string = "{{  " + result_value + "  }}"
                         context = {
                             "result": result_dict
                         }
                         templar = Templar(loader=DataLoader(), variables=context)
-                        templated_value = templar.template(template_string)
+                        try:
+                            templated_value = templar.template(template_string)
+                        except AnsibleUndefinedVariable as e:
+                            self._display.display(msg=str(e), color=C.COLOR_ERROR)
+                            self.exit_playbook()
+                            return
                         expected = result_value_and_expected['expected']
                         returned_tuple = switch_test_method(test_name, templated_value, expected)
                         test_result[returned_tuple[0]].append(returned_tuple[1])
 
+                self._last_check_output_result = test_result
                 if len(test_result[FAILED_TEST]) >= 1:
                     self._display.display(msg=str(test_result), color=C.COLOR_ERROR)
-                    sys.exit(1)
+                    self.exit_playbook()
+                    return
                 self._display.display(msg=str(test_result), color=C.COLOR_OK)
-                return test_result
 
     def check_if_task_should_have_been_skipped(self, task_has_been_actually_skipped=False):
         self._display.debug("Monkeyble check_if_task_should_have_been_skipped called")
@@ -142,13 +148,13 @@ class CallbackModule(CallbackBase):
                 self._display.debug(f"actual_state: {actual_state}")
                 message = f"Task '{task_name}' - expected '{config_flag_name}': {config_flag_value}. " \
                           f"actual state: {actual_state}"
-                if config_flag_value:
-                    if not actual_state:
-                        self._display.display(msg=message, color=C.COLOR_ERROR)
-                        sys.exit(1)
-                if not config_flag_value:
-                    if actual_state:
-                        self._display.display(msg=message, color=C.COLOR_ERROR)
-                        sys.exit(1)
+                if config_flag_value != actual_state:
+                    self._display.display(msg=message, color=C.COLOR_ERROR)
+                    self.exit_playbook()
+                    return False
                 self._display.display(msg=message, color=C.COLOR_OK)
                 return True
+
+    @staticmethod
+    def exit_playbook():
+        sys.exit(1)

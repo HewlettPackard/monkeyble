@@ -36,6 +36,6 @@ monkeyble_scenarios:
       - task: "test_name3"
         test_output:
           - assert_dict_equal:
-              result_value: "result.ansible_facts"
+              result_key: "result.ansible_facts"
               expected:
                 new_var: new_val
