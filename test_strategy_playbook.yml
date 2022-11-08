@@ -5,7 +5,7 @@
   connection: local
   gather_facts: false
   become: false
-  any_errors_fatal: true
+#  any_errors_fatal: true
   vars:
     my_var: "general kenobi"
   tasks:
@@ -16,10 +16,11 @@
     - name: "test_name2"
       debug:
         msg: "{{ my_var }}"
-
-
-  roles:
-    - role: test_role
+#    - name: "test_name2"
+#      fail:
+#        msg: "this is a fail"
+#  roles:
+#    - role: test_role
 #    - role: test_role2
 
 #- name: "Play2"

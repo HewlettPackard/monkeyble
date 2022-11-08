@@ -65,7 +65,6 @@ def switch_test_method(test_name, tested_value, expected=None):
             test_case.assertDictEqual(tested_value, expected)
         return PASSED_TEST, json_output
     except AssertionError:
-        print(f"{test_name} failed. tested_value: {tested_value}. expected: {expected}")
         return FAILED_TEST, json_output
 
 

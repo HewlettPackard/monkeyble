@@ -67,5 +67,7 @@ class TestMonkeybleModule(unittest.TestCase):
 
             })
             monkeyble_module.main()
-        expected_dict = {'changed': False, 'my_key': 'my_val'}
+        expected_dict = {'changed': False,
+                         'my_key': 'my_val',
+                         'msg': 'Monkeyble Mock module called. Original module: copy'}
         self.assertDictEqual(expected_dict, result.exception.args[0])

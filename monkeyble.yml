@@ -6,7 +6,7 @@ hello_there: "general kenobi"
 test_input_config_1:
   - assert_equal:
       arg_name: msg
-      expected: "general kenobi"
+      expected: "general kenobiz"
 
 # mocks
 replace_debug_mock:
@@ -24,11 +24,11 @@ monkeyble_scenarios:
 #        play: "play"
 #        role: "ddzdz"
 #        should_be_changed: true
-        should_be_skipped: false
+#        should_be_skipped: true
 #        should_failed: false
         test_input: "{{ test_input_config_1 }}"
-        mock:
-          config: "{{ replace_debug_mock }}"
+#        mock:
+#          config: "{{ replace_debug_mock }}"
 #        test_output:
 #          - assert_equal:
 #              value: "{{ monkeyble_result["key"] }}

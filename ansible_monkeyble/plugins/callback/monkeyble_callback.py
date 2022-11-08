@@ -38,82 +38,59 @@ class CallbackModule(CallbackBase):
         self.skipped_task_list = list()
         self.changed_task_list = list()
         self.monkeyble_config = None
+        self._last_task_config = None
+        self._last_task_name = None
 
     def v2_playbook_on_play_start(self, play):
         vm = play.get_variable_manager()
         extra_vars = vm.extra_vars
         monkeyble_scenario = extra_vars.get("monkeyble_scenario")
         monkeyble_scenarios = extra_vars.get("monkeyble_scenarios")
-        # print(f"Monkeyble callback init")
         self.monkeyble_config = monkeyble_scenarios[monkeyble_scenario]
 
+    def v2_playbook_on_task_start(self, task, is_conditional):
+        self._last_task_config = get_task_config(ansible_task=task, monkeyble_config=self.monkeyble_config)
+        self._last_task_name = task.name
+
     def v2_runner_on_unreachable(self, result):
+        self._display.debug("Run v2_runner_on_unreachable")
         host = result._host
         self.host_unreachable[host.get_name()] = result
 
     def v2_runner_on_ok(self, result, *args, **kwargs):
-        """Print a json representation of the result.
-
-        Also, store the result in an instance attribute for retrieval later
-        """
+        self._display.debug("Run v2_runner_on_ok")
         host = result._host
         self.host_ok[host.get_name()] = result
         task_name = copy(result._task.name)
         if result.is_changed():
             self.changed_task_list.append(task_name)
-        # check if the task should have been skipped instead of being ok
-        self.check_if_task_should_have_been_skipped(ansible_task=result._task, task_has_been_actually_skipped=False)
-        # TODO check if task should have status changed
-        # check result
-        self.check_output(ansible_task=result._task, result_dict=result._result)
+
+        self.check_if_task_should_have_been_skipped(task_has_been_actually_skipped=False)
+        self.check_if_task_should_have_been_changed(task_has_been_actually_changed=result.is_changed())
+        self.check_if_task_should_have_failed(task_has_actually_failed=False)
+        self.check_output(result_dict=result._result)
 
     def v2_runner_on_failed(self, result, *args, **kwargs):
+        self._display.debug("Run v2_runner_on_failed")
         host = result._host
         self.host_failed[host.get_name()] = result
-        # print(json.dumps({host.name: result._result}, indent=4))
+        task_config = get_task_config(ansible_task=result._task, monkeyble_config=self.monkeyble_config)
+        self.check_if_task_should_have_failed(task_has_actually_failed=True)
 
     def v2_runner_on_skipped(self, result, **kwargs):
-        print("Run v2_runner_on_skipped")
-        task_name = result._task.name
-        # play_name = result._task.play.name
-        # role_name = None
-        # if result._task._role is not None:
-        #     role_name = result._task._role._role_name
-        self.skipped_task_list.append(task_name)
-        self.check_if_task_should_have_been_skipped(task_has_been_actually_skipped=True, ansible_task=result._task)
+        self._display.debug("Run v2_runner_on_skipped")
+        self.check_if_task_should_have_been_skipped(task_has_been_actually_skipped=True)
 
-    def check_if_task_should_have_been_skipped(self, ansible_task, task_has_been_actually_skipped=False):
-        self._display.debug("Monkeyble check_if_task_should_have_been_skipped called")
-        # get the Monkeyble task config if exist
-        task_config = get_task_config(ansible_task=ansible_task, monkeyble_config=self.monkeyble_config)
+    def check_output(self, result_dict):
 
-        if task_config is not None:
-            if "should_be_skipped" in task_config:
-                should_be_skipped = str_to_bool(task_config["should_be_skipped"])
-                print(f"should_be_skipped: {should_be_skipped}")
-                print(f"have been actually skipped:: {task_has_been_actually_skipped}")
-                if should_be_skipped:
-                    if not task_has_been_actually_skipped:
-                        message = f"The task '{ansible_task.name}' should have been skipped"
-                        self._display.display(msg=message, color=C.COLOR_ERROR)
-                        sys.exit(1)
-                if not should_be_skipped:
-                    if task_has_been_actually_skipped:
-                        message = f"The task '{ansible_task.name}' should not have been skipped"
-                        self._display.display(msg=message, color=C.COLOR_ERROR)
-                        sys.exit(1)
-
-    def check_output(self, ansible_task, result_dict):
-        # get the Monkeyble task config if exist
-        task_config = get_task_config(ansible_task=ansible_task, monkeyble_config=self.monkeyble_config)
-
-        if task_config is not None:
-            if "test_output" in task_config:
+        if self._last_task_config is not None:
+            if "test_output" in self._last_task_config:
                 test_result = {
+                    "task": self._last_task_name,
                     PASSED_TEST: [],
                     FAILED_TEST: []
                 }
-                for result_value_to_test in task_config["test_output"]:
+                for result_value_to_test in self._last_task_config["test_output"]:
                     for test_name, result_value_and_expected in result_value_to_test.items():
                         result_value = result_value_and_expected['result_value']
                         # template the result to get the real value
@@ -132,3 +109,46 @@ class CallbackModule(CallbackBase):
                     sys.exit(1)
                 self._display.display(msg=str(test_result), color=C.COLOR_OK)
                 return test_result
+
+    def check_if_task_should_have_been_skipped(self, task_has_been_actually_skipped=False):
+        self._display.debug("Monkeyble check_if_task_should_have_been_skipped called")
+        self._compare_boolean_to_config(task_name=self._last_task_name,
+                                        config_flag_name="should_be_skipped",
+                                        task_config=self._last_task_config,
+                                        actual_state=task_has_been_actually_skipped)
+
+    def check_if_task_should_have_been_changed(self, task_has_been_actually_changed):
+        self._display.debug("Monkeyble task_has_been_actually_changed called")
+
+        self._compare_boolean_to_config(task_name=self._last_task_name,
+                                        config_flag_name="should_be_changed",
+                                        task_config=self._last_task_config,
+                                        actual_state=task_has_been_actually_changed)
+
+    def check_if_task_should_have_failed(self, task_has_actually_failed):
+        self._display.debug("Monkeyble check_if_task_should_have_failed called")
+
+        self._compare_boolean_to_config(task_name=self._last_task_name,
+                                        config_flag_name="should_failed",
+                                        task_config=self._last_task_config,
+                                        actual_state=task_has_actually_failed)
+
+    def _compare_boolean_to_config(self, task_name: str, config_flag_name: str, task_config: dict, actual_state: bool):
+        if task_config is not None:
+            if config_flag_name in task_config:
+                config_flag_value = str_to_bool(task_config[config_flag_name])
+                self._display.debug(f"config_flag_name: {config_flag_name}")
+                self._display.debug(f"config_flag_value: {config_flag_value}")
+                self._display.debug(f"actual_state: {actual_state}")
+                message = f"Task '{task_name}' - expected '{config_flag_name}': {config_flag_value}. " \
+                          f"actual state: {actual_state}"
+                if config_flag_value:
+                    if not actual_state:
+                        self._display.display(msg=message, color=C.COLOR_ERROR)
+                        sys.exit(1)
+                if not config_flag_value:
+                    if actual_state:
+                        self._display.display(msg=message, color=C.COLOR_ERROR)
+                        sys.exit(1)
+                self._display.display(msg=message, color=C.COLOR_OK)
+                return True
