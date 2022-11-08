@@ -32,6 +32,7 @@ class StrategyModule(LinearStrategyModule):
     def __init__(self, tqm):
         super(StrategyModule, self).__init__(tqm)
         self.monkeyble_config = None
+        self._last_check_input_result = dict()
 
     def run(self, iterator, play_context, result=0):
         display.debug("Execute Monkeyble strategy")
@@ -64,24 +65,6 @@ class StrategyModule(LinearStrategyModule):
         # call default Ansible Linear Strategy
         return super(StrategyModule, self).run(iterator, play_context)
 
-    def mock_task_module(self, mock_config, ansible_task):
-        new_action_name = next(iter(mock_config["config"]))
-        original_module_name = ansible_task.action
-        msg = f"Monkeyble mock module - Before: '{original_module_name}' Now: '{new_action_name}'"
-        self._display.display(msg=str(msg), color=C.COLOR_CHANGED)
-        ansible_task.action = new_action_name
-        if new_action_name == "monkeyble_module":
-            original_module_args = ansible_task.args
-            ansible_task.args = {"task_name": ansible_task.name,
-                                 "original_module_name": original_module_name,
-                                 "original_module_args": original_module_args,
-                                 "consider_changed": mock_config.get("changed", False),
-                                 "result_dict": mock_config.get("result_dict", {})
-                                 }
-            ansible_task.args.update(mock_config["config"][new_action_name])
-        # TODO test with custom module
-        return ansible_task
-
     def _queue_task(self, host, task, task_vars, play_context):
         display.debug("Monkeyble strategy _queue_task called")
 
@@ -105,8 +88,25 @@ class StrategyModule(LinearStrategyModule):
 
         super(StrategyModule, self)._queue_task(host, task, task_vars, play_context)
 
-    @staticmethod
-    def check_input(test_input_list, ansible_task_args):
+    def mock_task_module(self, mock_config, ansible_task):
+        new_action_name = next(iter(mock_config["config"]))
+        original_module_name = ansible_task.action
+        msg = f"Monkeyble mock module - Before: '{original_module_name}' Now: '{new_action_name}'"
+        self._display.display(msg=str(msg), color=C.COLOR_CHANGED)
+        ansible_task.action = new_action_name
+        if new_action_name == "monkeyble_module":
+            original_module_args = ansible_task.args
+            ansible_task.args = {"task_name": ansible_task.name,
+                                 "original_module_name": original_module_name,
+                                 "original_module_args": original_module_args,
+                                 "consider_changed": mock_config.get("changed", False),
+                                 "result_dict": mock_config.get("result_dict", {})
+                                 }
+            ansible_task.args.update(mock_config["config"][new_action_name])
+        # TODO test with custom module
+        return ansible_task
+
+    def check_input(self, test_input_list, ansible_task_args):
         """
         Test all args and raise an error if one of the test has failed
         """
@@ -120,7 +120,8 @@ class StrategyModule(LinearStrategyModule):
                 expected = value_and_expected['expected']
                 returned_tuple = switch_test_method(test_name, argument_value, expected)
                 test_result[returned_tuple[0]].append(returned_tuple[1])
-
+        self._last_check_input_result = test_result
         if len(test_result[FAILED_TEST]) >= 1:
+            self._display.display(msg=str(test_result), color=C.COLOR_ERROR)
             raise MonkeybleTestFailed(message=str(test_result))
         return test_result
