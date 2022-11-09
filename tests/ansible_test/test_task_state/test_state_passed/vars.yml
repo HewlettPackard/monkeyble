@@ -1,0 +1,20 @@
+monkeyble_scenarios:
+  validate_test_passed:
+    tasks_to_test:
+      - task: "should_be_changed_false"
+        should_be_changed: false
+
+      - task: "should_be_changed_true"
+        should_be_changed: true
+
+      - task: "should_be_skipped"
+        should_be_skipped: true
+
+      - task: "should_not_be_skipped"
+        should_be_skipped: false
+
+      - task: "should_failed"
+        should_failed: true
+
+      - task: "should_not_failed"
+        should_failed: false

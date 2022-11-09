@@ -1,0 +1,36 @@
+- name: "Test task state"
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    var_true: true
+    var_false: false
+
+  tasks:
+    - name: "should_be_changed_false"
+      debug:
+        msg: "Obi-Wan Kenobi is a Jedi"
+
+    - name: "should_be_changed_true"
+      command: ls
+
+    - when: var_false
+      name: "should_be_skipped"
+      debug:
+        msg: "going to the dark side"
+
+    - when: var_true
+      name: "should_not_be_skipped"
+      debug:
+        msg: "learn the force"
+
+    - name: "should_failed"
+      fail:
+        msg: "save Palpatine"
+      ignore_errors: true
+
+    - name: "should_not_failed"
+      debug:
+        msg: "destroy the death star"
+      ignore_errors: true
