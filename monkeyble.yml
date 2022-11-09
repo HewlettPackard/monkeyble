@@ -25,7 +25,7 @@ monkeyble_scenarios:
 #        role: "ddzdz"
 #        should_be_changed: true
 #        should_be_skipped: true
-#        should_failed: false
+        should_failed: true
 #        extra_vars:
 #          my_var: "general Organa"
 #        test_input: "{{ test_input_config_1 }}"

@@ -13,12 +13,16 @@
 #      name: "test_name2"
 #      debug:
 #        msg: "{{ my_var }}"
-    - name: "test_name2"
-      debug:
-        msg: "{{ my_var }}"
 #    - name: "test_name2"
-#      fail:
-#        msg: "this is a fail"
+#      debug:
+#        msg: "{{ my_var }}"
+    - name: "test_name2"
+      fail:
+        msg: "this is a fail"
+      ignore_errors: true
+    - name: "next after fail"
+      debug:
+        msg: "test"
 #  roles:
 #    - role: test_role
 #    - role: test_role2

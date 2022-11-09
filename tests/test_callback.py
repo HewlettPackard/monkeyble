@@ -1,5 +1,6 @@
 import unittest
 from unittest import mock
+from unittest.mock import patch
 
 from ansible_monkeyble.plugins.callback.monkeyble_callback import CallbackModule as MonkeybleCallbackModule
 
@@ -109,3 +110,25 @@ class TestMonkeybleCallback(unittest.TestCase):
         with mock.patch('ansible_monkeyble.plugins.callback.monkeyble_callback.CallbackModule.exit_playbook') as mock_exit_playbook:
             test_callback.check_output(task_result)
             mock_exit_playbook.assert_called()
+
+    @patch('ansible_monkeyble.plugins.callback.monkeyble_callback.CallbackModule.exit_playbook')
+    def test_check_if_task_should_have_failed_continue_on_error_errors(self, mock_exit_playbook):
+        test_callback = self._get_testing_callback()
+        test_callback._last_task_config = {
+            "task": "test_task",
+            "should_failed": True
+        }
+        test_callback._last_task_ignore_errors = True
+        test_callback.check_if_task_should_have_failed(task_has_actually_failed=True)
+        mock_exit_playbook.assert_not_called()
+
+    @patch('ansible_monkeyble.plugins.callback.monkeyble_callback.CallbackModule.exit_playbook')
+    def test_check_if_task_should_have_failed_exit_zero_when_not_ignoring_errors(self, mock_exit_playbook):
+        test_callback = self._get_testing_callback()
+        test_callback._last_task_config = {
+            "task": "test_task",
+            "should_failed": True
+        }
+        test_callback._last_task_ignore_errors = False
+        test_callback.check_if_task_should_have_failed(task_has_actually_failed=True)
+        mock_exit_playbook.assert_called()

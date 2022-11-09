@@ -52,6 +52,7 @@ class CallbackModule(CallbackBase):
     def v2_playbook_on_task_start(self, task, is_conditional):
         self._last_task_config = get_task_config(ansible_task=task, monkeyble_config=self.monkeyble_config)
         self._last_task_name = task.name
+        self._last_task_ignore_errors = task.ignore_errors
 
     def v2_runner_on_unreachable(self, result):
         self._display.debug("Run v2_runner_on_unreachable")
@@ -134,10 +135,15 @@ class CallbackModule(CallbackBase):
     def check_if_task_should_have_failed(self, task_has_actually_failed):
         self._display.debug("Monkeyble check_if_task_should_have_failed called")
 
-        self._compare_boolean_to_config(task_name=self._last_task_name,
-                                        config_flag_name="should_failed",
-                                        task_config=self._last_task_config,
-                                        actual_state=task_has_actually_failed)
+        result = self._compare_boolean_to_config(task_name=self._last_task_name,
+                                                 config_flag_name="should_failed",
+                                                 task_config=self._last_task_config,
+                                                 actual_state=task_has_actually_failed)
+        if result is not None and result:
+            # if we reach this line, it means that the task was expected to fail.
+            # We exit with code 0 to prevent a CI to fail if the task does not ignore error
+            if not self._last_task_ignore_errors:
+                self.exit_playbook(0)
 
     def _compare_boolean_to_config(self, task_name: str, config_flag_name: str, task_config: dict, actual_state: bool):
         if task_config is not None:
@@ -154,7 +160,8 @@ class CallbackModule(CallbackBase):
                     return False
                 self._display.display(msg=message, color=C.COLOR_OK)
                 return True
+        return None
 
     @staticmethod
-    def exit_playbook():
-        sys.exit(1)
+    def exit_playbook(exit_code=1):
+        sys.exit(exit_code)
