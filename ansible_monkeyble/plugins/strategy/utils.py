@@ -86,14 +86,15 @@ def get_task_config(ansible_task: Task, monkeyble_config: dict):
     if ansible_task._role is not None:
         role_name = ansible_task._role._role_name
     # print(f"get_task_config role: {role_name}")
-    for task_config in monkeyble_config["tasks_to_test"]:
-        if task_config["task"] == task_name:
-            # we've found a task name
-            if "play" in task_config:
-                if task_config["play"] != play_name:
-                    return None
-            if "role" in task_config:
-                if role_name is None or task_config["role"] != role_name:
-                    return None
-            return task_config
+    if "tasks_to_test" in monkeyble_config:
+        for task_config in monkeyble_config["tasks_to_test"]:
+            if task_config["task"] == task_name:
+                # we've found a task name
+                if "play" in task_config:
+                    if task_config["play"] != play_name:
+                        return None
+                if "role" in task_config:
+                    if role_name is None or task_config["role"] != role_name:
+                        return None
+                return task_config
     return None

@@ -52,15 +52,13 @@ class StrategyModule(LinearStrategyModule):
             raise AnsibleAssertionError(f"The Monkeyble scenario name'{monkeyble_scenario}' "
                                         f"not found in 'monkeyble_scenarios'")
         display.display(f"Monkeyble selected scenario: {monkeyble_scenario}", color=C.COLOR_OK)
-        if "name" in self.monkeyble_config:
-            display.display(f"Monkeyble: {self.monkeyble_config['name']}", color=C.COLOR_OK)
+
         # template the scenario with extra vars
         templar = Templar(loader=self._loader, variables=iterator._variable_manager._extra_vars)
         self.monkeyble_config = templar.template(self.monkeyble_config)
 
-        # # apply extra vars from task config
-        # if "extra_vars" in self.monkeyble_config:
-        #     iterator._variable_manager._extra_vars.update(self.monkeyble_config["extra_vars"])
+        if "name" in self.monkeyble_config:
+            display.display(f"Monkeyble: {self.monkeyble_config['name']}", color=C.COLOR_OK)
 
         # call default Ansible Linear Strategy
         return super(StrategyModule, self).run(iterator, play_context)
@@ -83,6 +81,9 @@ class StrategyModule(LinearStrategyModule):
             # check input
             if "test_input" in task_config:
                 result = self.check_input(task_config["test_input"], ansible_task_args=templated_module_args)
+                if len(result[FAILED_TEST]) >= 1:
+                    self._display.display(msg=str(result), color=C.COLOR_ERROR)
+                    raise MonkeybleTestFailed(message=str(result))
                 self._display.display(msg=str(result), color=C.COLOR_CHANGED)
 
             if "mock" in task_config:
@@ -123,7 +124,4 @@ class StrategyModule(LinearStrategyModule):
                 returned_tuple = switch_test_method(test_name, argument_value, expected)
                 test_result[returned_tuple[0]].append(returned_tuple[1])
         self._last_check_input_result = test_result
-        if len(test_result[FAILED_TEST]) >= 1:
-            self._display.display(msg=str(test_result), color=C.COLOR_ERROR)
-            raise MonkeybleTestFailed(message=str(test_result))
         return test_result

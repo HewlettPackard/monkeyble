@@ -77,7 +77,7 @@ def main():
                         "test_output": [
                             {
                                 "assert_dict_equal": {
-                                    "result_value": "result.ansible_facts",
+                                    "result_key": "result.ansible_facts",
                                     "expected": {
                                         "new_var": "new_val"
                                     }
