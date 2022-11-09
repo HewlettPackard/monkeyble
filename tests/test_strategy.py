@@ -18,14 +18,14 @@ class TestMonkeybleStrategy(unittest.TestCase):
             "msg": "my_message"
         }
 
-    def test_check_input_ok(self):
-
-        test_input_list = [{
+        self.test_input_list = [{
             "assert_equal": {
                 "arg_name": "msg",
                 "expected": "value1"
             }
         }]
+
+    def test_check_input_ok(self):
         ansible_task_args = {
             "msg": "value1"
         }
@@ -34,9 +34,10 @@ class TestMonkeybleStrategy(unittest.TestCase):
                                                'tested_value': 'value1',
                                                'expected': 'value1'}],
                     'monkeyble_failed_test': []}
-        self.test_strategy.check_input(test_input_list, ansible_task_args)
+        self.test_strategy.check_input(self.test_input_list, ansible_task_args)
         self.assertDictEqual(self.test_strategy._last_check_input_result, expected)
 
+    def test_check_input_fail(self):
         # test fail test
         ansible_task_args = {
             "msg": "another_value"
@@ -46,7 +47,7 @@ class TestMonkeybleStrategy(unittest.TestCase):
                                                'tested_value': 'another_value',
                                                'expected': 'value1'}]}
         with self.assertRaises(MonkeybleTestFailed):
-            self.test_strategy.check_input(test_input_list, ansible_task_args)
+            self.test_strategy.check_input(self.test_input_list, ansible_task_args)
             self.assertDictEqual(self.test_strategy._last_check_input_result, expected)
 
     def test_mock_task_module(self):

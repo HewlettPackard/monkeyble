@@ -72,7 +72,9 @@ class StrategyModule(LinearStrategyModule):
         task_config = get_task_config(ansible_task=task, monkeyble_config=self.monkeyble_config)
 
         if task_config is not None:
-            # TODO apply extra vars
+            # apply extra vars from the tested task
+            if "extra_vars" in task_config:
+                task_vars.update(task_config["extra_vars"])
 
             # get all vars
             templar = Templar(loader=self._loader, variables=task_vars)

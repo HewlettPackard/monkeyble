@@ -26,7 +26,9 @@ monkeyble_scenarios:
 #        should_be_changed: true
 #        should_be_skipped: true
 #        should_failed: false
-        test_input: "{{ test_input_config_1 }}"
+#        extra_vars:
+#          my_var: "general Organa"
+#        test_input: "{{ test_input_config_1 }}"
 #        mock:
 #          config: "{{ replace_debug_mock }}"
 #        test_output:
