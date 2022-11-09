@@ -1,0 +1,79 @@
+monkeyble_scenarios:
+  test_assert_equal:
+    tasks_to_test:
+      - task: "test_assert_equal"
+        test_input:
+          - assert_equal:
+              arg_name: msg
+              expected: "general organa"
+
+  test_assert_not_equal:
+    tasks_to_test:
+      - task: "test_assert_equal"
+        test_input:
+          - assert_not_equal:
+              arg_name: msg
+              expected: "general kenobi"
+
+  test_assert_in_with_list:
+    tasks_to_test:
+      - task: "test_assert_in_with_list"
+        test_input:
+          - assert_in:
+              arg_name: excludes
+              expected: "palpatine"
+
+  test_assert_in_with_string:
+    tasks_to_test:
+      - task: "test_assert_in_with_string"
+        test_input:
+          - assert_in:
+              arg_name: msg
+              expected: "palpatine"
+
+  test_assert_true:
+    tasks_to_test:
+      - task: "test_assert_false"
+        test_input:
+          - assert_true:
+              arg_name: hidden
+
+  test_assert_false:
+    tasks_to_test:
+      - task: "test_assert_true"
+        test_input:
+          - assert_false:
+              arg_name: hidden
+
+  assert_is_none:
+    tasks_to_test:
+      - task: "assert_is_not_none"
+        test_input:
+          - assert_is_none:
+              arg_name: msg
+
+  assert_is_not_none:
+    tasks_to_test:
+      - task: "assert_is_none"
+        test_input:
+          - assert_is_not_none:
+              arg_name: msg
+
+  assert_list_equal:
+    tasks_to_test:
+      - task: "assert_list_equal"
+        test_input:
+          - assert_list_equal:
+              arg_name: excludes
+              expected:
+                - "vader"
+                - "palpatine"
+
+  assert_dict_equal:
+    tasks_to_test:
+      - task: "assert_dict_equal"
+        test_input:
+          - assert_dict_equal:
+              arg_name: headers
+              expected:
+                key3: value3

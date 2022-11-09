@@ -120,7 +120,10 @@ class StrategyModule(LinearStrategyModule):
         for arg_to_test in test_input_list:
             for test_name, value_and_expected in arg_to_test.items():
                 argument_value = ansible_task_args[value_and_expected['arg_name']]
-                expected = value_and_expected['expected']
+                try:
+                    expected = value_and_expected['expected']
+                except KeyError:
+                    expected = None
                 returned_tuple = switch_test_method(test_name, argument_value, expected)
                 test_result[returned_tuple[0]].append(returned_tuple[1])
         self._last_check_input_result = test_result

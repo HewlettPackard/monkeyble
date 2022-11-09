@@ -49,6 +49,11 @@ class CallbackModule(CallbackBase):
         monkeyble_scenarios = extra_vars.get("monkeyble_scenarios")
         self.monkeyble_config = monkeyble_scenarios[monkeyble_scenario]
 
+    def v2_playbook_on_stats(self, stats):
+        # if we reach this line, all test have passed sucessfully
+        self._display.display(msg="Monkeyble - ALL TESTS PASSED", color=C.COLOR_OK)
+        super(CallbackModule, self).v2_playbook_on_stats(stats)
+
     def v2_playbook_on_task_start(self, task, is_conditional):
         self._last_task_config = get_task_config(ansible_task=task, monkeyble_config=self.monkeyble_config)
         self._last_task_name = task.name

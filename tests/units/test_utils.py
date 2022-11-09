@@ -49,27 +49,30 @@ class TestMonkeybleUtils(unittest.TestCase):
 
     def test_assert_in(self):
         test_name = "assert_in"
-        tested_value = "value"
 
         # test OK with string
-        expected = "value_and_more"
+        tested_value = "val"
+        expected = "value"
         expected_test_state = PASSED_TEST
-        self._do_test(expected_test_state, test_name, tested_value, expected)
-
-        # test OK with list
-        expected = ["value", "other_val"]
-        expected_test_state = PASSED_TEST
-        self._do_test(expected_test_state, test_name, tested_value, expected)
+        self._do_test(expected_test_state, test_name, expected, tested_value)
 
         # test NOK with string
+        tested_value = "value"
         expected = "not_here"
         expected_test_state = FAILED_TEST
-        self._do_test(expected_test_state, test_name, tested_value, expected)
+        self._do_test(expected_test_state, test_name, expected, tested_value)
+
+        # test OK with list
+        tested_value = "value"
+        expected = ["value", "other_val"]
+        expected_test_state = PASSED_TEST
+        self._do_test(expected_test_state, test_name, expected, tested_value)
 
         # test NOK with list
+        tested_value = "value"
         expected = ["not_here", "other_val"]
         expected_test_state = FAILED_TEST
-        self._do_test(expected_test_state, test_name, tested_value, expected)
+        self._do_test(expected_test_state, test_name, expected, tested_value)
 
     def test_assert_not_in(self):
         test_name = "assert_not_in"

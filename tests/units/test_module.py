@@ -4,8 +4,7 @@ from unittest.mock import patch
 from ansible.module_utils import basic
 
 from ansible_monkeyble.plugins.library import monkeyble_module
-from ansible_monkeyble.plugins.strategy.const import PASSED_TEST, FAILED_TEST
-from tests.utils.test_utils import set_module_args, exit_json, fail_json, AnsibleExitJson, AnsibleFailJson
+from tests.units.utils.test_utils import set_module_args, exit_json, fail_json, AnsibleExitJson
 
 
 class TestMonkeybleModule(unittest.TestCase):

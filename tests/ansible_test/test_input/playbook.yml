@@ -1,0 +1,55 @@
+- name: "Play1"
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    simple_string: "han"
+    list_var:
+      - "luke"
+      - "obi-wan"
+    null_val: null
+
+  tasks:
+    - name: "test_assert_equal"
+      debug:
+        msg: "general kenobi"
+
+    - name: "test_assert_in_with_list"
+      find:
+        path: "/tmp"
+        excludes : "{{ list_var }}"
+
+    - name: "test_assert_in_with_string"
+      debug:
+        msg: "anakin"
+
+    - name: "test_assert_true"
+      find:
+        path: "/tmp"
+        hidden: true
+
+    - name: "test_assert_false"
+      find:
+        path: "/tmp"
+        hidden: false
+
+    - name: "assert_is_none"
+      debug:
+        msg: "{{ null_val }}"
+
+    - name: "assert_is_not_none"
+      debug:
+        msg: "{{ simple_string }}"
+
+    - name: "assert_list_equal"
+      find:
+        path: "/tmp"
+        excludes: "{{ list_var }}"
+
+    - name: "assert_dict_equal"
+      uri:
+        url: https://www.hpe.com
+        headers:
+          key1: value1
+          key2: value2
