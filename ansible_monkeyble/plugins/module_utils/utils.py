@@ -48,8 +48,10 @@ def switch_test_method(test_name, tested_value, expected=None):
         if test_name == "assert_not_equal":
             test_case.assertNotEqual(tested_value, expected)
         if test_name == "assert_in":
+            # assertIn(member, container)
             test_case.assertIn(expected, tested_value)
         if test_name == "assert_not_in":
+            # assertNotIn(member, container)
             test_case.assertNotIn(expected, tested_value)
         if test_name == "assert_true":
             test_case.assertTrue(str_to_bool(tested_value))
