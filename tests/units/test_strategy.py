@@ -43,72 +43,9 @@ class TestMonkeybleStrategy(unittest.TestCase):
         self.iterator = MagicMock()
         self.play_context = MagicMock()
 
-    def test_check_input_ok(self):
-        ansible_task_args = {
-            "msg": "value1"
-        }
 
-        expected = {'monkeyble_passed_test': [{'test_name': 'assert_equal',
-                                               'tested_value': 'value1',
-                                               'expected': 'value1'}],
-                    'monkeyble_failed_test': []}
-        self.test_strategy._check_input(self.test_input_list, ansible_task_args)
-        self.assertDictEqual(self.test_strategy._last_check_input_result, expected)
 
-    def test_check_input_fail(self):
-        # test fail test
-        ansible_task_args = {
-            "msg": "another_value"
-        }
-        expected = {'monkeyble_passed_test': [],
-                    'monkeyble_failed_test': [{'test_name': 'assert_equal',
-                                               'tested_value': 'another_value',
-                                               'expected': 'value1'}]}
 
-        self.test_strategy._check_input(self.test_input_list, ansible_task_args)
-        self.assertDictEqual(self.test_strategy._last_check_input_result, expected)
-
-    def test_mock_task_module(self):
-        mock_config_test = {
-            "config": {
-                "monkeyble_module": {
-                    "consider_changed": True,
-                    "result_dict": {
-                        "msg": "output_value"
-                    }
-                }
-            }
-        }
-
-        update_ansible_task = self.test_strategy.mock_task_module(mock_config_test, self.ansible_task_test)
-        self.assertEqual("test_task", update_ansible_task.name)
-        self.assertEqual("debug", update_ansible_task.args["original_module_name"])
-        self.assertTrue(update_ansible_task.args["consider_changed"])
-        expected_result_dict = {
-            "msg": "output_value"
-        }
-        self.assertDictEqual(expected_result_dict, update_ansible_task.args["result_dict"])
-        expected_original_module_args = {
-            "msg": "my_message"
-        }
-        self.assertDictEqual(expected_original_module_args, update_ansible_task.args["original_module_args"])
-
-    def test_mock_task_module_default_config(self):
-        mock_config_test = {
-            "config": {
-                "monkeyble_module": {}
-            }
-        }
-        update_ansible_task = self.test_strategy.mock_task_module(mock_config_test, self.ansible_task_test)
-        self.assertEqual("test_task", update_ansible_task.name)
-        self.assertEqual("debug", update_ansible_task.args["original_module_name"])
-        self.assertFalse(update_ansible_task.args["consider_changed"])
-        expected_result_dict = {}
-        self.assertDictEqual(expected_result_dict, update_ansible_task.args["result_dict"])
-        expected_original_module_args = {
-            "msg": "my_message"
-        }
-        self.assertDictEqual(expected_original_module_args, update_ansible_task.args["original_module_args"])
 
     @patch('ansible.plugins.strategy.StrategyBase._queue_task')
     def test_queue_task_task_not_match(self, mock_ansible_queue_task):
