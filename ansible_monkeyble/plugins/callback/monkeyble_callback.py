@@ -216,26 +216,6 @@ class CallbackModule(CallbackBase):
                 return True
         return None
 
-    def _check_input(self, test_input_list, ansible_task_args):
-        """
-        Test all args and raise an error if one of the test has failed
-        """
-        test_result = {
-            PASSED_TEST: [],
-            FAILED_TEST: []
-        }
-        for arg_to_test in test_input_list:
-            for test_name, value_and_expected in arg_to_test.items():
-                argument_value = ansible_task_args[value_and_expected['arg_name']]
-                try:
-                    expected = value_and_expected['expected']
-                except KeyError:
-                    expected = None
-                returned_tuple = switch_test_method(test_name, argument_value, expected)
-                test_result[returned_tuple[0]].append(returned_tuple[1])
-        self._last_check_input_result = test_result
-        return test_result
-
     def mock_task_module(self, ansible_task):
         new_action_name = next(iter(self._last_task_config["mock"]["config"]))
         original_module_name = ansible_task.action
@@ -270,7 +250,23 @@ class CallbackModule(CallbackBase):
         task_vars.update(self.extra_vars)
         templar = Templar(loader=DataLoader(), variables=task_vars)
         templated_module_args = templar.template(ansible_task.args)
-        result = self._check_input(self._last_task_config["test_input"], ansible_task_args=templated_module_args)
-        if len(result[FAILED_TEST]) >= 1:
-            raise MonkeybleException(message=str(result))
-        self.display_message_ok(msg=str(result))
+
+        # result = self._check_input(self._last_task_config["test_input"], ansible_task_args=templated_module_args)
+        test_result = {
+            PASSED_TEST: [],
+            FAILED_TEST: []
+        }
+        for arg_to_test in self._last_task_config["test_input"]:
+            for test_name, value_and_expected in arg_to_test.items():
+                argument_value = templated_module_args[value_and_expected['arg_name']]
+                try:
+                    expected = value_and_expected['expected']
+                except KeyError:
+                    expected = None
+                returned_tuple = switch_test_method(test_name, argument_value, expected)
+                test_result[returned_tuple[0]].append(returned_tuple[1])
+        self._last_check_input_result = test_result
+
+        if len(test_result[FAILED_TEST]) >= 1:
+            raise MonkeybleException(message=str(test_result))
+        self.display_message_ok(msg=str(test_result))

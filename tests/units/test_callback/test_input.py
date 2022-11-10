@@ -15,9 +15,10 @@ class TestMonkeybleCallbackInput(BaseTestMonkeybleCallback):
                 "expected": "value1"
             }
         }]
+        self.test_callback._last_task_config["test_input"] = self.test_input_list
 
     def test_check_input_ok(self):
-        ansible_task_args = {
+        self.ansible_task_test.args = {
             "msg": "value1"
         }
 
@@ -25,18 +26,20 @@ class TestMonkeybleCallbackInput(BaseTestMonkeybleCallback):
                                                'tested_value': 'value1',
                                                'expected': 'value1'}],
                     'monkeyble_failed_test': []}
-        self.test_callback._check_input(self.test_input_list, ansible_task_args)
+        self.test_callback.test_input(self.ansible_task_test)
         self.assertDictEqual(self.test_callback._last_check_input_result, expected)
 
-    def test_check_input_fail(self):
+    @patch('sys.exit')
+    def test_check_input_fail(self, mock_exit):
         # test fail test
-        ansible_task_args = {
+        self.ansible_task_test.args = {
             "msg": "another_value"
         }
         expected = {'monkeyble_passed_test': [],
                     'monkeyble_failed_test': [{'test_name': 'assert_equal',
                                                'tested_value': 'another_value',
                                                'expected': 'value1'}]}
-
-        self.test_callback._check_input(self.test_input_list, ansible_task_args)
-        self.assertDictEqual(self.test_callback._last_check_input_result, expected)
+        with self.assertRaises(MonkeybleException):
+            self.test_callback.test_input(self.ansible_task_test)
+            self.assertDictEqual(self.test_callback._last_check_input_result, expected)
+            mock_exit.assert_called()
