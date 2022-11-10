@@ -30,6 +30,16 @@ class MonkeybleException(Exception):
 
 
 class CallbackModule(CallbackBase):
+    """
+    Monkeyble callback will:
+    - override extra vars
+    - test task input (module args)
+    - mock the task module
+    - check if task should have been skipped
+    - check if task should have been changed
+    - check if task should have failed
+    - test task output (result dict)
+    """
 
     def __init__(self, *args, **kwargs):
         super(CallbackModule, self).__init__(*args, **kwargs)
@@ -46,8 +56,12 @@ class CallbackModule(CallbackBase):
         self.extra_vars = None
         self._last_task_ignore_errors = None
 
+    @staticmethod
+    def display_message_ok(msg):
+        global_display.display(msg=msg, color=C.COLOR_OK)
+
     def v2_playbook_on_play_start(self, play):
-        global_display.display(msg="Starting Monkeyble callback", color=C.COLOR_OK)
+        self.display_message_ok(msg="Starting Monkeyble callback")
         vm = play.get_variable_manager()
         self.extra_vars = vm.extra_vars
         monkeyble_scenario = self.extra_vars.get("monkeyble_scenario")
@@ -67,17 +81,17 @@ class CallbackModule(CallbackBase):
         templar = Templar(loader=DataLoader(), variables=self.extra_vars)
         self.monkeyble_config = templar.template(loaded_monkeyble_config)
 
-        global_display.display(f"monkeyble_scenario: {monkeyble_scenario}", color=C.COLOR_OK)
+        self.display_message_ok(f"monkeyble_scenario: {monkeyble_scenario}")
 
         # keep only the config of the current scenario
         if "name" in self.monkeyble_config:
-            global_display.display(f"Monkeyble scenario: {self.monkeyble_config['name']}", color=C.COLOR_OK)
+            self.display_message_ok(f"Monkeyble scenario: {self.monkeyble_config['name']}")
 
         return play
 
     def v2_playbook_on_stats(self, stats):
         # if we reach this line, all test have passed successfully
-        global_display.display(msg="Monkeyble - ALL TESTS PASSED", color=C.COLOR_OK)
+        self.display_message_ok(msg="Monkeyble - ALL TESTS PASSED")
         super(CallbackModule, self).v2_playbook_on_stats(stats)
 
     def v2_playbook_on_task_start(self, task, is_conditional):
@@ -88,28 +102,14 @@ class CallbackModule(CallbackBase):
         if self._last_task_config is not None:
             # apply extra vars from the tested task
             if "extra_vars" in self._last_task_config:
-                # first template our extra vars with extra vars from the playbook
-                templar = Templar(loader=DataLoader(), variables=self.extra_vars)
-                templated_task_extra_vars = templar.template(self._last_task_config["extra_vars"])
-                # then template the module args
-                templar = Templar(loader=DataLoader(), variables=templated_task_extra_vars)
-                templated_module_args = templar.template(task.args)
-                task.args = templated_module_args
+                task = self.update_extra_var(ansible_task=task)
 
             # check input
             if "test_input" in self._last_task_config:
-                task_vars = task.play.vars
-                task_vars.update(self.extra_vars)
-                templar = Templar(loader=DataLoader(), variables=task_vars)
-                templated_module_args = templar.template(task.args)
-                result = self.check_input(self._last_task_config["test_input"], ansible_task_args=templated_module_args)
-                if len(result[FAILED_TEST]) >= 1:
-                    # self._display.display(msg=str(result), color=C.COLOR_ERROR)
-                    raise MonkeybleException(message=str(result))
-                self._display.display(msg=str(result), color=C.COLOR_CHANGED)
+                self.test_input(ansible_task=task)
 
             if "mock" in self._last_task_config:
-                task = self.mock_task_module(self._last_task_config["mock"], ansible_task=task)
+                task = self.mock_task_module(ansible_task=task)
 
         return super(CallbackModule, self).v2_playbook_on_task_start(task, is_conditional)
 
@@ -129,7 +129,7 @@ class CallbackModule(CallbackBase):
         self.check_if_task_should_have_been_skipped(task_has_been_actually_skipped=False)
         self.check_if_task_should_have_been_changed(task_has_been_actually_changed=result.is_changed())
         self.check_if_task_should_have_failed(task_has_actually_failed=False)
-        self.check_output(result_dict=result._result)
+        self.test_output(result_dict=result._result)
 
     def v2_runner_on_failed(self, result, *args, **kwargs):
         self._display.debug("Run v2_runner_on_failed")
@@ -141,7 +141,7 @@ class CallbackModule(CallbackBase):
         self._display.debug("Run v2_runner_on_skipped")
         self.check_if_task_should_have_been_skipped(task_has_been_actually_skipped=True)
 
-    def check_output(self, result_dict):
+    def test_output(self, result_dict):
 
         if self._last_task_config is not None:
             if "test_output" in self._last_task_config:
@@ -162,7 +162,6 @@ class CallbackModule(CallbackBase):
                         try:
                             templated_value = templar.template(template_string)
                         except AnsibleUndefinedVariable as e:
-                            self._display.display(msg=str(e), color=C.COLOR_ERROR)
                             raise MonkeybleException(message=str(e))
                         expected = result_value_and_expected['expected']
                         returned_tuple = switch_test_method(test_name, templated_value, expected)
@@ -171,7 +170,7 @@ class CallbackModule(CallbackBase):
                 self._last_check_output_result = test_result
                 if len(test_result[FAILED_TEST]) >= 1:
                     raise MonkeybleException(message=str(test_result))
-                self._display.display(msg=str(test_result), color=C.COLOR_OK)
+                self.display_message_ok(msg=str(test_result))
 
     def check_if_task_should_have_been_skipped(self, task_has_been_actually_skipped=False):
         self._display.debug("Monkeyble check_if_task_should_have_been_skipped called")
@@ -212,13 +211,12 @@ class CallbackModule(CallbackBase):
                 message = f"Task '{task_name}' - expected '{config_flag_name}': {config_flag_value}. " \
                           f"actual state: {actual_state}"
                 if config_flag_value != actual_state:
-                    self._display.display(msg=message, color=C.COLOR_ERROR)
                     raise MonkeybleException(message=message)
-                self._display.display(msg=message, color=C.COLOR_OK)
+                self.display_message_ok(msg=message)
                 return True
         return None
 
-    def check_input(self, test_input_list, ansible_task_args):
+    def _check_input(self, test_input_list, ansible_task_args):
         """
         Test all args and raise an error if one of the test has failed
         """
@@ -238,22 +236,41 @@ class CallbackModule(CallbackBase):
         self._last_check_input_result = test_result
         return test_result
 
-    @staticmethod
-    def mock_task_module(mock_config, ansible_task):
-        new_action_name = next(iter(mock_config["config"]))
+    def mock_task_module(self, ansible_task):
+        new_action_name = next(iter(self._last_task_config["mock"]["config"]))
         original_module_name = ansible_task.action
         message = f"Monkeyble mock module - Before: '{original_module_name}' Now: '{new_action_name}'"
-        global_display.display(msg=str(message), color=C.COLOR_CHANGED)
+        self.display_message_ok(msg=str(message))
         ansible_task.action = new_action_name
         if new_action_name == "monkeyble_module":
             original_module_args = ansible_task.args
             ansible_task.args = {"task_name": ansible_task.name,
                                  "original_module_name": original_module_name,
                                  "original_module_args": original_module_args,
-                                 "consider_changed": mock_config["config"]["monkeyble_module"].get("consider_changed",
+                                 "consider_changed": self._last_task_config["mock"]["config"]["monkeyble_module"].get("consider_changed",
                                                                                                    False),
-                                 "result_dict": mock_config["config"]["monkeyble_module"].get("result_dict", {})
+                                 "result_dict": self._last_task_config["mock"]["config"]["monkeyble_module"].get("result_dict", {})
                                  }
             # ansible_task.args.update(mock_config["config"]["monkeyble_module"])
         # TODO test with custom module
         return ansible_task
+
+    def update_extra_var(self, ansible_task):
+        # first template our extra vars with extra vars from the playbook
+        templar = Templar(loader=DataLoader(), variables=self.extra_vars)
+        templated_task_extra_vars = templar.template(self._last_task_config["extra_vars"])
+        # then template the module args
+        templar = Templar(loader=DataLoader(), variables=templated_task_extra_vars)
+        templated_module_args = templar.template(ansible_task.args)
+        ansible_task.args = templated_module_args
+        return ansible_task
+
+    def test_input(self, ansible_task):
+        task_vars = ansible_task.play.vars
+        task_vars.update(self.extra_vars)
+        templar = Templar(loader=DataLoader(), variables=task_vars)
+        templated_module_args = templar.template(ansible_task.args)
+        result = self._check_input(self._last_task_config["test_input"], ansible_task_args=templated_module_args)
+        if len(result[FAILED_TEST]) >= 1:
+            raise MonkeybleException(message=str(result))
+        self.display_message_ok(msg=str(result))

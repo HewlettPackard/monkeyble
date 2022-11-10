@@ -52,7 +52,7 @@ class TestMonkeybleStrategy(unittest.TestCase):
                                                'tested_value': 'value1',
                                                'expected': 'value1'}],
                     'monkeyble_failed_test': []}
-        self.test_strategy.check_input(self.test_input_list, ansible_task_args)
+        self.test_strategy._check_input(self.test_input_list, ansible_task_args)
         self.assertDictEqual(self.test_strategy._last_check_input_result, expected)
 
     def test_check_input_fail(self):
@@ -65,7 +65,7 @@ class TestMonkeybleStrategy(unittest.TestCase):
                                                'tested_value': 'another_value',
                                                'expected': 'value1'}]}
 
-        self.test_strategy.check_input(self.test_input_list, ansible_task_args)
+        self.test_strategy._check_input(self.test_input_list, ansible_task_args)
         self.assertDictEqual(self.test_strategy._last_check_input_result, expected)
 
     def test_mock_task_module(self):
