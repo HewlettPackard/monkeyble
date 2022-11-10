@@ -3,7 +3,7 @@ import unittest
 from ansible.errors import AnsibleError
 from ansible.playbook.task import Task
 
-from ansible_monkeyble.plugins.strategy.const import *
+from ansible_monkeyble.plugins.module_utils.const import *
 
 
 class MonkeybleUnsupportedTest(AnsibleError):

@@ -41,6 +41,8 @@ def main():
     # variable manager takes care of merging all the different sources to give you a unified view of variables
     # available in each context
     extra_vars = {
+        "task_name": "test_name2",
+        "test_var": "updated !",
         "test_input_config_1": [
             {
                 "assert_equal": {
@@ -51,9 +53,9 @@ def main():
         ],
         "replace_debug_mock": {
             "monkeyble_module": {
-                "consider_changed": False,
+                "consider_changed": True,
                 "result_dict": {
-                    "msg": "output_value"
+                    "key1": "val1"
                 }
             }
         },
@@ -61,31 +63,34 @@ def main():
         "monkeyble_scenarios": {
             "validate_test_1": {
                 "name": "Validate that bla bla",
-                # "tasks_to_test": [
-                #     {
-                #         "task": "test_name2",
-                #         "should_be_changed": True,
-                #         "should_be_skipped": False,
-                #         "should_failed": False,
-                #         "test_input": "{{ test_input_config_1 }}",
-                #         "mock": {"config": "{{ replace_debug_mock }}"}
-                #     }
-                # ]
                 "tasks_to_test": [
                     {
-                        "task": "test_name3",
-                        "test_output": [
-                            {
-                                "assert_dict_equal": {
-                                    "result_key": "result.ansible_facts",
-                                    "expected": {
-                                        "new_var": "new_val"
-                                    }
-                                }
-                            }
-                        ]
+                        "task": "test_name2",
+                        # "should_be_changed": True,
+                        # "should_be_skipped": False,
+                        # "should_failed": False,
+                        # "test_input": "{{ test_input_config_1 }}",
+                        "mock": {"config": "{{ replace_debug_mock }}"}
                     }
                 ]
+                # "tasks_to_test": [
+                #     {
+                #         "task": "{{ task_name }}",
+                #         "extra_vars": {
+                #             "my_var": "{{ test_var }}"
+                #         },
+                #         # "test_output": [
+                #         #     {
+                #         #         "assert_dict_equal": {
+                #         #             "result_key": "result.ansible_facts",
+                #         #             "expected": {
+                #         #                 "new_var": "{{ test_var }}"
+                #         #             }
+                #         #         }
+                #         #     }
+                #         # ]
+                #     }
+                # ]
             }
         }
     }
@@ -116,9 +121,9 @@ def main():
         tasks=[
             # dict(action=dict(module='shell', args='ls'), register='shell_out'),
             # dict(name="test_name2", action=dict(module='debug', args=dict(msg='{{ my_var }}')), when="my_var == 'to_be_updated'"),
-            # dict(name="test_name2", action=dict(module='debug', args=dict(msg='{{ my_var }}'))),
+            dict(name="test_name2", action=dict(module='debug', args=dict(msg='general kenobi'))),
             # dict(name="test_name3", action=dict(module='find', args=dict(path='/tmp'))),
-            dict(name="test_name3", action=dict(module='set_fact', args=dict(new_var='new_val'))),
+            # dict(name="test_name3", action=dict(module='set_fact', args=dict(new_var='{{ test_var }}'))),
             # dict(name="test_name1", action=dict(module='debug', args=dict(msg='{{ my_var }}'))),
             # dict(action=dict(module='debug', args=dict(msg='{{shell_out.stdout}}'))),
             # dict(action=dict(module='command', args=dict(cmd='/usr/bin/uptime'))),

@@ -11,9 +11,9 @@ test_input_config_1:
 # mocks
 replace_debug_mock:
   monkeyble_module:
-    consider_changed: false
+    consider_changed: true
     result_dict:
-      msg: "output_value"
+      test_key: "changed_result"
 
 
 monkeyble_scenarios:
@@ -25,19 +25,19 @@ monkeyble_scenarios:
 #        role: "ddzdz"
 #        should_be_changed: true
 #        should_be_skipped: true
-        should_failed: true
+#        should_failed: true
 #        extra_vars:
 #          my_var: "general Organa"
 #        test_input: "{{ test_input_config_1 }}"
-#        mock:
-#          config: "{{ replace_debug_mock }}"
+        mock:
+          config: "{{ replace_debug_mock }}"
 #        test_output:
 #          - assert_equal:
 #              value: "{{ monkeyble_result["key"] }}
 #              expected: "hello there"
-      - task: "test_name3"
-        test_output:
-          - assert_dict_equal:
-              result_key: "result.ansible_facts"
-              expected:
-                new_var: new_val
+#      - task: "test_name3"
+#        test_output:
+#          - assert_dict_equal:
+#              result_key: "result.ansible_facts"
+#              expected:
+#                new_var: new_val
