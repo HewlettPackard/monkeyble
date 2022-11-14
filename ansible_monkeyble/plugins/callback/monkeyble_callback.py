@@ -77,7 +77,7 @@ class CallbackModule(CallbackBase):
         try:
             loaded_monkeyble_config = monkeyble_scenarios[monkeyble_scenario]
         except KeyError:
-            raise MonkeybleException(f"The Monkeyble scenario name'{monkeyble_scenario}' "
+            raise MonkeybleException(f"The Monkeyble scenario name '{monkeyble_scenario}' "
                                      f"not found in 'monkeyble_scenarios'")
 
         # variable placed into the monkeyble config need to be instantiated with extra vars
