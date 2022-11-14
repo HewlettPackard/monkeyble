@@ -23,8 +23,10 @@ global_display = Display()
 
 
 class MonkeybleException(Exception):
-    def __init__(self, message, exit_code=1):
+    def __init__(self, message, scenario_description=None, exit_code=1):
         super().__init__(message)
+        if scenario_description is not None:
+            global_display.display(msg=f"Monkeyble failed scenario: {scenario_description}", color=C.COLOR_ERROR)
         global_display.display(msg=message, color=C.COLOR_ERROR)
         sys.exit(exit_code)
 
@@ -49,6 +51,7 @@ class CallbackModule(CallbackBase):
         self.skipped_task_list = list()
         self.changed_task_list = list()
         self.monkeyble_config = None
+        self.monkeyble_scenario_description = None
         self._last_task_config = None
         self._last_task_name = None
         self._last_check_output_result = dict()
@@ -82,16 +85,17 @@ class CallbackModule(CallbackBase):
         self.monkeyble_config = templar.template(loaded_monkeyble_config)
 
         self.display_message_ok(f"monkeyble_scenario: {monkeyble_scenario}")
-
+        self.monkeyble_scenario_description = monkeyble_scenario
         # keep only the config of the current scenario
         if "name" in self.monkeyble_config:
-            self.display_message_ok(f"Monkeyble scenario: {self.monkeyble_config['name']}")
+            self.monkeyble_scenario_description = self.monkeyble_config['name']
+            self.display_message_ok(f"Monkeyble scenario: {self.monkeyble_scenario_description}")
 
         return play
 
     def v2_playbook_on_stats(self, stats):
         # if we reach this line, all test have passed successfully
-        self.display_message_ok(msg="Monkeyble - ALL TESTS PASSED")
+        self.display_message_ok(msg=f"Monkeyble - ALL TESTS PASSED - scenario: {self.monkeyble_scenario_description}")
         super(CallbackModule, self).v2_playbook_on_stats(stats)
 
     def v2_playbook_on_task_start(self, task, is_conditional):
@@ -162,14 +166,16 @@ class CallbackModule(CallbackBase):
                         try:
                             templated_value = templar.template(template_string)
                         except AnsibleUndefinedVariable as e:
-                            raise MonkeybleException(message=str(e))
+                            raise MonkeybleException(message=str(e),
+                                                     scenario_description=self.monkeyble_scenario_description)
                         expected = result_value_and_expected['expected']
                         returned_tuple = switch_test_method(test_name, templated_value, expected)
                         test_result[returned_tuple[0]].append(returned_tuple[1])
 
                 self._last_check_output_result = test_result
                 if len(test_result[FAILED_TEST]) >= 1:
-                    raise MonkeybleException(message=str(test_result))
+                    raise MonkeybleException(message=str(test_result),
+                                             scenario_description=self.monkeyble_scenario_description)
                 self.display_message_ok(msg=str(test_result))
 
     def check_if_task_should_have_been_skipped(self, task_has_been_actually_skipped=False):
@@ -199,7 +205,9 @@ class CallbackModule(CallbackBase):
             # We exit with code 0 to prevent a CI to fail if the task does not ignore error
             if not self._last_task_ignore_errors:
                 message = f"Task '{self._last_task_name}' failed as expected"
-                raise MonkeybleException(message=message, exit_code=0)
+                raise MonkeybleException(message=message,
+                                         scenario_description=self.monkeyble_scenario_description,
+                                         exit_code=0)
 
     def _compare_boolean_to_config(self, task_name: str, config_flag_name: str, task_config: dict, actual_state: bool):
         if task_config is not None:
@@ -211,7 +219,8 @@ class CallbackModule(CallbackBase):
                 message = f"Task '{task_name}' - expected '{config_flag_name}': {config_flag_value}. " \
                           f"actual state: {actual_state}"
                 if config_flag_value != actual_state:
-                    raise MonkeybleException(message=message)
+                    raise MonkeybleException(message=message,
+                                             scenario_description=self.monkeyble_scenario_description)
                 self.display_message_ok(msg=message)
                 return True
         return None
@@ -268,5 +277,6 @@ class CallbackModule(CallbackBase):
         self._last_check_input_result = test_result
 
         if len(test_result[FAILED_TEST]) >= 1:
-            raise MonkeybleException(message=str(test_result))
+            raise MonkeybleException(message=str(test_result),
+                                     scenario_description=self.monkeyble_scenario_description)
         self.display_message_ok(msg=str(test_result))
