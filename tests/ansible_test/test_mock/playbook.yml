@@ -1,0 +1,19 @@
+- name: "Test mock"
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: "mock_test"
+      debug:
+        msg: "going to be mocked"
+      register: mock_test_register
+
+    - debug:
+        var: mock_test_register
+
+    - assert:
+        that:
+          - "'msg' in mock_test_register"
+          - "mock_test_register['msg'] == 'message from mock module'"
+          - "mock_test_register['changed'] == true"

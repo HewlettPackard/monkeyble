@@ -1,0 +1,10 @@
+monkeyble_scenarios:
+  validate_test_passed:
+    tasks_to_test:
+      - task: "mock_test"
+        mock:
+          config:
+            monkeyble_module:
+              consider_changed: true
+              result_dict:
+                msg: "message from mock module"

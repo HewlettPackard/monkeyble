@@ -95,3 +95,9 @@ LIST_SCENARIO=(
 PLAYBOOK_PATH="test_output/playbook.yml"
 VARS_PATH="test_output/test_asserts_failed/vars.yml"
 assert_playbook_fail $PLAYBOOK_PATH $VARS_PATH "${LIST_SCENARIO[@]}"
+
+echo "Monkeyble test mock..."
+eval $ANSIBLE_CMD \
+test_mock/playbook.yml \
+-e "@test_mock/vars.yml" \
+-e "monkeyble_scenario=validate_test_passed"
