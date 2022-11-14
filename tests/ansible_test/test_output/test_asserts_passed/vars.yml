@@ -1,0 +1,32 @@
+monkeyble_scenarios:
+  validate_test_passed:
+    tasks_to_test:
+      - task: "test_output"
+        test_output:
+          - assert_equal:
+              result_key: result.ansible_facts.r2d2
+              expected: "is the coolest robot ever"
+          - assert_equal:
+              result_key: result.ansible_facts.empty_string
+              expected: ""
+          - assert_dict_equal:
+              result_key: result.ansible_facts.dict_test
+              expected:
+                key1: value1
+                key2: value2
+          - assert_list_equal:
+              result_key: result.ansible_facts.list_test
+              expected:
+                - "tatooine"
+                - "coruscant"
+          - assert_true:
+              result_key: result.ansible_facts.true_bool
+              expected: true
+          - assert_false:
+              result_key: result.ansible_facts.false_bool
+              expected: false
+          - assert_is_not_none:
+              result_key: result.ansible_facts.r2d2
+          - assert_not_equal:
+              result_key: result.ansible_facts.r2d2
+              expected: "bb8"

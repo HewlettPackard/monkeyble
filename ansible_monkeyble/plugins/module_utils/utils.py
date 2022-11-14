@@ -4,6 +4,7 @@ from ansible.errors import AnsibleError
 from ansible.playbook.task import Task
 
 from ansible_monkeyble.plugins.module_utils.const import *
+from ansible_monkeyble.plugins.module_utils.exceptions import MonkeybleException
 
 
 class MonkeybleUnsupportedTest(AnsibleError):
@@ -31,7 +32,8 @@ def str_to_bool(s):
 
 def switch_test_method(test_name, tested_value, expected=None):
     if test_name not in SUPPORTED_TEST:
-        raise MonkeybleUnsupportedTest(message=f"Test name '{test_name}' is not supported")
+        raise MonkeybleUnsupportedTest(message=f"Test name '{test_name}' is not supported. "
+                                               f"Supported tests: {SUPPORTED_TEST}")
     json_output = {
         "test_name": test_name,
         "tested_value": tested_value,
@@ -90,6 +92,8 @@ def get_task_config(ansible_task: Task, monkeyble_config: dict):
     # print(f"get_task_config role: {role_name}")
     if "tasks_to_test" in monkeyble_config:
         for task_config in monkeyble_config["tasks_to_test"]:
+            if "task" not in task_config:
+                raise MonkeybleException(message=str("Monkeyble error: Task name need to be set"))
             if task_config["task"] == task_name:
                 # we've found a task name
                 if "play" in task_config:

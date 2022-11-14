@@ -1,0 +1,19 @@
+- name: "Test output"
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: "test_output"
+      set_fact:
+        r2d2: "is the coolest robot ever"
+        dict_test:
+          key1: value1
+          key2: value2
+        list_test:
+          - "tatooine"
+          - "coruscant"
+        empty_string: ""
+        true_bool: true
+        false_bool: false
+        none_val: null  # none val are templated as empty string ""

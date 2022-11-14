@@ -10,6 +10,7 @@ from ansible.plugins.callback import CallbackBase
 from ansible.template import Templar
 from ansible.utils.display import Display
 
+
 BASE_DIR = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '../../..')
 )
@@ -18,17 +19,9 @@ if BASE_DIR not in sys.path:
 
 from ansible_monkeyble.plugins.module_utils.utils import str_to_bool, switch_test_method, get_task_config
 from ansible_monkeyble.plugins.module_utils.const import PASSED_TEST, FAILED_TEST
+from ansible_monkeyble.plugins.module_utils.exceptions import MonkeybleException
 
 global_display = Display()
-
-
-class MonkeybleException(Exception):
-    def __init__(self, message, scenario_description=None, exit_code=1):
-        super().__init__(message)
-        if scenario_description is not None:
-            global_display.display(msg=f"Monkeyble failed scenario: {scenario_description}", color=C.COLOR_ERROR)
-        global_display.display(msg=message, color=C.COLOR_ERROR)
-        sys.exit(exit_code)
 
 
 class CallbackModule(CallbackBase):
@@ -156,9 +149,9 @@ class CallbackModule(CallbackBase):
                 }
                 for result_value_to_test in self._last_task_config["test_output"]:
                     for test_name, result_value_and_expected in result_value_to_test.items():
-                        result_value = result_value_and_expected['result_key']
+                        result_key = result_value_and_expected['result_key']
                         # template the result to get the real value
-                        template_string = "{{  " + result_value + "  }}"
+                        template_string = "{{  " + result_key + "  }}"
                         context = {
                             "result": result_dict
                         }
@@ -168,7 +161,10 @@ class CallbackModule(CallbackBase):
                         except AnsibleUndefinedVariable as e:
                             raise MonkeybleException(message=str(e),
                                                      scenario_description=self.monkeyble_scenario_description)
-                        expected = result_value_and_expected['expected']
+                        try:
+                            expected = result_value_and_expected['expected']
+                        except KeyError:
+                            expected = None  # can be none for assert_none, assert_false, assert_true, assert_false
                         returned_tuple = switch_test_method(test_name, templated_value, expected)
                         test_result[returned_tuple[0]].append(returned_tuple[1])
 

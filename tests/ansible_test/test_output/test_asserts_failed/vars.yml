@@ -1,0 +1,53 @@
+monkeyble_scenarios:
+  test_output_key_does_not_exist:
+    tasks_to_test:
+      - task: "test_output"
+        test_output:
+          - assert_equal:
+              result_key: result.ansible_facts.does_not_exist
+              expected: "content"
+  test_output_key_not_equal:
+    tasks_to_test:
+      - task: "test_output"
+        test_output:
+          - assert_equal:
+              result_key: result.ansible_facts.r2d2
+              expected: "bb8"
+  test_output_key_dict_not_equal:
+    tasks_to_test:
+      - task: "test_output"
+        test_output:
+          - assert_dict_equal:
+              result_key: result.ansible_facts.dict_test
+              expected:
+                key1: "other"
+                key2: "value"
+  test_output_key_list_not_equal:
+    tasks_to_test:
+      - task: "test_output"
+        test_output:
+          - assert_list_equal:
+              result_key: result.ansible_facts.list_test
+              expected:
+                - "naboo"
+                - "bespin"
+  test_output_key_true:
+    tasks_to_test:
+      - task: "test_output"
+        test_output:
+          - assert_true:
+              result_key: result.ansible_facts.false_bool
+              expected: true
+  test_output_key_false:
+    tasks_to_test:
+      - task: "test_output"
+        test_output:
+          - assert_false:
+              result_key: result.ansible_facts.true_bool
+              expected: false
+  test_output_key_is_none:
+    tasks_to_test:
+      - task: "test_output"
+        test_output:
+          - assert_is_none:
+              result_key: result.ansible_facts.r2d2

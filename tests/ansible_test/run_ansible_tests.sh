@@ -10,11 +10,13 @@ function assert_playbook_fail () {
   # $2: vars path
   # $3: list scenario
 
-  PLAYBOOK_PATH=$1
-  VARS_PATH=$2
-  LIST_SCENARIO=("$@")
+  local  PLAYBOOK_PATH=$1
+  local  VARS_PATH=$2
+  shift # Shift all arguments to the left (original $1 gets lost)
+  shift # Shift all arguments to the left (original $2 gets lost)
+  local LIST_SCENARIO=("$@")
 
-  for scenario in ${LIST_SCENARIO[@]}; do
+  for scenario in "${LIST_SCENARIO[@]}"; do  # Represents the remaining parameters.
     echo "Run Monkeyble scenario: $scenario"
     # Run the test and capture the returned error code
     if eval $ANSIBLE_CMD \
@@ -72,4 +74,24 @@ LIST_SCENARIO=(
 )
 PLAYBOOK_PATH="test_task_state/playbook.yml"
 VARS_PATH="test_task_state/test_state_failed/vars.yml"
+assert_playbook_fail $PLAYBOOK_PATH $VARS_PATH "${LIST_SCENARIO[@]}"
+
+echo "Monkeyble test output passed..."
+eval $ANSIBLE_CMD \
+test_output/playbook.yml \
+-e "@test_output/test_asserts_passed/vars.yml" \
+-e "monkeyble_scenario=validate_test_passed"
+
+echo "Monkeyble test output failed..."
+LIST_SCENARIO=(
+  "test_output_key_does_not_exist"
+  "test_output_key_not_equal"
+  "test_output_key_dict_not_equal"
+  "test_output_key_list_not_equal"
+  "test_output_key_true"
+  "test_output_key_false"
+  "test_output_key_is_none"
+)
+PLAYBOOK_PATH="test_output/playbook.yml"
+VARS_PATH="test_output/test_asserts_failed/vars.yml"
 assert_playbook_fail $PLAYBOOK_PATH $VARS_PATH "${LIST_SCENARIO[@]}"
