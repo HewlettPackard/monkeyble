@@ -63,3 +63,11 @@ monkeyble_scenarios:
               expected:
                 key1: value1
                 key2: value2
+
+      - task: "test_extra_var"
+        extra_vars:
+          default_extra_vars: "extra_var_updated"
+        test_input:
+          - assert_equal:
+              arg_name: msg
+              expected: "extra_var_updated"

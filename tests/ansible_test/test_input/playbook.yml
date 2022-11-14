@@ -9,6 +9,7 @@
       - "luke"
       - "obi-wan"
     null_val: null
+    default_extra_vars: "default_extra_vars"
 
   tasks:
     - name: "test_assert_equal"
@@ -53,3 +54,8 @@
         headers:
           key1: value1
           key2: value2
+
+    - name: "test_extra_var"
+      debug:
+        msg: "{{ default_extra_vars }}"
+      register: mock_test_register
