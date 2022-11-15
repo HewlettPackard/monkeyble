@@ -6,9 +6,18 @@ monkeyble_scenarios:
           - assert_equal:
               result_key: result.ansible_facts.r2d2
               expected: "is the coolest robot ever"
+          - assert_not_equal:
+              result_key: result.ansible_facts.r2d2
+              expected: "same as bb8"
           - assert_equal:
               result_key: result.ansible_facts.empty_string
               expected: ""
+          - assert_in:
+              result_key: result.ansible_facts.list_test
+              expected: "tatooine"
+          - assert_not_in:
+              result_key: result.ansible_facts.list_test
+              expected: "naboo"
           - assert_dict_equal:
               result_key: result.ansible_facts.dict_test
               expected:

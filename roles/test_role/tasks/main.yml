@@ -1,7 +1,0 @@
-- name: "debug test role 1"
-  debug:
-    msg: "this is test_role 1"
-
-- name: "test_name3"
-  set_fact:
-    new_var: "new_val"

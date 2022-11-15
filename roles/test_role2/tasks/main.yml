@@ -1,3 +1,0 @@
-- name:  "debug test role 2"
-  debug:
-    msg: "this is test_role 2"

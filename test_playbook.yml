@@ -1,21 +1,25 @@
 # ANSIBLE_CONFIG="ansible.cfg" ansible-playbook test_strategy_playbook.yml
 
-- name: "Play1"
+- name: "play1"
   hosts: localhost
   connection: local
   gather_facts: false
   become: false
-#  any_errors_fatal: true
   vars:
-    my_var: "general kenobi"
+    my_var: "Hello Monkeyble"
   tasks:
+    - name: "task1"
+      debug:
+        msg: "{{ my_var }}"
+
+    - name: "task2"
+      debug:
+        msg: "{{ my_var }}"
+
 #    - when: my_var == "var1"
 #      name: "test_name2"
 #      debug:
 #        msg: "{{ my_var }}"
-    - name: "test_name2"
-      debug:
-        msg: "{{ my_var }}"
 #    - name: "test_name2"
 #      fail:
 #        msg: "this is a fail"

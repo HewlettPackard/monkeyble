@@ -18,9 +18,20 @@ replace_debug_mock:
 
 monkeyble_scenarios:
   validate_test_1:
-    name: "Validate that bla bla"
+    name: "Monkeyble hello world"
     tasks_to_test:
-      - task: "test_name2"
+      - task: "task2"
+        extra_vars:
+          my_var: "new value"
+#      - task: "Create a virtual machine on given ESXi hostname"
+#        mock:
+#          config:
+#            monkeyble_module:
+#              consider_changed: true
+#              result_dict:
+#                instance:
+#                  hw_eth0:
+#                    macaddress: "01:02:b1:03:04:9d"
 #        play: "play"
 #        role: "ddzdz"
 #        should_be_changed: true
@@ -28,7 +39,6 @@ monkeyble_scenarios:
 #        should_failed: true
 #        extra_vars:
 #          my_var: "general Organa"
-#        test_input: "{{ test_input_config_1 }}"
 #        mock:
 #          config: "{{ replace_debug_mock }}"
 #        test_output:

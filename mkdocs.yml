@@ -1,0 +1,39 @@
+site_name: Monkeyble
+repo_name: HewlettPackard/monkeyble
+repo_url: https://github.com/HewlettPackard/monkeyble
+
+theme:
+  name: material
+  palette:
+    scheme: default
+    primary: brown
+    accent: orange
+  logo: images/monkeyble_short_logo.png
+
+extra_javascript:
+    - https://cdnjs.cloudflare.com/ajax/libs/mermaid/8.9.2/mermaid.min.js
+
+extra:
+  version:
+    provider: mike
+
+markdown_extensions:
+  - pymdownx.highlight
+  - admonition
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_div_format
+
+nav:
+  - Installation: installation.md
+  - Hello world: hello_world.md
+  - Scenarios: scenarios.md
+  - Test input: test_input.md
+  - Test output: test_output.md
+  - Test states: states.md
+  - Mock: mock.md
+  - Task filters: task_filters.md
+  - Task extra vars: extra_vars.md
+  - CI/CD usage: ci_cd_usage.md
