@@ -1,3 +1,4 @@
+# Copyright 2022 Hewlett Packard Enterprise Development LP
 import json
 
 from ansible.module_utils import basic

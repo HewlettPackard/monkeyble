@@ -1,3 +1,4 @@
+# Copyright 2022 Hewlett Packard Enterprise Development LP
 from unittest.mock import MagicMock
 
 from tests.units.test_callback.base_test_callback import BaseTestMonkeybleCallback

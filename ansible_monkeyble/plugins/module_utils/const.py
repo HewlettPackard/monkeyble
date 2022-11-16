@@ -1,3 +1,4 @@
+# Copyright 2022 Hewlett Packard Enterprise Development LP
 PASSED_TEST = "monkeyble_passed_test"
 FAILED_TEST = "monkeyble_failed_test"
 SUPPORTED_TEST = ["assert_equal", "assert_not_equal", "assert_in", "assert_not_in",
