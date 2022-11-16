@@ -230,15 +230,17 @@ class CallbackModule(CallbackBase):
         ansible_task.action = new_action_name
         if new_action_name == "monkeyble_module":
             original_module_args = ansible_task.args
+            consider_changed = self._last_task_config["mock"]["config"][new_action_name].get("consider_changed", False)
+            result_dict = self._last_task_config["mock"]["config"][new_action_name].get("result_dict", {})
             ansible_task.args = {"task_name": ansible_task.name,
                                  "original_module_name": original_module_name,
                                  "original_module_args": original_module_args,
-                                 "consider_changed": self._last_task_config["mock"]["config"]["monkeyble_module"].get("consider_changed",
-                                                                                                   False),
-                                 "result_dict": self._last_task_config["mock"]["config"]["monkeyble_module"].get("result_dict", {})
+                                 "consider_changed": consider_changed,
+                                 "result_dict": result_dict
                                  }
-            # ansible_task.args.update(mock_config["config"]["monkeyble_module"])
-        # TODO test with custom module
+        else:
+            # custom module
+            ansible_task.args = self._last_task_config["mock"]["config"][new_action_name]
         return ansible_task
 
     def update_extra_var(self, ansible_task):
