@@ -1,0 +1,35 @@
+name: On pull request
+
+#on: [pull_request]  # set to this value when pushing in prod
+on: [push] # set this one for dev the ci/cd
+
+env:
+  ANSIBLE_CONFIG: "ansible.cfg"
+
+jobs:
+  unit-tests:
+#    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        python-version: [ '3.10']
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install python dependencies
+        run: |
+          pip3 install -r requirements.txt
+
+      - name: Run Python unit tests
+        run: python3 -m unittest discover
+
+      - name: Run functional test
+        run: |
+          cd tests/ansible_test
+          ./run_ansible_tests.sh

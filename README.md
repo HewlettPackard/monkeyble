@@ -4,6 +4,10 @@
 
 <h3 align="center">End-to-end testing framework for Ansible</h3>
 
+<p align="center">
+<a href="https://hewlettpackard.github.io/monkeyble/latest"><img alt="Doc" src="https://img.shields.io/badge/read-documentation-1abc9c?style=flat-square"></a>
+<a href="https://makeapullrequest.com"><img alt="PR" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square"></a>
+</p>
 
 # Monkeyble
 
@@ -108,3 +112,9 @@ Monkeyble allows to mock a task and return a specific value:
         result_dict:
           my_key: "mock value"
 ```
+
+## Contribute
+
+Feel free to fill an issue containing feature request(s), or (even better) to send a Pull request, we would be happy to collaborate with you.
+
+> If you like the project, star it ⭐, it motivates us a lot 🙂

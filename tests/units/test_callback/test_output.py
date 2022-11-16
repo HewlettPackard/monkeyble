@@ -25,16 +25,33 @@ class TestMonkeybleCallbackOutput(BaseTestMonkeybleCallback):
     def test_check_output_test_ok_null_value(self):
         task_result = {
             "key1": None,
-            "key2": ""
         }
+        self.test_callback._last_task_name = "test_ok_null_value"
         self.test_callback._last_task_config = {
-            "task": "test_task",
+            "task": "test_ok_null_value",
             "test_output": [
                 {
                     "assert_is_none": {
                         "result_key": "result.key1",
                     }
                 },
+            ]
+        }
+        expected = {'task': 'test_ok_null_value', 'monkeyble_passed_test': [{'test_name': 'assert_is_none',
+                                                                             'tested_value': None,
+                                                                             'expected': None}],
+                    'monkeyble_failed_test': []}
+
+        self.test_callback.test_output(task_result)
+        self.assertDictEqual(self.test_callback._last_check_output_result, expected)
+
+    def test_check_output_test_ok_empty_value(self):
+        task_result = {
+            "key2": ""
+        }
+        self.test_callback._last_task_config = {
+            "task": "test_task",
+            "test_output": [
                 {
                     "assert_equal": {
                         "result_key": "result.key2",
@@ -43,10 +60,7 @@ class TestMonkeybleCallbackOutput(BaseTestMonkeybleCallback):
                 }
             ]
         }
-        expected = {'task': 'test_task', 'monkeyble_passed_test': [{'test_name': 'assert_is_none',
-                                                                    'tested_value': None,
-                                                                    'expected': None},
-                                                                   {'test_name': 'assert_equal',
+        expected = {'task': 'test_task', 'monkeyble_passed_test': [{'test_name': 'assert_equal',
                                                                     'tested_value': '',
                                                                     'expected': ''}
                                                                    ],
