@@ -12,9 +12,9 @@
       debug:
         msg: "{{ my_var }}"
 
-    - name: "task2"
-      debug:
-        msg: "{{ my_var }}"
+#    - name: "task2"
+#      debug:
+#        msg: "{{ my_var }}"
 
 #    - when: my_var == "var1"
 #      name: "test_name2"

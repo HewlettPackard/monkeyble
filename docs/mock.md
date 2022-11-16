@@ -3,7 +3,7 @@
 Mock modules are simulated modules that mimic the behaviour of real module in controlled ways.
 Mock can be used to test the behavior of a playbook without actually perform some operations like creating resource 
 in a cloud or in IT infrastructure.
-The mock module can return values so the tested playbook can register new variable from its output like if it was the real module.
+The mock module can return values so the tested playbook can register new variable from its output like if the real module had been called.
 
 ## Syntax
 
@@ -96,4 +96,55 @@ ok: [localhost] => {
 
 PLAY RECAP *********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
 localhost                  : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
+
+## Using your own mock module
+
+A custom module can be used instead of the Monkeyble one. For more information follow the official [Ansible documentation](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_general.html).
+
+Monkeyble config example:
+```yaml
+monkeyble_scenarios:
+  validate_test_1:
+    name: "Monkeyble hello world"
+    tasks_to_test:
+       - task: "task1"
+         mock:
+           config:
+             my_module:
+               my_arg: "value"
+```
+
+Module python code example of `my_module.py`:
+
+```python
+from ansible.module_utils.basic import AnsibleModule
+
+def run_module():
+    module_args = {
+        'my_arg': dict(type='str', required=True),
+    }
+
+    module = AnsibleModule(
+        argument_spec=module_args,
+        supports_check_mode=True
+    )
+    module.log(msg='My module started')
+    
+    # ------------------------------
+    # PLACE HERE YOUR MAGIC THAT UPDATE THE 'result' DICT
+    # ------------------------------
+    result = {
+        'custom_result': 'hello there !',
+        'changed': True,
+    }
+    module.exit_json(**result)
+
+
+def main():
+    run_module()
+
+
+if __name__ == '__main__':
+    main()
 ```

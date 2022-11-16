@@ -20,18 +20,23 @@ monkeyble_scenarios:
   validate_test_1:
     name: "Monkeyble hello world"
     tasks_to_test:
-      - task: "task2"
-        extra_vars:
-          my_var: "new value"
-#      - task: "Create a virtual machine on given ESXi hostname"
-#        mock:
-#          config:
-#            monkeyble_module:
-#              consider_changed: true
-#              result_dict:
-#                instance:
-#                  hw_eth0:
-#                    macaddress: "01:02:b1:03:04:9d"
+#       - task: "task1"
+#         mock:
+#           config:
+#             my_module:
+#               my_arg: "value"
+#      - task: "task2"
+#        extra_vars:
+#          my_var: "new value"
+      - task: "task1"
+        mock:
+          config:
+            monkeyble_module:
+              consider_changed: true
+              result_dict:
+                instance:
+                  hw_eth0:
+                    macaddress: "01:02:b1:03:04:9d"
 #        play: "play"
 #        role: "ddzdz"
 #        should_be_changed: true
