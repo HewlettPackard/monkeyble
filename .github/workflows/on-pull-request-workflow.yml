@@ -1,7 +1,7 @@
 name: On pull request
 
-#on: [pull_request]  # set to this value when pushing in prod
-on: [push] # set this one for dev the ci/cd
+on: [pull_request]  # set to this value when pushing in prod
+#on: [push] # set this one for dev the ci/cd
 
 env:
   ANSIBLE_CONFIG: "ansible.cfg"
