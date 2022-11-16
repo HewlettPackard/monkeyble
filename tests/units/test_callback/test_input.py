@@ -1,7 +1,7 @@
 # Copyright 2022 Hewlett Packard Enterprise Development LP
 from unittest.mock import patch
 
-from ansible_monkeyble.plugins.callback.monkeyble_callback import MonkeybleException
+from plugins.callback.monkeyble_callback import MonkeybleException
 from tests.units.test_callback.base_test_callback import BaseTestMonkeybleCallback
 
 

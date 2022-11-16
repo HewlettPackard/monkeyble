@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from ansible_monkeyble.plugins.callback.monkeyble_callback import MonkeybleException
+from plugins.callback.monkeyble_callback import MonkeybleException
 from tests.units.test_callback.base_test_callback import BaseTestMonkeybleCallback
 
 
@@ -140,9 +140,9 @@ class TestMonkeybleCallback(BaseTestMonkeybleCallback):
         }
         self.assertDictEqual(expected_dict, self.ansible_task_test.args)
 
-    @patch('ansible_monkeyble.plugins.callback.monkeyble_callback.CallbackModule.mock_task_module')
-    @patch('ansible_monkeyble.plugins.callback.monkeyble_callback.CallbackModule.test_input')
-    @patch('ansible_monkeyble.plugins.callback.monkeyble_callback.CallbackModule.update_extra_var')
+    @patch('plugins.callback.monkeyble_callback.CallbackModule.mock_task_module')
+    @patch('plugins.callback.monkeyble_callback.CallbackModule.test_input')
+    @patch('plugins.callback.monkeyble_callback.CallbackModule.update_extra_var')
     def test_v2_playbook_on_task_start_when_task_does_not_match(self, mock_update_extra_var, mock_test_input, mock_mock_task_module):
         self.test_callback.monkeyble_config = {
             "name": "Validate this",

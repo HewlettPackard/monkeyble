@@ -2,7 +2,7 @@
 import unittest
 from unittest.mock import MagicMock
 
-from ansible_monkeyble.plugins.callback.monkeyble_callback import CallbackModule as MonkeybleCallbackModule
+from plugins.callback.monkeyble_callback import CallbackModule as MonkeybleCallbackModule
 
 
 class BaseTestMonkeybleCallback(unittest.TestCase):

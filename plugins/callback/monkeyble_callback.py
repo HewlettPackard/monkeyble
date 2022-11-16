@@ -13,14 +13,14 @@ from ansible.utils.display import Display
 
 
 BASE_DIR = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '../../..')
+    os.path.join(os.path.dirname(__file__), '../..')
 )
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
-from ansible_monkeyble.plugins.module_utils.utils import str_to_bool, switch_test_method, get_task_config
-from ansible_monkeyble.plugins.module_utils.const import PASSED_TEST, FAILED_TEST
-from ansible_monkeyble.plugins.module_utils.exceptions import MonkeybleException
+from plugins.module_utils.utils import str_to_bool, switch_test_method, get_task_config
+from plugins.module_utils.const import PASSED_TEST, FAILED_TEST
+from plugins.module_utils.exceptions import MonkeybleException
 
 global_display = Display()
 

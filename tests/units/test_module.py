@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 from ansible.module_utils import basic
 
-from ansible_monkeyble.plugins.module import monkeyble_module
+from plugins.module import monkeyble_module
 from tests.units.utils.test_utils import set_module_args, exit_json, fail_json, AnsibleExitJson
 
 

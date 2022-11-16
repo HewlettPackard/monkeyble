@@ -12,7 +12,7 @@ from ansible.playbook.play import Play
 from ansible.vars.manager import VariableManager
 
 # Create a callback plugin so we can capture the output
-from ansible_monkeyble.plugins.callback.monkeyble_callback import CallbackModule as MonkeybleCallback
+from plugins.callback.monkeyble_callback import CallbackModule as MonkeybleCallback
 
 
 def main():
