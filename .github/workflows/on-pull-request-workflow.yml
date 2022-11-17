@@ -1,15 +1,15 @@
 name: On pull request
 
 on: [pull_request]  # set to this value when pushing in prod
-#on: [push] # set this one for dev the ci/cd
+#on: [push] # set this one to dev the ci/cd
 
 env:
   ANSIBLE_CONFIG: "ansible.cfg"
 
 jobs:
   unit-tests:
-#    runs-on: ubuntu-latest
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+#    runs-on: self-hosted # set this one to dev the ci/cd
     strategy:
       matrix:
         python-version: [ '3.10']
