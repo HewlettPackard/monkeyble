@@ -495,10 +495,27 @@
 </div>
 <p>That's it. Monkeyble is installed. See now the <a href="../hello_world/">Hello world</a> section to learn the basics.</p>
 <h2 id="using-ansible-galaxy">Using Ansible Galaxy</h2>
-<div class="admonition info">
-<p class="admonition-title">Info</p>
-<p>Coming soon</p>
+<p>Check that you have a <a href="https://docs.ansible.com/ansible/latest/reference_appendices/config.html#collections-paths">collection path</a> 
+declared in your ansible config (<code>collections_paths</code>). E.g:
+<div class="highlight"><pre><span></span><code><span class="k">[defaults]</span><span class="w"></span>
+<span class="na">collections_paths</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/home/my_user/Documents</span><span class="w"></span>
+</code></pre></div></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Ansible expect to find a folder named <code>ansible_collections</code> in the defined <code>collections_paths</code></p>
 </div>
+<p>Install Monkeyble:
+<div class="highlight"><pre><span></span><code>ansible-galaxy collection install git+https://github.com/HewlettPackard/monkeyble
+</code></pre></div></p>
+<p>Create a dedicated <code>ansible.cfg</code> config file that use the "Monkeyble" callback and declare the monkeyble mock module
+<div class="highlight"><pre><span></span><code><span class="k">[defaults]</span><span class="w"></span>
+<span class="na">collections_paths</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/home/my_user/Documents</span><span class="w"></span>
+<span class="na">library</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/home/my_user/Documents/ansible_collections/hpe/monkeyble/plugins/library</span><span class="w"></span>
+<span class="na">module_utils</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/home/my_user/Documents/ansible_collections/hpe/monkeyble/plugins/module_utils</span><span class="w"></span>
+<span class="na">callback_plugins</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/home/my_user/Documents/ansible_collections/hpe/monkeyble/plugins/callback</span><span class="w"></span>
+<span class="na">callbacks_enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">monkeyble_callback</span><span class="w"></span>
+<span class="na">jinja2_native</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span><span class="w"></span>
+</code></pre></div></p>
 
 
 
