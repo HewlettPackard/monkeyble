@@ -7,7 +7,7 @@
 Welcome to the Monkeyble documentation! 👋
 
 Monkeyble is a callback plugin for Ansible that allow to execute end-to-end tests on Ansible playbooks with a 
-Pythonic testing approach. 🧐
+Pythonic testing approach. 🐍
 
 Monkeyble allows, at task level, to:
 

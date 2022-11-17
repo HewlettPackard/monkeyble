@@ -5,7 +5,7 @@
 <h3 align="center">End-to-end testing framework for Ansible</h3>
 
 <p align="center">
-<a href="https://hewlettpackard.github.io/monkeyble/latest"><img alt="Doc" src="https://img.shields.io/badge/read-documentation-1abc9c?style=flat-square"></a>
+<a href="https://hewlettpackard.github.io/monkeyble"><img alt="Doc" src="https://img.shields.io/badge/read-documentation-1abc9c?style=flat-square"></a>
 <a href="https://makeapullrequest.com"><img alt="PR" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square"></a>
 </p>
 
@@ -25,7 +25,7 @@ Monkeyble is designed to be executed by a CI/CD in order to detect regressions w
 
 ## Quick tour
 
-Complete documentation available [here]().
+Complete documentation available [here](https://hewlettpackard.github.io/monkeyble).
 
 Ansible resources are models of desired-state. Ansible modules have their own unit tests and guarantee you of their correct functioning.
 As such, it's not necessary to test that services are started, packages are installed, or other such things. 
@@ -35,7 +35,7 @@ That being said, an Ansible playbook is commonly a bunch of data manipulation be
 For example, we get data from an API endpoint, or from the result of a module, we register a variable, then use a filter transform the data like combining two dictionary, 
 transforming into a list, changing the type, extract a specific value, etc... to finally call another module in a new task with the transformed data..
 
-Given a list of variable as input we want to be sure that a particular task: 
+Given a defined list of variable as input we want to be sure that a particular task: 
 
 - is well called with the expected instantiated arguments
 - produced this exact result
@@ -112,6 +112,19 @@ Monkeyble allows to mock a task and return a specific value:
         result_dict:
           my_key: "mock value"
 ```
+
+## Do I need Monkeyble?
+
+The common testing strategy when using Ansible is to deploy to a staging environment that simulates the production.
+When a role or a playbook is updated, we usually run an integration test battery against staging again before pushing in production.
+
+But when our playbooks are exposed in an [Ansible Controller/AWX](https://www.ansible.com/products/controller) (ex Tower)
+or available as a service in a catalog like [Squest](https://github.com/HewlettPackard/squest), we need to be sure that we don't have any regressions 
+when updating the code base, especially when modifying a role used by multiple playbooks. This is where Monkeyble is helpful. Placed in a CI/CD it will 
+be in charge of validating that the legacy code is always working as expected.
+
+Monkeyble is a tool that can help you to enhance the quality of your Ansible code base and can be coupled 
+with [official best practices](https://docs.ansible.com/ansible/latest/reference_appendices/test_strategies.html).
 
 ## Contribute
 
