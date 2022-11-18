@@ -504,8 +504,11 @@ declared in your ansible config (<code>collections_paths</code>). E.g:
 <p class="admonition-title">Note</p>
 <p>Ansible expect to find a folder named <code>ansible_collections</code> in the defined <code>collections_paths</code></p>
 </div>
-<p>Install Monkeyble:
+<p>Install Monkeyble with ansible-galaxy and git repo:
 <div class="highlight"><pre><span></span><code>ansible-galaxy collection install git+https://github.com/HewlettPackard/monkeyble
+</code></pre></div></p>
+<p>Install Monkeyble with ansible-galaxy:
+<div class="highlight"><pre><span></span><code>ansible-galaxy collection install hpe.monkeyble
 </code></pre></div></p>
 <p>Create a dedicated <code>ansible.cfg</code> config file that use the "Monkeyble" callback and declare the monkeyble mock module
 <div class="highlight"><pre><span></span><code><span class="k">[defaults]</span><span class="w"></span>
