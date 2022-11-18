@@ -36,9 +36,14 @@ collections_paths = /home/my_user/Documents
 
     Ansible expect to find a folder named `ansible_collections` in the defined `collections_paths`
 
-Install Monkeyble:
+Install Monkeyble with ansible-galaxy and git repo:
 ```bash
 ansible-galaxy collection install git+https://github.com/HewlettPackard/monkeyble
+```
+
+Install Monkeyble with ansible-galaxy:
+```bash
+ansible-galaxy collection install hpe.monkeyble
 ```
 
 Create a dedicated `ansible.cfg` config file that use the "Monkeyble" callback and declare the monkeyble mock module
