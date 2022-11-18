@@ -440,7 +440,7 @@
 <span class="w">              </span><span class="nt">arg_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">msg</span><span class="w"></span>
 <span class="w">              </span><span class="nt">expected</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Hello</span><span class="nv"> </span><span class="s">Monkeyble&quot;</span><span class="w"></span>
 </code></pre></div></p>
-<p>Then, call you playbook by passing the Ansible configuration, the extra var file that contains all your scenarios and the selected scenario to validate.
+<p>Then, call your playbook by passing the Ansible configuration, the extra var file that contains all your scenarios and the selected scenario to validate.
 <div class="highlight"><pre><span></span><code><span class="nv">ANSIBLE_CONFIG</span><span class="o">=</span><span class="s2">&quot;ansible.cfg&quot;</span> ansible-playbook <span class="se">\</span>
 playbook.yml <span class="se">\</span>
 -e <span class="s2">&quot;@monkeyble.yml&quot;</span> <span class="se">\</span>
