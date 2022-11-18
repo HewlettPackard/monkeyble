@@ -27,7 +27,7 @@ monkeyble_scenarios:
               expected: "Hello Monkeyble"
 ```
 
-Then, call you playbook by passing the Ansible configuration, the extra var file that contains all your scenarios and the selected scenario to validate.
+Then, call your playbook by passing the Ansible configuration, the extra var file that contains all your scenarios and the selected scenario to validate.
 ```bash
 ANSIBLE_CONFIG="ansible.cfg" ansible-playbook \
 playbook.yml \
