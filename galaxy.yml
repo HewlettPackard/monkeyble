@@ -8,7 +8,7 @@ namespace: hpe
 name: monkeyble
 
 # The version of the collection. Must be compatible with semantic versioning
-version: 1.0.0
+version: 1.0.1
 
 # The path to the Markdown (.md) readme file. This path is relative to the root of the collection
 readme: README.md
@@ -44,10 +44,10 @@ dependencies: {}
 repository:  https://github.com/HewlettPackard/monkeyble
 
 # The URL to any online docs
-documentation: https://hewlettpackard.github.io/monkeyble/latest
+documentation: https://hewlettpackard.github.io/monkeyble
 
 # The URL to the homepage of the collection/project
-homepage: https://hewlettpackard.github.io/monkeyble/latest
+homepage: https://hewlettpackard.github.io/monkeyble
 
 # The URL to the collection issue tracker
 issues: https://github.com/HewlettPackard/monkeyble/issues
@@ -61,3 +61,4 @@ build_ignore:
   - .gitignore
   - .idea
   - venv
+  - site
