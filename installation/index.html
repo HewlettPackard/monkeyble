@@ -483,7 +483,7 @@
 </code></pre></div></p>
 <p>Create a dedicated <code>ansible.cfg</code> config file that use the "Monkeyble" callback and declare the monkeyble mock module
 <div class="highlight"><pre><span></span><code><span class="k">[defaults]</span><span class="w"></span>
-<span class="na">library</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/path/to/monkeyble/plugins/library</span><span class="w"></span>
+<span class="na">library</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/path/to/monkeyble/plugins/module</span><span class="w"></span>
 <span class="na">module_utils</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/path/to/monkeyble/plugins/module_utils</span><span class="w"></span>
 <span class="na">callback_plugins</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/path/to/monkeyble/plugins/callback</span><span class="w"></span>
 <span class="na">callbacks_enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">monkeyble_callback</span><span class="w"></span>
@@ -513,7 +513,7 @@ declared in your ansible config (<code>collections_paths</code>). E.g:
 <p>Create a dedicated <code>ansible.cfg</code> config file that use the "Monkeyble" callback and declare the monkeyble mock module
 <div class="highlight"><pre><span></span><code><span class="k">[defaults]</span><span class="w"></span>
 <span class="na">collections_paths</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/home/my_user/Documents</span><span class="w"></span>
-<span class="na">library</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/home/my_user/Documents/ansible_collections/hpe/monkeyble/plugins/library</span><span class="w"></span>
+<span class="na">library</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/home/my_user/Documents/ansible_collections/hpe/monkeyble/plugins/module</span><span class="w"></span>
 <span class="na">module_utils</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/home/my_user/Documents/ansible_collections/hpe/monkeyble/plugins/module_utils</span><span class="w"></span>
 <span class="na">callback_plugins</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/home/my_user/Documents/ansible_collections/hpe/monkeyble/plugins/callback</span><span class="w"></span>
 <span class="na">callbacks_enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">monkeyble_callback</span><span class="w"></span>

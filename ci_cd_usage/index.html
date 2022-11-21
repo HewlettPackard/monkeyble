@@ -418,7 +418,7 @@
 
 <h1 id="cicd-usage">CI/CD usage</h1>
 <p>This is an example script you could use to test a playbook against all your scenarios</p>
-<div class="highlight"><pre><span></span><code><span class="c1">#/bin/bash</span>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
 <span class="nb">set</span> -e <span class="c1"># exit when any command fails</span>
 
 <span class="nv">ANSIBLE_CMD</span><span class="o">=</span><span class="s2">&quot;ANSIBLE_CONFIG=&#39;ansible.cfg&#39; ansible-playbook -v&quot;</span>
