@@ -3,7 +3,7 @@
 This is an example script you could use to test a playbook against all your scenarios
 
 ```bash
-#/bin/bash
+#!/bin/bash
 set -e # exit when any command fails
 
 ANSIBLE_CMD="ANSIBLE_CONFIG='ansible.cfg' ansible-playbook -v"

@@ -10,7 +10,7 @@ git clone https://github.com/HewlettPackard/monkeyble
 Create a dedicated `ansible.cfg` config file that use the "Monkeyble" callback and declare the monkeyble mock module
 ```ini
 [defaults]
-library = /path/to/monkeyble/plugins/library
+library = /path/to/monkeyble/plugins/module
 module_utils = /path/to/monkeyble/plugins/module_utils
 callback_plugins = /path/to/monkeyble/plugins/callback
 callbacks_enabled = monkeyble_callback
@@ -50,7 +50,7 @@ Create a dedicated `ansible.cfg` config file that use the "Monkeyble" callback a
 ```ini
 [defaults]
 collections_paths = /home/my_user/Documents
-library = /home/my_user/Documents/ansible_collections/hpe/monkeyble/plugins/library
+library = /home/my_user/Documents/ansible_collections/hpe/monkeyble/plugins/module
 module_utils = /home/my_user/Documents/ansible_collections/hpe/monkeyble/plugins/module_utils
 callback_plugins = /home/my_user/Documents/ansible_collections/hpe/monkeyble/plugins/callback
 callbacks_enabled = monkeyble_callback
