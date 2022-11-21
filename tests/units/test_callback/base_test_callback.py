@@ -28,6 +28,7 @@ class BaseTestMonkeybleCallback(unittest.TestCase):
 
         self.ansible_task_test = MagicMock()
         self.ansible_task_test.name = "test_task"
+        self.ansible_task_test._role._role_name = None
         self.ansible_task_test.get_name.return_value = "test_task"
         self.ansible_task_test.action = "debug"
         self.ansible_task_test.args = {
