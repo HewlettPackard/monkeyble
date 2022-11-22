@@ -176,7 +176,7 @@ class TestMonkeybleCallback(BaseTestMonkeybleCallback):
                 }
             ]
         }
-        self.test_callback.v2_playbook_on_task_start(task=self.ansible_task_test, is_conditional=False)
+        self.test_callback.v2_runner_on_start(task=self.ansible_task_test, host=None)
         expected_last_check_input_result = {'monkeyble_passed_test': [
             {'test_name': 'assert_equal',
              'tested_value': 'my_message',
@@ -186,7 +186,7 @@ class TestMonkeybleCallback(BaseTestMonkeybleCallback):
         self.assertDictEqual(self.test_callback._last_check_input_result, expected_last_check_input_result)
 
     @patch('sys.exit')
-    def test_v2_playbook_on_task_start_input_test_fail(self, mock_exit_playbook):
+    def test_v2_runner_on_start_input_test_fail(self, mock_exit_playbook):
         self.test_callback.monkeyble_config = {
             "name": "Validate this",
             "tasks_to_test": [
@@ -202,7 +202,7 @@ class TestMonkeybleCallback(BaseTestMonkeybleCallback):
             ]
         }
         with self.assertRaises(MonkeybleException):
-            self.test_callback.v2_playbook_on_task_start(task=self.ansible_task_test, is_conditional=False)
+            self.test_callback.v2_runner_on_start(task=self.ansible_task_test, host=None)
             mock_exit_playbook.assert_called()
             expected_last_check_input_result = {'monkeyble_failed_test': [
                 {'test_name': 'assert_equal',

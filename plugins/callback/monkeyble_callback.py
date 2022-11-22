@@ -87,29 +87,28 @@ class CallbackModule(CallbackBase):
 
         return play
 
-    def v2_playbook_on_stats(self, stats):
-        # if we reach this line, all test have passed successfully
-        self.display_message_ok(msg=f"Monkeyble - ALL TESTS PASSED - scenario: {self.monkeyble_scenario_description}")
-        super(CallbackModule, self).v2_playbook_on_stats(stats)
-
-    def v2_playbook_on_task_start(self, task, is_conditional):
+    def v2_runner_on_start(self, host, task):
         self._last_task_config = get_task_config(ansible_task=task, monkeyble_config=self.monkeyble_config)
         self._last_task_name = task.name
         self._last_task_ignore_errors = task.ignore_errors
 
+        # apply extra vars from the tested task
         if self._last_task_config is not None:
-            # apply extra vars from the tested task
             if "extra_vars" in self._last_task_config:
                 task = self.update_extra_var(ansible_task=task)
 
-            # check input
-            if "test_input" in self._last_task_config:
-                self.test_input(ansible_task=task)
+        # check input
+        if "test_input" in self._last_task_config:
+            self.test_input(ansible_task=task, host=host)
 
-            if "mock" in self._last_task_config:
-                task = self.mock_task_module(ansible_task=task)
+        if "mock" in self._last_task_config:
+            task = self.mock_task_module(ansible_task=task)
+        return super(CallbackModule, self).v2_runner_on_start(host, task)
 
-        return super(CallbackModule, self).v2_playbook_on_task_start(task, is_conditional)
+    def v2_playbook_on_stats(self, stats):
+        # if we reach this line, all test have passed successfully
+        self.display_message_ok(msg=f"Monkeyble - ALL TESTS PASSED - scenario: {self.monkeyble_scenario_description}")
+        super(CallbackModule, self).v2_playbook_on_stats(stats)
 
     def v2_runner_on_unreachable(self, result):
         self._display.debug("Run v2_runner_on_unreachable")
@@ -253,13 +252,16 @@ class CallbackModule(CallbackBase):
         ansible_task.args = templated_module_args
         return ansible_task
 
-    def test_input(self, ansible_task):
-        task_vars = ansible_task.play.vars
+    def test_input(self, ansible_task, host=None):
+        # inventory + host vars + group vars
+        task_vars = ansible_task.play.get_variable_manager().get_vars(host=host, task=ansible_task)
+        # add play vars
+        task_vars.update(ansible_task.play.vars)
+        # add extra vars
         task_vars.update(self.extra_vars)
         templar = Templar(loader=DataLoader(), variables=task_vars)
         templated_module_args = templar.template(ansible_task.args)
 
-        # result = self._check_input(self._last_task_config["test_input"], ansible_task_args=templated_module_args)
         test_result = {
             PASSED_TEST: [],
             FAILED_TEST: []
