@@ -58,7 +58,7 @@ class CallbackModule(CallbackBase):
         global_display.display(msg=msg, color=C.COLOR_OK)
 
     def v2_playbook_on_play_start(self, play):
-        self.display_message_ok(msg="Starting Monkeyble callback")
+        self.display_message_ok(msg="🐵 Starting Monkeyble callback")
         vm = play.get_variable_manager()
         self.extra_vars = vm.extra_vars
         monkeyble_scenario = self.extra_vars.get("monkeyble_scenario")
@@ -117,7 +117,7 @@ class CallbackModule(CallbackBase):
 
     def v2_playbook_on_stats(self, stats):
         # if we reach this line, all test have passed successfully
-        self.display_message_ok(msg=f"Monkeyble - ALL TESTS PASSED - scenario: {self.monkeyble_scenario_description}")
+        self.display_message_ok(msg=f"🐵 Monkeyble - ALL TESTS PASSED ✔ - scenario: {self.monkeyble_scenario_description}")
         super(CallbackModule, self).v2_playbook_on_stats(stats)
 
     def v2_runner_on_unreachable(self, result):
@@ -182,6 +182,7 @@ class CallbackModule(CallbackBase):
                 if len(test_result[FAILED_TEST]) >= 1:
                     raise MonkeybleException(message=str(test_result),
                                              scenario_description=self.monkeyble_scenario_description)
+                self.display_message_ok(msg="🙊 Monkeyble test output passed ✔")
                 self.display_message_ok(msg=str(test_result))
 
     def check_if_task_should_have_been_skipped(self, task_has_been_actually_skipped=False):
@@ -210,7 +211,7 @@ class CallbackModule(CallbackBase):
             # if we reach this line, it means that the task was expected to fail.
             # We exit with code 0 to prevent a CI to fail if the task does not ignore error
             if not self._last_task_ignore_errors:
-                message = f"Task '{self._last_task_name}' failed as expected"
+                message = f"🐵 Monkeyble - Task '{self._last_task_name}' failed as expected"
                 raise MonkeybleException(message=message,
                                          scenario_description=self.monkeyble_scenario_description,
                                          exit_code=0)
@@ -222,7 +223,7 @@ class CallbackModule(CallbackBase):
                 self._display.debug(f"config_flag_name: {config_flag_name}")
                 self._display.debug(f"config_flag_value: {config_flag_value}")
                 self._display.debug(f"actual_state: {actual_state}")
-                message = f"Task '{task_name}' - expected '{config_flag_name}': {config_flag_value}. " \
+                message = f"🐵 Monkeyble - Task '{task_name}' - expected '{config_flag_name}': {config_flag_value}. " \
                           f"actual state: {actual_state}"
                 if config_flag_value != actual_state:
                     raise MonkeybleException(message=message,
@@ -234,7 +235,7 @@ class CallbackModule(CallbackBase):
     def mock_task_module(self, ansible_task):
         new_action_name = next(iter(self._last_task_config["mock"]["config"]))
         original_module_name = ansible_task.action
-        message = f"Monkeyble mock module - Before: '{original_module_name}' Now: '{new_action_name}'"
+        message = f"🙉 Monkeyble mock module - Before: '{original_module_name}' Now: '{new_action_name}'"
         self.display_message_ok(msg=str(message))
         ansible_task.action = new_action_name
         if new_action_name == "monkeyble_module":
@@ -284,6 +285,7 @@ class CallbackModule(CallbackBase):
         if len(test_result[FAILED_TEST]) >= 1:
             raise MonkeybleException(message=str(test_result),
                                      scenario_description=self.monkeyble_scenario_description)
+        self.display_message_ok(msg="🙈 Monkeyble test input passed ✔")
         self.display_message_ok(msg=str(test_result))
 
     def _get_playbook_vars(self, host, task):
