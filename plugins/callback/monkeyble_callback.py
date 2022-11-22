@@ -1,4 +1,5 @@
 # Copyright 2022 Hewlett Packard Enterprise Development LP
+import json
 import os
 import sys
 from builtins import super
@@ -179,11 +180,12 @@ class CallbackModule(CallbackBase):
                         test_result[returned_tuple[0]].append(returned_tuple[1])
 
                 self._last_check_output_result = test_result
+                json_test_result = json.dumps(test_result)
                 if len(test_result[FAILED_TEST]) >= 1:
-                    raise MonkeybleException(message=str(test_result),
+                    raise MonkeybleException(message=str(json_test_result),
                                              scenario_description=self.monkeyble_scenario_description)
                 self.display_message_ok(msg="🙊 Monkeyble test output passed ✔")
-                self.display_message_ok(msg=str(test_result))
+                self.display_message_ok(msg=str(json_test_result))
 
     def check_if_task_should_have_been_skipped(self, task_has_been_actually_skipped=False):
         self._display.debug("Monkeyble check_if_task_should_have_been_skipped called")
@@ -282,11 +284,12 @@ class CallbackModule(CallbackBase):
                 test_result[returned_tuple[0]].append(returned_tuple[1])
         self._last_check_input_result = test_result
 
+        json_test_result = json.dumps(test_result)
         if len(test_result[FAILED_TEST]) >= 1:
-            raise MonkeybleException(message=str(test_result),
+            raise MonkeybleException(message=str(json_test_result),
                                      scenario_description=self.monkeyble_scenario_description)
         self.display_message_ok(msg="🙈 Monkeyble test input passed ✔")
-        self.display_message_ok(msg=str(test_result))
+        self.display_message_ok(msg=str(json_test_result))
 
     def _get_playbook_vars(self, host, task):
         # inventory + host vars + group vars
