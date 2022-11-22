@@ -34,3 +34,12 @@ class BaseTestMonkeybleCallback(unittest.TestCase):
         self.ansible_task_test.args = {
             "msg": "my_message"
         }
+
+        self.ansible_task_test_2 = MagicMock()
+        self.ansible_task_test_2.name = "test_task {{ my_extra_var }}"
+        self.ansible_task_test_2._role._role_name = None
+        self.ansible_task_test_2.get_name.return_value = self.ansible_task_test_2.name
+        self.ansible_task_test_2.action = "debug"
+        self.ansible_task_test_2.args = {
+            "msg": "my_message"
+        }

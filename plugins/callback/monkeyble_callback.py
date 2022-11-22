@@ -88,21 +88,31 @@ class CallbackModule(CallbackBase):
         return play
 
     def v2_runner_on_start(self, host, task):
-        self._last_task_config = get_task_config(ansible_task=task, monkeyble_config=self.monkeyble_config)
-        self._last_task_name = task.name
+        playbook_vars = self._get_playbook_vars(host=host, task=task)
+
+        # template the task name
+        task_copy = copy(task)
+        templar = Templar(loader=DataLoader(), variables=playbook_vars)
+        templated_task_name = templar.template(task.name)
+        task_copy.name = templated_task_name
+        task_copy._name = templated_task_name
+        self._last_task_name = templated_task_name
         self._last_task_ignore_errors = task.ignore_errors
 
-        # apply extra vars from the tested task
+        # get a monkeyble config for the current task
+        self._last_task_config = get_task_config(ansible_task=task_copy, monkeyble_config=self.monkeyble_config)
+
         if self._last_task_config is not None:
+            # apply extra vars from the tested task
             if "extra_vars" in self._last_task_config:
                 task = self.update_extra_var(ansible_task=task)
 
-        # check input
-        if "test_input" in self._last_task_config:
-            self.test_input(ansible_task=task, host=host)
+            # check input
+            if "test_input" in self._last_task_config:
+                self.test_input(ansible_task=task, playbook_vars=playbook_vars)
 
-        if "mock" in self._last_task_config:
-            task = self.mock_task_module(ansible_task=task)
+            if "mock" in self._last_task_config:
+                task = self.mock_task_module(ansible_task=task)
         return super(CallbackModule, self).v2_runner_on_start(host, task)
 
     def v2_playbook_on_stats(self, stats):
@@ -252,14 +262,8 @@ class CallbackModule(CallbackBase):
         ansible_task.args = templated_module_args
         return ansible_task
 
-    def test_input(self, ansible_task, host=None):
-        # inventory + host vars + group vars
-        task_vars = ansible_task.play.get_variable_manager().get_vars(host=host, task=ansible_task)
-        # add play vars
-        task_vars.update(ansible_task.play.vars)
-        # add extra vars
-        task_vars.update(self.extra_vars)
-        templar = Templar(loader=DataLoader(), variables=task_vars)
+    def test_input(self, ansible_task, playbook_vars=dict):
+        templar = Templar(loader=DataLoader(), variables=playbook_vars)
         templated_module_args = templar.template(ansible_task.args)
 
         test_result = {
@@ -281,3 +285,12 @@ class CallbackModule(CallbackBase):
             raise MonkeybleException(message=str(test_result),
                                      scenario_description=self.monkeyble_scenario_description)
         self.display_message_ok(msg=str(test_result))
+
+    def _get_playbook_vars(self, host, task):
+        # inventory + host vars + group vars
+        playbook_vars = task.play.get_variable_manager().get_vars(host=host, task=task)
+        # add play vars
+        playbook_vars.update(task.play.vars)
+        # add extra vars
+        playbook_vars.update(self.extra_vars)
+        return playbook_vars
