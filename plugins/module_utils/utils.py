@@ -83,7 +83,7 @@ def get_task_config(ansible_task: Task, monkeyble_config: dict):
     :ansible_task: AnsibleTask object
     :ty
     """
-    task_name = ansible_task.get_name()
+    task_name = ansible_task.name
     play_name = ansible_task.play.name
     role_name = None
     # print(f"get_task_config task: {task_name}")
@@ -96,8 +96,6 @@ def get_task_config(ansible_task: Task, monkeyble_config: dict):
             if "task" not in task_config:
                 raise MonkeybleException(message=str("Monkeyble error: Task name need to be set"))
             name_to_test = task_config["task"]
-            if role_name is not None:  # the task name contains the role when placed in a role
-                name_to_test = f"{role_name} : {task_config['task']}"
             if name_to_test == task_name:
                 # we've found a task name
                 if "play" in task_config:

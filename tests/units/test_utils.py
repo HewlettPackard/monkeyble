@@ -208,18 +208,7 @@ class TestMonkeybleUtils(unittest.TestCase):
     def test_get_task_config_task_name_match(self):
         ansible_task = MagicMock()
         ansible_task._role._role_name = None
-        ansible_task.get_name.return_value = "task_name_test"
-        monkeyble_config = {"name": "Validate this",
-                            "tasks_to_test": [{"task": "task_name_test"}]
-                            }
-        result = get_task_config(ansible_task=ansible_task, monkeyble_config=monkeyble_config)
-        expected = {"task": "task_name_test"}
-        self.assertDictEqual(result, expected)
-
-    def test_get_task_config_task_name_match_with_role(self):
-        ansible_task = MagicMock()
-        ansible_task._role._role_name = "role_name"
-        ansible_task.get_name.return_value = "role_name : task_name_test"
+        ansible_task.name = "task_name_test"
         monkeyble_config = {"name": "Validate this",
                             "tasks_to_test": [{"task": "task_name_test"}]
                             }
@@ -229,7 +218,7 @@ class TestMonkeybleUtils(unittest.TestCase):
 
     def test_get_task_config_task_role_filter(self):
         ansible_task = MagicMock()
-        ansible_task.get_name.return_value = "role_name_test : task_name_test"  # role is placed in the name by Ansible engine
+        ansible_task.name = "task_name_test"
         ansible_task._role._role_name = "role_name_test"
         monkeyble_config = {"name": "Validate this",
                             "tasks_to_test": [{"task": "task_name_test",
@@ -249,7 +238,7 @@ class TestMonkeybleUtils(unittest.TestCase):
     def test_get_task_config_task_play_filter(self):
         ansible_task = MagicMock()
         ansible_task._role._role_name = None
-        ansible_task.get_name.return_value = "task_name_test"
+        ansible_task.name = "task_name_test"
         ansible_task.play.name = "play_name_test"
         monkeyble_config = {"name": "Validate this",
                             "tasks_to_test": [{"task": "task_name_test",
