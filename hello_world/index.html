@@ -447,13 +447,14 @@ playbook.yml <span class="se">\</span>
 -e <span class="s2">&quot;monkeyble_scenario=validate_test_1&quot;</span>
 </code></pre></div></p>
 <p>Here is the output:</p>
-<div class="highlight"><pre><span></span><code>PLAY [Testing play] ************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
-Starting Monkeyble callback
+<div class="highlight"><pre><span></span><code>PLAY [play1] *******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
+🐵 Starting Monkeyble callback
 monkeyble_scenario: validate_test_1
 Monkeyble scenario: Monkeyble hello world
 
 TASK [debug task] **************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
-{&#39;monkeyble_passed_test&#39;: [{&#39;test_name&#39;: &#39;assert_equal&#39;, &#39;tested_value&#39;: &#39;Hello Monkeyble&#39;, &#39;expected&#39;: &#39;Hello Monkeyble&#39;}], &#39;monkeyble_failed_test&#39;: []}
+🙈 Monkeyble test input passed ✔
+{&quot;monkeyble_passed_test&quot;: [{&quot;test_name&quot;: &quot;assert_equal&quot;, &quot;tested_value&quot;: &quot;Hello Monkeyble&quot;, &quot;expected&quot;: &quot;Hello Monkeyble&quot;}], &quot;monkeyble_failed_test&quot;: []}
 ok: [localhost] =&gt; {
     &quot;msg&quot;: &quot;Hello Monkeyble&quot;
 }
@@ -461,7 +462,7 @@ ok: [localhost] =&gt; {
 PLAY RECAP *********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
 localhost                  : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 
-Monkeyble - ALL TESTS PASSED - scenario: Monkeyble hello world
+🐵 Monkeyble - ALL TESTS PASSED ✔ - scenario: Monkeyble hello world
 </code></pre></div>
 <p>The debug module has been well called with the expected argument value. The test passed. The return code on stderr is <code>0</code>.</p>
 <p>Let's change the test to make it fail. We update the executed task and change the <code>msg</code> argument of the <code>debug</code> module.</p>
@@ -470,14 +471,14 @@ Monkeyble - ALL TESTS PASSED - scenario: Monkeyble hello world
 <span class="w">    </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Goodbye</span><span class="nv"> </span><span class="s">Monkeyble&quot;</span><span class="w"></span>
 </code></pre></div>
 <p>We execute the playbook the same way. The result is now the following:
-<div class="highlight"><pre><span></span><code>PLAY [Testing play] ************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
-Starting Monkeyble callback
+<div class="highlight"><pre><span></span><code>PLAY [play1] *******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
+🐵 Starting Monkeyble callback
 monkeyble_scenario: validate_test_1
 Monkeyble scenario: Monkeyble hello world
 
 TASK [debug task] **************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
-Monkeyble failed scenario: Monkeyble hello world
-{&#39;monkeyble_passed_test&#39;: [], &#39;monkeyble_failed_test&#39;: [{&#39;test_name&#39;: &#39;assert_equal&#39;, &#39;tested_value&#39;: &#39;Goodbye Monkeyble&#39;, &#39;expected&#39;: &#39;Hello Monkeyble&#39;}]}
+🙊 Monkeyble failed scenario ❌: Monkeyble hello world
+{&quot;monkeyble_passed_test&quot;: [], &quot;monkeyble_failed_test&quot;: [{&quot;test_name&quot;: &quot;assert_equal&quot;, &quot;tested_value&quot;: &quot;Goodbye Monkeyble&quot;, &quot;expected&quot;: &quot;Hello Monkeyble&quot;}]}
 </code></pre></div></p>
 <p>This time the test has failed. The return code on stderr is <code>1</code>.</p>
 
