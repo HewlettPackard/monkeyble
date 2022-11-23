@@ -20,6 +20,11 @@ monkeyble_scenarios:
   validate_test_1:
     name: "Monkeyble hello world"
     tasks_to_test:
+      - task: "debug task"
+        test_input:
+          - assert_equal:
+              arg_name: msg
+              expected: "Hello Monkeyble"
 #       - task: "task1"
 #         mock:
 #           config:

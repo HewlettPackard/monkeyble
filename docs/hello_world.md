@@ -38,13 +38,14 @@ playbook.yml \
 Here is the output:
 
 ```
-PLAY [Testing play] ************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
-Starting Monkeyble callback
+PLAY [play1] *******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
+🐵 Starting Monkeyble callback
 monkeyble_scenario: validate_test_1
 Monkeyble scenario: Monkeyble hello world
 
 TASK [debug task] **************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
-{'monkeyble_passed_test': [{'test_name': 'assert_equal', 'tested_value': 'Hello Monkeyble', 'expected': 'Hello Monkeyble'}], 'monkeyble_failed_test': []}
+🙈 Monkeyble test input passed ✔
+{"monkeyble_passed_test": [{"test_name": "assert_equal", "tested_value": "Hello Monkeyble", "expected": "Hello Monkeyble"}], "monkeyble_failed_test": []}
 ok: [localhost] => {
     "msg": "Hello Monkeyble"
 }
@@ -52,7 +53,7 @@ ok: [localhost] => {
 PLAY RECAP *********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
 localhost                  : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 
-Monkeyble - ALL TESTS PASSED - scenario: Monkeyble hello world
+🐵 Monkeyble - ALL TESTS PASSED ✔ - scenario: Monkeyble hello world
 ```
 
 The debug module has been well called with the expected argument value. The test passed. The return code on stderr is `0`.
@@ -67,14 +68,14 @@ Let's change the test to make it fail. We update the executed task and change th
 
 We execute the playbook the same way. The result is now the following:
 ```
-PLAY [Testing play] ************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
-Starting Monkeyble callback
+PLAY [play1] *******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
+🐵 Starting Monkeyble callback
 monkeyble_scenario: validate_test_1
 Monkeyble scenario: Monkeyble hello world
 
 TASK [debug task] **************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
-Monkeyble failed scenario: Monkeyble hello world
-{'monkeyble_passed_test': [], 'monkeyble_failed_test': [{'test_name': 'assert_equal', 'tested_value': 'Goodbye Monkeyble', 'expected': 'Hello Monkeyble'}]}
+🙊 Monkeyble failed scenario ❌: Monkeyble hello world
+{"monkeyble_passed_test": [], "monkeyble_failed_test": [{"test_name": "assert_equal", "tested_value": "Goodbye Monkeyble", "expected": "Hello Monkeyble"}]}
 ```
 
 This time the test has failed. The return code on stderr is `1`.

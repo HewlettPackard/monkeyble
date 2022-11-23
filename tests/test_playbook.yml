@@ -8,9 +8,9 @@
   vars:
     my_var: "Hello Monkeyble"
   tasks:
-    - name: "task1"
+    - name: "debug task"
       debug:
-        msg: "{{ my_var }}"
+        msg: "Goodbye Monkeyble"
 
 #    - name: "task2"
 #      debug:
