@@ -10,7 +10,7 @@
   tasks:
     - name: "debug task"
       debug:
-        msg: "Goodbye Monkeyble"
+        msg: "Hello Monkeyble"
 
 #    - name: "task2"
 #      debug:
