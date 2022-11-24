@@ -1,0 +1,14 @@
+
+
+# test input
+test_input_config_1:
+  - assert_equal:
+      arg_name: msg
+      expected: "Hello Monkeyble"
+
+# mocks
+replace_debug_mock:
+  monkeyble_module:
+    consider_changed: true
+    result_dict:
+      test_key: "changed_result"

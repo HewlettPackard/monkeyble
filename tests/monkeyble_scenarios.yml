@@ -1,20 +1,6 @@
 # playbook base extra var
 my_variable_1: "my_value_1"
-hello_there: "general kenobi"
-
-# test input
-test_input_config_1:
-  - assert_equal:
-      arg_name: msg
-      expected: "general kenobi"
-
-# mocks
-replace_debug_mock:
-  monkeyble_module:
-    consider_changed: true
-    result_dict:
-      test_key: "changed_result"
-
+hello_there: "Hello Monkeyble"
 
 monkeyble_scenarios:
   validate_test_1:
@@ -24,24 +10,13 @@ monkeyble_scenarios:
         test_input:
           - assert_equal:
               arg_name: msg
-              expected: "Hello Monkeyble"
-#       - task: "task1"
-#         mock:
-#           config:
-#             my_module:
-#               my_arg: "value"
-#      - task: "task2"
-#        extra_vars:
-#          my_var: "new value"
-      - task: "task1"
-        mock:
-          config:
-            monkeyble_module:
-              consider_changed: true
-              result_dict:
-                instance:
-                  hw_eth0:
-                    macaddress: "01:02:b1:03:04:9d"
+              expected: "{{ hello_there }}"
+  validate_test_2:
+    name: "Test 2"
+    tasks_to_test:
+      - task: "debug task"
+        test_input: "{{ test_input_config_1 }}"
+
 #        play: "play"
 #        role: "ddzdz"
 #        should_be_changed: true
