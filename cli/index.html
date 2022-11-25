@@ -13,7 +13,7 @@
     
     
       
-        <title>CI/CD usage - Monkeyble</title>
+        <title>CLI - Monkeyble</title>
       
     
     
@@ -66,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#cicd-usage" class="md-skip">
+        <a href="#monkeyble-cli" class="md-skip">
           Skip to content
         </a>
       
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              CI/CD usage
+              CLI
             
           </span>
         </div>
@@ -355,9 +355,100 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          CLI
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
-        CI/CD usage
+        CLI
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    Installation
+  </a>
+  
+    <nav class="md-nav" aria-label="Installation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from-pypi" class="md-nav__link">
+    From Pypi
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from-sources" class="md-nav__link">
+    From sources
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-file" class="md-nav__link">
+    Configuration file
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration file">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#monkeyble_test_suite" class="md-nav__link">
+    monkeyble_test_suite
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#commands" class="md-nav__link">
+    Commands
+  </a>
+  
+    <nav class="md-nav" aria-label="Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#monkeyble-test" class="md-nav__link">
+    monkeyble test
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -398,6 +489,81 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    Installation
+  </a>
+  
+    <nav class="md-nav" aria-label="Installation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from-pypi" class="md-nav__link">
+    From Pypi
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from-sources" class="md-nav__link">
+    From sources
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-file" class="md-nav__link">
+    Configuration file
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration file">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#monkeyble_test_suite" class="md-nav__link">
+    monkeyble_test_suite
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#commands" class="md-nav__link">
+    Commands
+  </a>
+  
+    <nav class="md-nav" aria-label="Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#monkeyble-test" class="md-nav__link">
+    monkeyble test
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -410,49 +576,110 @@
                 
                   
 
-  <a href="https://github.com/HewlettPackard/monkeyble/edit/master/docs/ci_cd_usage.md" title="Edit this page" class="md-content__button md-icon">
+  <a href="https://github.com/HewlettPackard/monkeyble/edit/master/docs/cli.md" title="Edit this page" class="md-content__button md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
   </a>
 
 
-<h1 id="cicd-usage">CI/CD usage</h1>
-<p>This is an example script you could use to test a playbook against all your scenarios</p>
-<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
-<span class="nb">set</span> -e <span class="c1"># exit when any command fails</span>
-
-<span class="nv">ANSIBLE_CMD</span><span class="o">=</span><span class="s2">&quot;ANSIBLE_CONFIG=&#39;ansible.cfg&#39; ansible-playbook -v&quot;</span>
-
-<span class="k">function</span> test_all_scenario <span class="o">()</span> <span class="o">{</span>
-  <span class="c1"># $1: playbook path</span>
-  <span class="c1"># $2: vars path</span>
-  <span class="c1"># $3: list scenario</span>
-
-  <span class="nb">local</span>  <span class="nv">PLAYBOOK_PATH</span><span class="o">=</span><span class="nv">$1</span>
-  <span class="nb">local</span>  <span class="nv">VARS_PATH</span><span class="o">=</span><span class="nv">$2</span>
-  <span class="nb">shift</span> <span class="c1"># Shift all arguments to the left (original $1 gets lost)</span>
-  <span class="nb">shift</span> <span class="c1"># Shift all arguments to the left (original $2 gets lost)</span>
-  <span class="nb">local</span> <span class="nv">LIST_SCENARIO</span><span class="o">=(</span><span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span><span class="o">)</span> <span class="c1"># Represents the remaining parameters</span>
-
-  <span class="k">for</span> scenario <span class="k">in</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">LIST_SCENARIO</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span> <span class="k">do</span>  
-    <span class="nb">echo</span> <span class="s2">&quot;Run Monkeyble scenario: </span><span class="nv">$scenario</span><span class="s2">&quot;</span>
-    <span class="nv">$ANSIBLE_CMD</span> <span class="se">\</span>
-    <span class="nv">$PLAYBOOK_PATH</span> <span class="se">\</span>
-    -e <span class="s2">&quot;@</span><span class="si">${</span><span class="nv">VARS_PATH</span><span class="si">}</span><span class="s2">&quot;</span> <span class="se">\</span>
-    -e <span class="s2">&quot;monkeyble_scenario=</span><span class="nv">$scenario</span><span class="s2">&quot;</span>
-  <span class="k">done</span>
-<span class="o">}</span>
-
-<span class="nb">echo</span> <span class="s2">&quot;Monkeyble test playbook start...&quot;</span>
-<span class="nv">LIST_SCENARIO</span><span class="o">=(</span>
-  <span class="s2">&quot;validate_scenario_1&quot;</span>
-  <span class="s2">&quot;validate_scenario_2&quot;</span>
-  <span class="s2">&quot;validate_scenario_3&quot;</span>
-<span class="o">)</span>
-<span class="nv">PLAYBOOK_PATH</span><span class="o">=</span><span class="s2">&quot;playbook.yml&quot;</span>
-<span class="nv">VARS_PATH</span><span class="o">=</span><span class="s2">&quot;monkeyble.yml&quot;</span>
-test_all_scenario <span class="nv">$PLAYBOOK_PATH</span> <span class="nv">$VARS_PATH</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">LIST_SCENARIO</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span>
+<h1 id="monkeyble-cli">Monkeyble CLI</h1>
+<p>The monkeyble CLI provides a convenient way to execute all your tests from a single command.</p>
+<h2 id="installation">Installation</h2>
+<h3 id="from-pypi">From Pypi</h3>
+<p>Install from pypi
+<div class="highlight"><pre><span></span><code>pip3 install monkeyble
+</code></pre></div></p>
+<p>If you are using pipx, inject Monkeyble in your ansible installation
+<div class="highlight"><pre><span></span><code>pipx inject ansible --include-apps monkeyble
+</code></pre></div></p>
+<h3 id="from-sources">From sources</h3>
+<p>Run the Python setup 
+<div class="highlight"><pre><span></span><code>python3 setup.py install
+</code></pre></div></p>
+<h2 id="configuration-file">Configuration file</h2>
+<p>The CLI expect to find monkeyble configuration file. The file will be searched for in the following order:</p>
+<ul>
+<li><code>-c CONFIG</code> as a cli argument</li>
+<li><code>MONKEYBLE_CONFIG</code> placed as an environment variable</li>
+<li><code>monkeyble.yml</code> from the current directory</li>
+</ul>
+<h3 id="monkeyble_test_suite">monkeyble_test_suite</h3>
+<p>The <code>monkeyble_test_suite</code> contains a list of Monkeyble test definition.
+A test definition contains information about the playbook to test with all scenario to validate.</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>playbook</td>
+<td>true</td>
+<td>path to the playbook to test</td>
+</tr>
+<tr>
+<td>inventory</td>
+<td>false</td>
+<td>optional path to the inventory</td>
+</tr>
+<tr>
+<td>extra_vars</td>
+<td>false</td>
+<td>List of path to extra var file</td>
+</tr>
+<tr>
+<td>scenarios</td>
+<td>true</td>
+<td>List of scenario name to validate</td>
+</tr>
+</tbody>
+</table>
+<p>Configuration example:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">monkeyble_test_suite</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">playbook</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;play1.yml&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">inventory</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;inventory&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">extra_vars</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;shared_mocks.yml&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;play1_scenarios.yml&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">scenarios</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;validate_test_1&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;validate_test_2&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">playbook</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;play2.yml&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">inventory</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;inventory&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">extra_vars</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;shared_mocks.yml&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;play2_scenarios.yml&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">scenarios</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;validate_this&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;validate_that&quot;</span><span class="w"></span>
 </code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As the monkeyble <a href="../scenarios/">scenario configuration</a> is passed as <code>extra_vars</code> you should at least 
+have one file declared in the <code>extra_vars</code> list and one scenario name placed in <code>scenarios</code>.</p>
+</div>
+<h2 id="commands">Commands</h2>
+<h3 id="monkeyble-test">monkeyble test</h3>
+<p>The monkeyble test command executes all the test declared in the <code>monkeyble_test_suite</code> configuration flag and provides
+a test result summary.</p>
+<p>Command:
+<div class="highlight"><pre><span></span><code>ANSIBLE_CONFIG=&#39;monkeyble.cfg&#39; monkeyble test 
+</code></pre></div></p>
+<p>Output example:
+<div class="highlight"><pre><span></span><code># TRUNCATED. Playbook executions output
+
+Playbook   | Scenario        | Test passed
+-----------+-----------------+-------------
+ play1.yml | validate_test_1 | ✅
+ play1.yml | validate_test_2 | ✅
+ play2.yml | validate_this   | ✅
+ play2.yml | validate_that   | ✅
+
+ 🐵 Monkeyble test result - Tests passed: 4 of 4 tests
+</code></pre></div></p>
 
 
 
