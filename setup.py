@@ -1,9 +1,18 @@
+from os import path
+
 from setuptools import setup, find_packages
+
+# Get the long description from the README file
+basedir = path.abspath(path.dirname(__file__))
+with open(path.join(basedir, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
 
 setup(
     name='monkeyble',
     description='End-to-end testing framework for Ansible',
-    version='1.1.0b',
+    version='1.1.0.dev0',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
     url='https://hewlettpackard.github.io/monkeyble/',
     license='GNU General Public License v3 (GPLv3)',

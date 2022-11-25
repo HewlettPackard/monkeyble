@@ -1,0 +1,10 @@
+ansible_cmd: "ansible-playbook -v"
+monkeyble_tests:
+  - playbook: "test_playbook.yml"
+    inventory: "inventory"
+    extra_vars:
+      - "mocks.yml"
+      - "monkeyble_scenarios.yml"
+    scenarios:
+      - validate_test_1
+      - validate_test_2
