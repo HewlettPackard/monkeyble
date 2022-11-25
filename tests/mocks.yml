@@ -4,7 +4,7 @@
 test_input_config_1:
   - assert_equal:
       arg_name: msg
-      expected: "Hello Monkeyble"
+      expected: "Goodbye Monkeyble"
 
 # mocks
 replace_debug_mock:

@@ -7,11 +7,15 @@ import pathlib
 import yaml
 from tabulate import tabulate
 
-from monkeyble.cli.const import *
+from monkeyble.cli.const import MONKEYBLE_DEFAULT_CONFIG_PATH, TEST_PASSED, TEST_FAILED, MONKEYBLE, \
+    MONKEYBLE_DEFAULT_ANSIBLE_CMD
+from monkeyble.cli.exceptions import MonkeybleCLIException
 from monkeyble.cli.models import MonkeybleResult, ScenarioResult
 from monkeyble.cli.utils import Utils
 
 logger = logging.getLogger(MONKEYBLE)
+
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
 
 # actions available
 ACTION_LIST = ["test"]
@@ -38,7 +42,7 @@ def run_ansible(ansible_cmd, playbook, inventory, extra_vars, scenario):
                              stderr=subprocess.STDOUT)
     for line in iter(pipes.stdout.readline, b''):
         print(f"{line.rstrip().decode('utf-8')}")
-    std_out, std_err = pipes.communicate()
+    pipes.wait()
     if pipes.returncode == 0:
         return TEST_PASSED
     else:
@@ -46,12 +50,11 @@ def run_ansible(ansible_cmd, playbook, inventory, extra_vars, scenario):
 
 
 def run_monkeyble_test(monkeyble_config):
-    ansible_cmd = "ansible-playbook"
+    ansible_cmd = MONKEYBLE_DEFAULT_ANSIBLE_CMD
     if "ansible_cmd" in monkeyble_config:
         ansible_cmd = monkeyble_config["ansible_cmd"]
     if "monkeyble_tests" not in monkeyble_config:
-        Utils.print_danger("No 'monkeyble_tests' variable defined")
-        sys.exit(1)
+        raise MonkeybleCLIException(message="No 'monkeyble_tests' variable defined")
     list_result = list()
     for test_config in monkeyble_config["monkeyble_tests"]:
         if "ansible_cmd" in test_config:
@@ -60,13 +63,12 @@ def run_monkeyble_test(monkeyble_config):
         playbook = test_config.get("playbook", None)
         new_result = MonkeybleResult(playbook)
         if playbook is None:
-            Utils.print_danger("Missing 'playbook' key in a test")
-            sys.exit(1)
+            raise MonkeybleCLIException(message="Missing 'playbook' key in a test")
         inventory = test_config.get("inventory", None)
         extra_vars = test_config.get("extra_vars", None)
         scenarios = test_config.get("scenarios", None)
         if scenarios is None:
-            Utils.print_danger("No scenario selected")
+            raise MonkeybleCLIException(message=f"No scenarios for playbook {playbook}")
         # print the current path
         Utils.print_info(f"Monkeyble - current path: {pathlib.Path().resolve()}")
         list_scenario_result = list()
@@ -124,7 +126,7 @@ def load_monkeyble_config(arg_config_path):
     - cli args 'config'
     """
     # set a default config
-    config_path = "monkeyble.yml"
+    config_path = MONKEYBLE_DEFAULT_CONFIG_PATH
     # load from env if exist
     env_config = os.getenv("MONKEYBLE_CONFIG", default=None)
     if env_config is not None:
@@ -132,6 +134,7 @@ def load_monkeyble_config(arg_config_path):
     # load from cli args
     if arg_config_path is not None:
         config_path = arg_config_path
+    logger.debug(f"Try to open file {config_path}")
     with open(config_path, "r") as stream:
         try:
             monkeyble_config = yaml.full_load(stream)
