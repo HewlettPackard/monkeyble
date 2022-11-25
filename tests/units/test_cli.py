@@ -33,11 +33,10 @@ class TestMonkeybleModule(unittest.TestCase):
     @patch("monkeyble.cli.monkeyble_cli.MONKEYBLE_DEFAULT_CONFIG_PATH", "test_config/monkeyble.yml")
     def test_load_monkeyble_config(self):
         data = load_monkeyble_config(None)
-        expected = {'ansible_cmd': 'ansible-playbook -v',
-                    'monkeyble_tests': [{'playbook': 'test_playbook.yml',
-                                         'inventory': 'inventory',
-                                         'extra_vars': ['mocks.yml', 'monkeyble_scenarios.yml'],
-                                         'scenarios': ['validate_test_1', 'validate_test_2']}]}
+        expected = {'monkeyble_test_suite': [{'playbook': 'test_playbook.yml',
+                                              'inventory': 'inventory',
+                                              'extra_vars': ['mocks.yml', 'monkeyble_scenarios.yml'],
+                                              'scenarios': ['validate_test_1', 'validate_test_2']}]}
 
         self.assertDictEqual(data, expected)
 
@@ -69,7 +68,7 @@ class TestMonkeybleModule(unittest.TestCase):
     @patch('sys.exit')
     def test_run_monkeyble_test_no_playbook_defined(self, mock_exit):
         monkeyble_config = {
-            "monkeyble_tests": [
+            "monkeyble_test_suite": [
                 {"inventory": "test"}
             ]
         }
@@ -80,7 +79,7 @@ class TestMonkeybleModule(unittest.TestCase):
     @patch('sys.exit')
     def test_run_monkeyble_test_no_scenario_defined(self, mock_exit):
         monkeyble_config = {
-            "monkeyble_tests": [
+            "monkeyble_test_suite": [
                 {"playbook": "playbook.yml"}
             ]
         }
@@ -90,7 +89,7 @@ class TestMonkeybleModule(unittest.TestCase):
 
     def test_run_monkeyble_test_run_ansible_called(self):
         monkeyble_config = {
-            "monkeyble_tests": [
+            "monkeyble_test_suite": [
                 {
                     "playbook": "playbook.yml",
                     "inventory": "my_inventory",

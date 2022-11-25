@@ -93,6 +93,22 @@ Monkeyble allow to check the states of a task
     should_failed: false
 ```
 
+### Cli 
+
+Monkeyble comes with a CLI that allow to execute all tests from a single command and return a summary of test executions.
+```bash
+monkeyble test
+
+Playbook   | Scenario        | Test passed
+-----------+-----------------+-------------
+ play1.yml | validate_test_1 | ✅
+ play1.yml | validate_test_2 | ✅
+ play2.yml | validate_this   | ✅
+ play2.yml | validate_that   | ✅
+ 
+ 🐵 Monkeyble test result - Tests passed: 4 of 4 tests
+```
+
 ### Monkey patching
 
 Monkey patching is a technique that allows you to intercept what a function would normally do, substituting its full execution with a return value of your own specification. 

@@ -1,5 +1,4 @@
-ansible_cmd: "ansible-playbook -v"
-monkeyble_tests:
+monkeyble_test_suite:
   - playbook: "../../tests/test_playbook.yml"
 #    inventory: "inventory"
     extra_vars:
