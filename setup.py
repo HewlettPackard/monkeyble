@@ -10,7 +10,7 @@ with open(path.join(basedir, 'README.md'), encoding='utf-8') as f:
 setup(
     name='monkeyble',
     description='End-to-end testing framework for Ansible',
-    version='1.1.0.dev0',
+    version='1.1.0',
     long_description=long_description,
     long_description_content_type='text/markdown',
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),

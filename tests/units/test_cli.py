@@ -1,5 +1,6 @@
 import io
 import os
+import pathlib
 import unittest
 from unittest import mock
 from unittest.mock import patch, mock_open, call
@@ -30,15 +31,19 @@ class TestMonkeybleModule(unittest.TestCase):
             load_monkeyble_config("/path/to/monkeyble.yml")
         mock_open_file.assert_called_with("/path/to/monkeyble.yml", 'r')
 
-    @patch("monkeyble.cli.monkeyble_cli.MONKEYBLE_DEFAULT_CONFIG_PATH", "test_config/monkeyble.yml")
+    # fix path when executed as standalone test
+    @patch("monkeyble.cli.monkeyble_cli.MONKEYBLE_DEFAULT_CONFIG_PATH", "tests/units/test_config/monkeyble.yml")
     def test_load_monkeyble_config(self):
-        data = load_monkeyble_config(None)
-        expected = {'monkeyble_test_suite': [{'playbook': 'test_playbook.yml',
-                                              'inventory': 'inventory',
-                                              'extra_vars': ['mocks.yml', 'monkeyble_scenarios.yml'],
-                                              'scenarios': ['validate_test_1', 'validate_test_2']}]}
+        current_path = pathlib.Path(__file__).parent.resolve()
+        test_monkeyble_path = str(current_path) + "/test_config/monkeyble.yml"
+        with mock.patch("monkeyble.cli.monkeyble_cli.MONKEYBLE_DEFAULT_CONFIG_PATH", test_monkeyble_path):
+            data = load_monkeyble_config(None)
+            expected = {'monkeyble_test_suite': [{'playbook': 'test_playbook.yml',
+                                                  'inventory': 'inventory',
+                                                  'extra_vars': ['mocks.yml', 'monkeyble_scenarios.yml'],
+                                                  'scenarios': ['validate_test_1', 'validate_test_2']}]}
 
-        self.assertDictEqual(data, expected)
+            self.assertDictEqual(data, expected)
 
     @patch('sys.exit')
     def test_do_exit_all_test_passed(self, mock_exit):
