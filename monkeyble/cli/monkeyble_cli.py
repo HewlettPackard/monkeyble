@@ -15,7 +15,7 @@ from monkeyble.cli.utils import Utils
 
 logger = logging.getLogger(MONKEYBLE)
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 # actions available
 ACTION_LIST = ["test"]
@@ -51,14 +51,10 @@ def run_ansible(ansible_cmd, playbook, inventory, extra_vars, scenario):
 
 def run_monkeyble_test(monkeyble_config):
     ansible_cmd = MONKEYBLE_DEFAULT_ANSIBLE_CMD
-    if "ansible_cmd" in monkeyble_config:
-        ansible_cmd = monkeyble_config["ansible_cmd"]
-    if "monkeyble_tests" not in monkeyble_config:
-        raise MonkeybleCLIException(message="No 'monkeyble_tests' variable defined")
+    if "monkeyble_test_suite" not in monkeyble_config:
+        raise MonkeybleCLIException(message="No 'monkeyble_test_suite' variable defined")
     list_result = list()
-    for test_config in monkeyble_config["monkeyble_tests"]:
-        if "ansible_cmd" in test_config:
-            ansible_cmd = test_config["ansible_cmd"]
+    for test_config in monkeyble_config["monkeyble_test_suite"]:
         Utils.print_info(f"Monkeyble - ansible cmd: {ansible_cmd}")
         playbook = test_config.get("playbook", None)
         new_result = MonkeybleResult(playbook)
