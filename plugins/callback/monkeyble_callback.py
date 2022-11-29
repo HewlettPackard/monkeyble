@@ -275,7 +275,14 @@ class CallbackModule(CallbackBase):
         }
         for arg_to_test in self._last_task_config["test_input"]:
             for test_name, value_and_expected in arg_to_test.items():
-                argument_value = templated_module_args[value_and_expected['arg_name']]
+                try:
+                    argument_value = templated_module_args[value_and_expected['arg_name']]
+                except KeyError:
+                    # the key specified in arg name does not exist. exit with error monkeyble
+                    raise MonkeybleException(message=str(f"arg_name '{value_and_expected['arg_name']}' not present in "
+                                                         f"the list of argument when executing the "
+                                                         f"module '{ansible_task.action}'"),
+                                             scenario_description=self.monkeyble_scenario_description)
                 try:
                     expected = value_and_expected['expected']
                 except KeyError:
