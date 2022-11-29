@@ -35,10 +35,10 @@ class TestMonkeybleCallbackInput(BaseTestMonkeybleCallback):
         # test fail test
         self.test_callback._last_task_config = {
             "task": "test_task",
-            "test_output": [
+            "test_input": [
                 {
                     "assert_equal": {
-                        "result_key": "result.key1",
+                        "arg_name": "msg",
                         "expected": "value1"
                     }
                 }

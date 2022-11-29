@@ -13,6 +13,7 @@ jobs:
     strategy:
       matrix:
         python-version: [ '3.10']
+        poetry-version: ['1.1.13']
 
     steps:
       - uses: actions/checkout@v2
@@ -22,12 +23,17 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install poetry
+        uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+
       - name: Install python dependencies
         run: |
-          pip3 install -r requirements.txt
+          poetry install
 
       - name: Run Python unit tests
-        run: python3 -m unittest discover
+        run: poetry run python3 -m unittest discover
 
       - name: Run functional test
         run: |
