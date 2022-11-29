@@ -1,9 +1,12 @@
 import argparse
 import logging
 import os
+import pathlib
 import subprocess
 import sys
-import pathlib
+import time
+from datetime import datetime, timedelta
+
 import yaml
 from tabulate import tabulate
 
@@ -95,7 +98,7 @@ def print_result_table(monkeyble_results):
     print(tabulate(table, headers=headers, tablefmt="presto"))
 
 
-def do_exit(test_results):
+def do_exit(test_results, start_time):
     """
     Exit with code 1 if at least one test has failed
     """
@@ -110,6 +113,8 @@ def do_exit(test_results):
             else:
                 at_least_one_test_failed = True
     print("")
+    end_time = time.monotonic()
+    Utils.print_info(f"⏱ Monkeyble execution time: {timedelta(seconds=end_time - start_time)}")
     test_result_message = f"Tests passed: {total_passed} of {total_test} tests"
     if at_least_one_test_failed:
         Utils.print_danger(f"🙊 Monkeyble test result - {test_result_message}")
@@ -177,9 +182,10 @@ def main():
     config = load_monkeyble_config(parser.config)
 
     if parser.action == "test":
+        start_time = time.monotonic()
         test_results = run_monkeyble_test(config)
         print_result_table(test_results)
-        do_exit(test_results)
+        do_exit(test_results, start_time)
 
 
 if __name__ == '__main__':

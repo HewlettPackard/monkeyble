@@ -1,6 +1,7 @@
 import io
 import os
 import pathlib
+import time
 import unittest
 from unittest import mock
 from unittest.mock import patch, mock_open, call
@@ -51,7 +52,7 @@ class TestMonkeybleModule(unittest.TestCase):
         scenario_result2 = ScenarioResult(scenario="scenario2", result=TEST_PASSED)
         monkeyble_result = MonkeybleResult(playbook="playbook", scenario_results=[scenario_result1, scenario_result2])
 
-        do_exit([monkeyble_result])
+        do_exit([monkeyble_result], time.monotonic())
         mock_exit.assert_called_with(0)
 
     @patch('sys.exit')
@@ -60,7 +61,7 @@ class TestMonkeybleModule(unittest.TestCase):
         scenario_result2 = ScenarioResult(scenario="scenario2", result=TEST_FAILED)
         monkeyble_result = MonkeybleResult(playbook="playbook", scenario_results=[scenario_result1, scenario_result2])
 
-        do_exit([monkeyble_result])
+        do_exit([monkeyble_result], time.monotonic())
         mock_exit.assert_called_with(1)
 
     @patch('sys.exit')
