@@ -19,27 +19,32 @@ ansible-galaxy collection publish hpe-monkeyble-1.0.3.tar.gz
 
 ## Python package
 
-The build package need to be present
-```
-pip3 install build
-```
-
 Build the CLI:
 ```
-python -m build
+poetry build
 ```
 
 This command creates a file in `dist/`
 
+Configure poetry
+
+```
+# dev
+poetry config repositories.test-pypi https://test.pypi.org/legacy/
+poetry config pypi-token.test-pypi $TEST_PYPI_TOKEN
+
+# prod
+poetry config pypi-token.pypi $PYPI_TOKEN
+```
 
 Publish to test env Pypi:
 ```
-python3 -m twine upload --repository testpypi -u sispheor -p $PYPI_PASSWORD dist/*
+poetry publish --repository test-pypi
 ```
 
 Publish to prod env Pypi:
 ```
-python3 -m twine upload --repository pypi dist/*
+poetry publish
 ```
 
 Test installing with pipx
