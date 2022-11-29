@@ -5,7 +5,7 @@ import unittest
 from unittest import mock
 from unittest.mock import patch, mock_open, call
 
-from monkeyble.cli.const import TEST_PASSED, TEST_FAILED, MONKEYBLE_DEFAULT_ANSIBLE_CMD
+from monkeyble.cli.const import TEST_PASSED, TEST_FAILED, MONKEYBLE_DEFAULT_ANSIBLE_CMD, MONKEYBLE_CALLBACK_STARTED
 from monkeyble.cli.exceptions import MonkeybleCLIException
 
 from monkeyble.cli.models import MonkeybleResult, ScenarioResult
@@ -121,7 +121,7 @@ class TestMonkeybleModule(unittest.TestCase):
 
     @patch("subprocess.Popen")
     def test_run_ansible(self, mock_subproc_popen):
-        mock_subproc_popen.return_value.stdout = io.BytesIO(b"playbook output")
+        mock_subproc_popen.return_value.stdout = io.BytesIO(MONKEYBLE_CALLBACK_STARTED.encode("utf-8"))
 
         run_ansible(MONKEYBLE_DEFAULT_ANSIBLE_CMD,
                     "playbook.yml",
@@ -134,3 +134,17 @@ class TestMonkeybleModule(unittest.TestCase):
                               '-e', '@extra_vars1.yml', '-e', '@extra_vars2.yml',
                               '-e', 'monkeyble_scenario=scenario1'], stdout=-1, stderr=-2)
         mock_subproc_popen.assert_has_calls([expected_call])
+
+    @patch('sys.exit')
+    @patch("subprocess.Popen")
+    def test_run_ansible_callback_not_started(self, mock_subproc_popen, mock_exit):
+        mock_subproc_popen.return_value.stdout = io.BytesIO(b"playbook output without expected callback sentence")
+
+        with self.assertRaises(MonkeybleCLIException):
+            run_ansible(MONKEYBLE_DEFAULT_ANSIBLE_CMD,
+                        "playbook.yml",
+                        "my_inventory",
+                        ["extra_vars1.yml", "extra_vars2.yml"],
+                        "scenario1")
+            self.assertTrue(mock_subproc_popen.called)
+            mock_exit.assert_called_with(1)
