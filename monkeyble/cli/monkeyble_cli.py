@@ -8,7 +8,7 @@ import yaml
 from tabulate import tabulate
 
 from monkeyble.cli.const import MONKEYBLE_DEFAULT_CONFIG_PATH, TEST_PASSED, TEST_FAILED, MONKEYBLE, \
-    MONKEYBLE_DEFAULT_ANSIBLE_CMD
+    MONKEYBLE_DEFAULT_ANSIBLE_CMD, MONKEYBLE_CALLBACK_STARTED
 from monkeyble.cli.exceptions import MonkeybleCLIException
 from monkeyble.cli.models import MonkeybleResult, ScenarioResult
 from monkeyble.cli.utils import Utils
@@ -40,9 +40,15 @@ def run_ansible(ansible_cmd, playbook, inventory, extra_vars, scenario):
     pipes = subprocess.Popen(cmd,
                              stdout=subprocess.PIPE,
                              stderr=subprocess.STDOUT)
+    monkeyble_callback_started_successfully = False
     for line in iter(pipes.stdout.readline, b''):
-        print(f"{line.rstrip().decode('utf-8')}")
+        decoded_line = line.rstrip().decode('utf-8')
+        if MONKEYBLE_CALLBACK_STARTED in str(decoded_line):
+            monkeyble_callback_started_successfully = True
+        print(f"{decoded_line}")
     pipes.wait()
+    if not monkeyble_callback_started_successfully:
+        raise MonkeybleCLIException(message="Seems that Monkeyble callback has not started. Check your Ansible config.")
     if pipes.returncode == 0:
         return TEST_PASSED
     else:
