@@ -1,9 +1,33 @@
 [tool.poetry]
 name = "monkeyble"
-version = "1.1.1.dev0"
+version = "1.1.1"
 description = "End-to-end testing framework for Ansible"
 authors = ["Nicolas Marcq <nicolas.marcq@hpe.com>"]
 license = "GNU General Public License v3 (GPLv3)"
+readme = "README.md"
+homepage = "https://hewlettpackard.github.io/monkeyble/"
+repository = "https://github.com/HewlettPackard/monkeyble"
+keywords = ["test", "ansible", "end2end"]
+classifiers = [
+    'Development Status :: 5 - Production/Stable',
+    'Environment :: Console',
+    'Intended Audience :: Information Technology',
+    'Intended Audience :: Developers',
+    'Intended Audience :: System Administrators',
+    'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+    'Operating System :: POSIX :: Linux',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Topic :: Utilities',
+]
+include = [
+    'LICENSE.md'
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -21,3 +45,6 @@ twine = "^4.0.1"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+monkeyble = 'monkeyble.cli.monkeyble_cli:main'
