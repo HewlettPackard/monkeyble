@@ -5,7 +5,7 @@ import pathlib
 import subprocess
 import sys
 import time
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import yaml
 from tabulate import tabulate
@@ -15,6 +15,7 @@ from monkeyble.cli.const import MONKEYBLE_DEFAULT_CONFIG_PATH, TEST_PASSED, TEST
 from monkeyble.cli.exceptions import MonkeybleCLIException
 from monkeyble.cli.models import MonkeybleResult, ScenarioResult
 from monkeyble.cli.utils import Utils
+from monkeyble._version import __version__
 
 logger = logging.getLogger(MONKEYBLE)
 
@@ -163,6 +164,8 @@ def parse_args(args):
     parser.add_argument("action", help="[test]")
     parser.add_argument("-c", "--config",
                         help="Path to the monkeyble config")
+    parser.add_argument('-v', '--version', action='version',
+                        version="Monkeyble {version}".format(version=__version__))
 
     # parse arguments from script parameters
     return parser.parse_args(args)
