@@ -117,8 +117,8 @@ class CallbackModule(CallbackBase):
         return super(CallbackModule, self).v2_runner_on_start(host, task)
 
     def v2_playbook_on_stats(self, stats):
-        # if we reach this line, all test have passed successfully
-        self.display_message_ok(msg=f"🐵 Monkeyble - ALL TESTS PASSED ✔ - scenario: {self.monkeyble_scenario_description}")
+        if not stats.failures:
+            self.display_message_ok(msg=f"🐵 Monkeyble - ALL TESTS PASSED ✔ - scenario: {self.monkeyble_scenario_description}")
         super(CallbackModule, self).v2_playbook_on_stats(stats)
 
     def v2_runner_on_unreachable(self, result):
