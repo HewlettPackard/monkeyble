@@ -121,7 +121,7 @@ def main():
         tasks=[
             # dict(action=dict(module='shell', args='ls'), register='shell_out'),
             # dict(name="test_name2", action=dict(module='debug', args=dict(msg='{{ my_var }}')), when="my_var == 'to_be_updated'"),
-            dict(name="test_name2 with {{ task_name }}", action=dict(module='debug', args=dict(msg='general kenobi'))),
+            dict(name="other", action=dict(module='debug', args=dict(msg='{{ bla }}'))),
             # dict(name="test_name3", action=dict(module='find', args=dict(path='/tmp'))),
             # dict(name="test_name3", action=dict(module='set_fact', args=dict(new_var='{{ test_var }}'))),
             # dict(name="test_name1", action=dict(module='debug', args=dict(msg='{{ my_var }}'))),
