@@ -37,4 +37,5 @@ nav:
   - Task filters: task_filters.md
   - Task extra vars: extra_vars.md
   - CLI: cli.md
+  - CI/CD: ci_cd.md
   - Dev env: dev_env.md
