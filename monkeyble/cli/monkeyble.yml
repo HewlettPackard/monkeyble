@@ -1,8 +1,9 @@
+monkeyble_global_extra_vars:
+  - "../../tests/mocks.yml"
 monkeyble_test_suite:
   - playbook: "../../tests/test_playbook.yml"
 #    inventory: "inventory"
     extra_vars:
-      - "../../tests/mocks.yml"
       - "../../tests/monkeyble_scenarios.yml"
     scenarios:
       - validate_test_1

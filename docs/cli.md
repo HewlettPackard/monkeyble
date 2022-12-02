@@ -31,6 +31,15 @@ The CLI expect to find monkeyble configuration file. The file will be searched f
 - `MONKEYBLE_CONFIG` placed as an environment variable
 - `monkeyble.yml` from the current directory
 
+### monkeyble_global_extra_vars
+
+This flag contains a list of extra var files that will be loaded in all test.
+```yaml
+monkeyble_global_extra_vars:
+  - "mocks.yml"
+  - "common_test_input.yml"
+```
+
 ### monkeyble_test_suite
 
 The `monkeyble_test_suite` contains a list of Monkeyble test definition.

@@ -5,6 +5,7 @@ import pathlib
 import subprocess
 import sys
 import time
+from copy import copy
 from datetime import timedelta
 
 import yaml
@@ -64,14 +65,18 @@ def run_monkeyble_test(monkeyble_config):
     if "monkeyble_test_suite" not in monkeyble_config:
         raise MonkeybleCLIException(message="No 'monkeyble_test_suite' variable defined")
     list_result = list()
+    global_extra_vars = list()
+    if "monkeyble_global_extra_vars" in monkeyble_config:
+        global_extra_vars.extend(monkeyble_config["monkeyble_global_extra_vars"])
     for test_config in monkeyble_config["monkeyble_test_suite"]:
+        extra_vars = copy(global_extra_vars)
         Utils.print_info(f"Monkeyble - ansible cmd: {ansible_cmd}")
         playbook = test_config.get("playbook", None)
         new_result = MonkeybleResult(playbook)
         if playbook is None:
             raise MonkeybleCLIException(message="Missing 'playbook' key in a test")
         inventory = test_config.get("inventory", None)
-        extra_vars = test_config.get("extra_vars", None)
+        extra_vars.extend(test_config.get("extra_vars", []))
         scenarios = test_config.get("scenarios", None)
         if scenarios is None:
             raise MonkeybleCLIException(message=f"No scenarios for playbook {playbook}")
