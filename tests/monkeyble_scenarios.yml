@@ -21,7 +21,7 @@ monkeyble_scenarios:
 #        role: "ddzdz"
 #        should_be_changed: true
 #        should_be_skipped: true
-#        should_failed: true
+#        should_fail: true
 #        extra_vars:
 #          my_var: "general Organa"
 #        mock:

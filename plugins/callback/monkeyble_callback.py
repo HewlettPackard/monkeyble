@@ -206,7 +206,7 @@ class CallbackModule(CallbackBase):
         self._display.debug("Monkeyble check_if_task_should_have_failed called")
 
         result = self._compare_boolean_to_config(task_name=self._last_task_name,
-                                                 config_flag_name="should_failed",
+                                                 config_flag_name="should_fail",
                                                  task_config=self._last_task_config,
                                                  actual_state=task_has_actually_failed)
         if result is not None and result:

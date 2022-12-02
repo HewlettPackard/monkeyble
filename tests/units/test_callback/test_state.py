@@ -14,7 +14,7 @@ class TestMonkeybleCallbackState(BaseTestMonkeybleCallback):
     def test_check_if_task_should_have_failed_continue_on_error_errors(self, mock_exit_playbook):
         self.test_callback._last_task_config = {
             "task": "test_task",
-            "should_failed": True
+            "should_fail": True
         }
         self.test_callback._last_task_ignore_errors = True
         self.test_callback.check_if_task_should_have_failed(task_has_actually_failed=True)
@@ -24,7 +24,7 @@ class TestMonkeybleCallbackState(BaseTestMonkeybleCallback):
     def test_check_if_task_should_have_failed_exit_zero_when_not_ignoring_errors(self, mock_exit_playbook):
         self.test_callback._last_task_config = {
             "task": "test_task",
-            "should_failed": True
+            "should_fail": True
         }
         self.test_callback._last_task_ignore_errors = False
         with self.assertRaises(MonkeybleException):
