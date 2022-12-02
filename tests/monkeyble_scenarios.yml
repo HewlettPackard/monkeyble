@@ -3,19 +3,33 @@ my_variable_1: "my_value_1"
 hello_there: "Hello Monkeyble"
 
 monkeyble_scenarios:
-  validate_test_1:
+  validate_hello_monkey:
     name: "Monkeyble hello world"
     tasks_to_test:
-      - task: "debug task"
+      - task: "First task"
+        test_output:
+          - assert_equal:
+              result_key: result.ansible_facts.hello_to_who
+              expected: "Hello Monkeyble"
+
+      - task: "Second task"
         test_input:
           - assert_equal:
               arg_name: msg
-              expected: "{{ hello_there }}"
-  validate_test_2:
-    name: "Test 2"
-    tasks_to_test:
-      - task: "debug task"
-        test_input: "{{ test_input_config_1 }}"
+              expected: "Hello Monkeyble"
+
+      - task: "Should be skipped task"
+        should_be_skipped: true
+
+      - task: "Push Monkeyble to a fake API"
+        mock:
+          config:
+            monkeyble_module:
+              consider_changed: true
+              result_dict:
+                json:
+                  id: 10
+                  message: "monkey added"
 
 #        play: "play"
 #        role: "ddzdz"

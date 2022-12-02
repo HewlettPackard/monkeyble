@@ -23,7 +23,11 @@ monkeyble_scenarios:
 
 Monkeyble comes with a mock module that return a configured dict.
 
-Considering this task from a role or a playbook. We create a VM in a VMware hypervisor.
+Consider a scenario where you are working with public cloud API or infrastructure module. 
+In the context of testing, you do not want to create a real instance of an object in the cloud like a VM or a container orchestrator.
+But you still need eventually the returned dictionary so the playbook can be executed entirely.
+
+In the following example, we create a VM in a VMware hypervisor.
 ```yaml
 - name: "Create a virtual machine on given ESXi hostname"
   community.vmware.vmware_guest:

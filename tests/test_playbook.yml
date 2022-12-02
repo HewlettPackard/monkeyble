@@ -1,46 +1,31 @@
 # ANSIBLE_CONFIG="ansible.cfg" ansible-playbook test_strategy_playbook.yml
 
-- name: "play1"
+- name: "Hello Monkeyble"
   hosts: localhost
   connection: local
   gather_facts: false
   become: false
   vars:
-    my_var: "Hello Monkeyble"
+    who: "Monkeyble"
+
   tasks:
-    - name: "debug task"
+    - name: "First task"
+      set_fact:
+        hello_to_who: "Hello {{ who }}"
+
+    - name: "Second task"
       debug:
-        msg: "Hello Monkeyble"
+        msg: "{{ hello_to_who }}"
 
-#    - name: "task2"
-#      debug:
-#        msg: "{{ my_var }}"
+    - when: "who != 'Monkeyble'"
+      name: "Should be skipped task"
+      debug:
+        msg: "You said hello to somebody else"
 
-#    - when: my_var == "var1"
-#      name: "test_name2"
-#      debug:
-#        msg: "{{ my_var }}"
-#    - name: "test_name2"
-#      fail:
-#        msg: "this is a fail"
-#      ignore_errors: true
-#    - name: "next after fail"
-#      debug:
-#        msg: "test"
-#  roles:
-#    - role: test_role
-#    - role: test_role2
-
-#- name: "Play2"
-#  hosts: localhost
-#  connection: local
-#  gather_facts: false
-#  become: false
-#
-#  vars:
-#    my_var: "var2"
-#
-#  tasks:
-#    - name: "Task test 2"
-#      debug:
-#        msg: "This is another test {{ my_var }}"
+    - name: "Push Monkeyble to a fake API"
+      uri:
+        url: "example.domain/monkeyble"
+        method: POST
+        body:
+          who: "{{ who }}"
+        body_format: json
