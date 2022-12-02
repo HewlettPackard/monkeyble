@@ -14,7 +14,7 @@ monkeyble_scenarios:
       - task: "debug task"
         should_be_changed: true
         should_be_skipped: false
-        should_failed: false
+        should_fail: false
 ```
 
 ## States
@@ -55,23 +55,23 @@ monkeyble_scenarios:
   should_be_skipped: true
 ```
 
-### should_failed
+### should_fail
 
 ```yaml
 # Task example
-- name: "should_failed"
+- name: "should_fail"
   fail:
     msg: "save Palpatine"
 ```
 
 ```yaml
 # Monkeyble config
-- task: "should_failed"
-  should_failed: true
+- task: "should_fail"
+  should_fail: true
 ```
 
 !!!warning
 
     The normal return code when a task fail in an Ansible is **1**.
-    When a task is declared as `should_failed` in a Monkeyble and actually fail then the return code 
+    When a task is declared as `should_fail` in a Monkeyble and actually fail then the return code
      is **O** instead to prevent a CI/CD from concidering the test as a failure.

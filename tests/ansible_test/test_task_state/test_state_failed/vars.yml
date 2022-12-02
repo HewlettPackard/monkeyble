@@ -19,12 +19,12 @@ monkeyble_scenarios:
       - task: "should_not_be_skipped"
         should_be_skipped: true
 
-  should_failed:
+  should_fail:
     tasks_to_test:
-      - task: "should_failed"
-        should_failed: false
+      - task: "should_fail"
+        should_fail: false
 
   should_not_failed:
     tasks_to_test:
       - task: "should_not_failed"
-        should_failed: true
+        should_fail: true

@@ -69,7 +69,7 @@ LIST_SCENARIO=(
   "should_be_changed_true"
   "should_be_skipped"
   "should_not_be_skipped"
-  "should_failed"
+  "should_fail"
   "should_not_failed"
 )
 PLAYBOOK_PATH="test_task_state/playbook.yml"

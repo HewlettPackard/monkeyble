@@ -25,7 +25,7 @@
       debug:
         msg: "learn the force"
 
-    - name: "should_failed"
+    - name: "should_fail"
       fail:
         msg: "save Palpatine"
       ignore_errors: true
