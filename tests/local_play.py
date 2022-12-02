@@ -68,7 +68,7 @@ def main():
                         "task": "test_name2 with test_name2",
                         # "should_be_changed": True,
                         # "should_be_skipped": False,
-                        # "should_failed": False,
+                        # "should_fail": False,
                         "test_input": "{{ test_input_config_1 }}",
                         # "mock": {"config": "{{ replace_debug_mock }}"}
                     }

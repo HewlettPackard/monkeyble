@@ -206,7 +206,7 @@ Monkeyble allow to check the states of a task
   - task: "my_task_name"
     should_be_skipped: false
     should_be_changed: true
-    should_failed: false
+    should_fail: false
 ```
 
 ### Monkey patching
