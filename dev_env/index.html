@@ -359,6 +359,21 @@
 
   
   
+  
+    <li class="md-nav__item">
+      <a href="../ci_cd/" class="md-nav__link">
+        CI/CD
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
     
   
   
@@ -395,15 +410,42 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#dev-with-ansible-cli" class="md-nav__link">
-    Dev with Ansible CLI
+  <a href="#install-dependencies" class="md-nav__link">
+    Install dependencies
   </a>
   
 </li>
       
         <li class="md-nav__item">
+  <a href="#dev-the-callback" class="md-nav__link">
+    Dev the callback
+  </a>
+  
+    <nav class="md-nav" aria-label="Dev the callback">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dev-with-ansible-cli" class="md-nav__link">
+    Dev with Ansible CLI
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#dev-with-python" class="md-nav__link">
     Dev with Python
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dev-the-cli" class="md-nav__link">
+    Dev the CLI
   </a>
   
 </li>
@@ -443,15 +485,42 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#dev-with-ansible-cli" class="md-nav__link">
-    Dev with Ansible CLI
+  <a href="#install-dependencies" class="md-nav__link">
+    Install dependencies
   </a>
   
 </li>
       
         <li class="md-nav__item">
+  <a href="#dev-the-callback" class="md-nav__link">
+    Dev the callback
+  </a>
+  
+    <nav class="md-nav" aria-label="Dev the callback">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dev-with-ansible-cli" class="md-nav__link">
+    Dev with Ansible CLI
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#dev-with-python" class="md-nav__link">
     Dev with Python
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dev-the-cli" class="md-nav__link">
+    Dev the CLI
   </a>
   
 </li>
@@ -477,19 +546,31 @@
 
 
 <h1 id="setup-a-dev-environment">Setup a dev environment</h1>
-<p>Requirements: ansible &gt; 2.11</p>
 <p>Clone the project:
 <div class="highlight"><pre><span></span><code>git clone https://github.com/HewlettPackard/monkeyble
 </code></pre></div></p>
-<h2 id="dev-with-ansible-cli">Dev with Ansible CLI</h2>
+<h2 id="install-dependencies">Install dependencies</h2>
+<p>Initializing and installing python libraries with Poetry
+<div class="highlight"><pre><span></span><code>poetry install
+</code></pre></div></p>
+<p>A new virtual environment is created in <code>/home/user/.cache/pypoetry/virtualenvs/monkeyble-yk3Ua9-4-py3.10</code>.
+You can configure your IDE to use the python binary <code>/home/user/.cache/pypoetry/virtualenvs/monkeyble-yk3Ua9-4-py3.10/bin/python3.10</code>.</p>
+<h2 id="dev-the-callback">Dev the callback</h2>
+<h3 id="dev-with-ansible-cli">Dev with Ansible CLI</h3>
 <p>Update the test ansible playbook in <code>tests/test_playbook.yml</code></p>
 <p>Update the monkeyble config in <code>tests/monkeyble.yml</code></p>
 <p>Run the playbook using the provided <code>ansible.cfg</code> that point to the local repository:
 <div class="highlight"><pre><span></span><code><span class="nv">ANSIBLE_CONFIG</span><span class="o">=</span><span class="s2">&quot;ansible.cfg&quot;</span> ansible-playbook  tests/test_playbook.yml -e <span class="s2">&quot;@tests/monkeyble.yml&quot;</span> -e <span class="s2">&quot;monkeyble_scenario=validate_test_1&quot;</span>
 </code></pre></div></p>
-<h2 id="dev-with-python">Dev with Python</h2>
+<h3 id="dev-with-python">Dev with Python</h3>
 <p>To use the python debugger you can execute the python script <code>tests/local_play.py</code> which is based on the Ansible Python API.
 <div class="highlight"><pre><span></span><code>python3 tests/local_play.py
+</code></pre></div></p>
+<h2 id="dev-the-cli">Dev the CLI</h2>
+<p>Execute the <code>cli/monkeyble_cli.py</code> script with an action parameter like <code>test</code>.</p>
+<p>To execute unit tests:
+<div class="highlight"><pre><span></span><code>poetry shell
+python3 -m unittest discover
 </code></pre></div></p>
 
 
@@ -511,7 +592,7 @@
     <nav class="md-footer__inner md-grid" aria-label="Footer" >
       
         
-        <a href="../cli/" class="md-footer__link md-footer__link--prev" aria-label="Previous: CLI" rel="prev">
+        <a href="../ci_cd/" class="md-footer__link md-footer__link--prev" aria-label="Previous: CI/CD" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
           </div>
@@ -520,7 +601,7 @@
               <span class="md-footer__direction">
                 Previous
               </span>
-              CLI
+              CI/CD
             </div>
           </div>
         </a>

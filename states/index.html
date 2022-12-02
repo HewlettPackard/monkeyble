@@ -349,8 +349,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#should_failed" class="md-nav__link">
-    should_failed
+  <a href="#should_fail" class="md-nav__link">
+    should_fail
   </a>
   
 </li>
@@ -436,6 +436,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../ci_cd/" class="md-nav__link">
+        CI/CD
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../dev_env/" class="md-nav__link">
         Dev env
       </a>
@@ -499,8 +514,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#should_failed" class="md-nav__link">
-    should_failed
+  <a href="#should_fail" class="md-nav__link">
+    should_fail
   </a>
   
 </li>
@@ -541,7 +556,7 @@
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">task</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;debug</span><span class="nv"> </span><span class="s">task&quot;</span><span class="w"></span>
 <span class="w">        </span><span class="nt">should_be_changed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
 <span class="w">        </span><span class="nt">should_be_skipped</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
-<span class="w">        </span><span class="nt">should_failed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
+<span class="w">        </span><span class="nt">should_fail</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
 </code></pre></div>
 <h2 id="states_1">States</h2>
 <h3 id="should_be_changed">should_be_changed</h3>
@@ -570,20 +585,20 @@
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">task</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;should_be_skipped&quot;</span><span class="w"></span>
 <span class="w">  </span><span class="nt">should_be_skipped</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
 </code></pre></div>
-<h3 id="should_failed">should_failed</h3>
+<h3 id="should_fail">should_fail</h3>
 <div class="highlight"><pre><span></span><code><span class="c1"># Task example</span><span class="w"></span>
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;should_failed&quot;</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;should_fail&quot;</span><span class="w"></span>
 <span class="w">  </span><span class="nt">fail</span><span class="p">:</span><span class="w"></span>
 <span class="w">    </span><span class="nt">msg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;save</span><span class="nv"> </span><span class="s">Palpatine&quot;</span><span class="w"></span>
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><span class="c1"># Monkeyble config</span><span class="w"></span>
-<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">task</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;should_failed&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="nt">should_failed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">task</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;should_fail&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="nt">should_fail</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
 </code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>The normal return code when a task fail in an Ansible is <strong>1</strong>.
-When a task is declared as <code>should_failed</code> in a Monkeyble and actually fail then the return code 
+When a task is declared as <code>should_fail</code> in a Monkeyble and actually fail then the return code
  is <strong>O</strong> instead to prevent a CI/CD from concidering the test as a failure.</p>
 </div>
 

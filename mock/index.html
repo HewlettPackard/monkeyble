@@ -416,6 +416,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../ci_cd/" class="md-nav__link">
+        CI/CD
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../dev_env/" class="md-nav__link">
         Dev env
       </a>
@@ -508,7 +523,10 @@ The mock module can return values so the tested playbook can register new variab
 </code></pre></div></p>
 <h2 id="the-monkeyble-mock-module">The monkeyble mock module</h2>
 <p>Monkeyble comes with a mock module that return a configured dict.</p>
-<p>Considering this task from a role or a playbook. We create a VM in a VMware hypervisor.
+<p>Consider a scenario where you are working with public cloud API or infrastructure module. 
+In the context of testing, you do not want to create a real instance of an object in the cloud like a VM or a container orchestrator.
+But you still need eventually the returned dictionary so the playbook can be executed entirely.</p>
+<p>In the following example, we create a VM in a VMware hypervisor.
 <div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Create</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">virtual</span><span class="nv"> </span><span class="s">machine</span><span class="nv"> </span><span class="s">on</span><span class="nv"> </span><span class="s">given</span><span class="nv"> </span><span class="s">ESXi</span><span class="nv"> </span><span class="s">hostname&quot;</span><span class="w"></span>
 <span class="w">  </span><span class="nt">community.vmware.vmware_guest</span><span class="p">:</span><span class="w"></span>
 <span class="w">    </span><span class="nt">hostname</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">vcenter_hostname</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
