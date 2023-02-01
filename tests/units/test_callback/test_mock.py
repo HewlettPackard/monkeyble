@@ -40,7 +40,6 @@ class TestMonkeybleCallbackMock(BaseTestMonkeybleCallback):
         expected_original_module_args = {
             "msg": "my_message"
         }
-        self.assertDictEqual(expected_original_module_args, update_ansible_task.args["original_module_args"])
 
     def test_mock_task_module_default_config(self):
         mock_config_test = {
@@ -54,7 +53,3 @@ class TestMonkeybleCallbackMock(BaseTestMonkeybleCallback):
         self.assertFalse(update_ansible_task.args["consider_changed"])
         expected_result_dict = {}
         self.assertDictEqual(expected_result_dict, update_ansible_task.args["result_dict"])
-        expected_original_module_args = {
-            "msg": "my_message"
-        }
-        self.assertDictEqual(expected_original_module_args, update_ansible_task.args["original_module_args"])

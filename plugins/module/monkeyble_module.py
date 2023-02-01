@@ -7,7 +7,6 @@ def run_module():
     module_args = {
         'task_name': dict(type='str', required=True),
         'original_module_name': dict(type='str', required=True),
-        'original_module_args': dict(type='dict', required=True),
         'consider_changed': dict(type='bool', required=False, default=False),
         'result_dict': dict(type='dict', required=False),
     }
