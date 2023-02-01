@@ -18,7 +18,7 @@ from plugins.callback.monkeyble_callback import CallbackModule as MonkeybleCallb
 def main():
     host_list = ['localhost']
     # since the API is constructed for CLI it expects certain options to always be set in the context object
-    context.CLIARGS = ImmutableDict(connection='local', module_path=['/to/mymodules', '/usr/share/ansible'], forks=10,
+    context.CLIARGS = ImmutableDict(connection='local', module_path=['../plugins/module'], forks=10,
                                     become=None, become_method=None, become_user=None, check=False, diff=False,
                                     verbosity=0)
     # required for
@@ -43,6 +43,10 @@ def main():
     extra_vars = {
         "task_name": "test_name2",
         "test_var": "updated !",
+        "list_var": [
+            "item1",
+            "item2",
+        ],
         "test_input_config_1": [
             {
                 "assert_equal": {
@@ -65,12 +69,12 @@ def main():
                 "name": "Validate that bla bla",
                 "tasks_to_test": [
                     {
-                        "task": "test_name2 with test_name2",
+                        "task": "test_name",
                         # "should_be_changed": True,
                         # "should_be_skipped": False,
                         # "should_fail": False,
-                        "test_input": "{{ test_input_config_1 }}",
-                        # "mock": {"config": "{{ replace_debug_mock }}"}
+                        # "test_input": "{{ test_input_config_1 }}",
+                        "mock": {"config": "{{ replace_debug_mock }}"}
                     }
                 ]
                 # "tasks_to_test": [
@@ -121,7 +125,8 @@ def main():
         tasks=[
             # dict(action=dict(module='shell', args='ls'), register='shell_out'),
             # dict(name="test_name2", action=dict(module='debug', args=dict(msg='{{ my_var }}')), when="my_var == 'to_be_updated'"),
-            dict(name="other", action=dict(module='debug', args=dict(msg='{{ bla }}'))),
+            dict(name="test_name", action=dict(module='set_fact', args=dict(key_test="{{ lookup('community.hashi_vault.hashi_vault', item) }}")), loop="{{ list_var }}", register="register1"),
+            dict(name="print register", action=dict(module='debug', args=dict(msg='{{ register1.results }}'))),
             # dict(name="test_name3", action=dict(module='find', args=dict(path='/tmp'))),
             # dict(name="test_name3", action=dict(module='set_fact', args=dict(new_var='{{ test_var }}'))),
             # dict(name="test_name1", action=dict(module='debug', args=dict(msg='{{ my_var }}'))),

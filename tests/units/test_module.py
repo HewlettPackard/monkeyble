@@ -21,9 +21,6 @@ class TestMonkeybleModule(unittest.TestCase):
         with self.assertRaises(AnsibleExitJson) as result:
             set_module_args({
                 'original_module_name': 'copy',
-                'original_module_args': {
-                    'datacenter': 'my_dc'
-                },
                 'task_name': "task1"
             })
             monkeyble_module.main()
@@ -32,9 +29,6 @@ class TestMonkeybleModule(unittest.TestCase):
         with self.assertRaises(AnsibleExitJson) as result:
             set_module_args({
                 'original_module_name': 'copy',
-                'original_module_args': {
-                    'datacenter': 'my_dc'
-                },
                 'task_name': "task1",
                 'consider_changed': True
             })
@@ -45,9 +39,6 @@ class TestMonkeybleModule(unittest.TestCase):
         with self.assertRaises(AnsibleExitJson) as result:
             set_module_args({
                 'original_module_name': 'copy',
-                'original_module_args': {
-                    'datacenter': 'my_dc'
-                },
                 'task_name': "task1",
                 'consider_changed': False
             })
@@ -59,9 +50,6 @@ class TestMonkeybleModule(unittest.TestCase):
         with self.assertRaises(AnsibleExitJson) as result:
             set_module_args({
                 'original_module_name': 'copy',
-                'original_module_args': {
-                    'datacenter': 'my_dc'
-                },
                 'task_name': "task1",
                 'result_dict': {'my_key': 'my_val'}
 
