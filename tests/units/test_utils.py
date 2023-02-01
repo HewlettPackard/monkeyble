@@ -254,3 +254,19 @@ class TestMonkeybleUtils(unittest.TestCase):
         ansible_task.play.name = "another_play_name"
         result = get_task_config(ansible_task=ansible_task, monkeyble_config=monkeyble_config)
         self.assertIsNone(result)
+
+    def test_get_task_config_task_from_shared_task(self):
+        ansible_task = MagicMock()
+        ansible_task._role._role_name = None
+        ansible_task.name = "task_name_test"
+        ansible_task.play.name = "play_name_test"
+        monkeyble_config = {"name": "Validate this",
+                            "tasks_to_test": [],
+                            "monkeyble_shared_tasks": [{"task": "task_name_test",
+                                                       "play": "play_name_test"}]
+                            }
+
+        result = get_task_config(ansible_task=ansible_task, monkeyble_config=monkeyble_config)
+        expected = {"task": "task_name_test",
+                    "play": "play_name_test"}
+        self.assertDictEqual(result, expected)

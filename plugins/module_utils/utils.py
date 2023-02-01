@@ -92,6 +92,9 @@ def get_task_config(ansible_task: Task, monkeyble_config: dict):
         role_name = ansible_task._role._role_name
     # print(f"get_task_config role: {role_name}")
     if "tasks_to_test" in monkeyble_config:
+        # we add global task at the end the list of task
+        if "monkeyble_shared_tasks" in monkeyble_config:
+            monkeyble_config["tasks_to_test"].extend(monkeyble_config["monkeyble_shared_tasks"])
         for task_config in monkeyble_config["tasks_to_test"]:
             if "task" not in task_config:
                 raise MonkeybleException(message=str("Monkeyble error: Task name need to be set"))
