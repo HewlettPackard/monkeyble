@@ -77,7 +77,11 @@ class CallbackModule(CallbackBase):
 
         # variable placed into the monkeyble config need to be instantiated with extra vars
         templar = Templar(loader=DataLoader(), variables=self.extra_vars)
-        self.monkeyble_config = templar.template(loaded_monkeyble_config)
+        try:
+            self.monkeyble_config = templar.template(loaded_monkeyble_config)
+        except Exception as e:
+            raise MonkeybleException(message=str(e),
+                                     scenario_description=monkeyble_scenario)
 
         self.display_message_ok(f"monkeyble_scenario: {monkeyble_scenario}")
         self.monkeyble_scenario_description = monkeyble_scenario

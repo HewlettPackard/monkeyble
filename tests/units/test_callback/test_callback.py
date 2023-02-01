@@ -239,3 +239,22 @@ class TestMonkeybleCallback(BaseTestMonkeybleCallback):
                 'monkeyble_passed_test': []
             }
             self.assertDictEqual(self.test_callback._last_check_input_result, expected_last_check_input_result)
+
+    @patch('sys.exit')
+    def test_v2_runner_on_start_fail_on_missing_var(self, mock_exit):
+        self.test_callback.monkeyble_config = {
+            "name": "Validate this",
+            "tasks_to_test": [
+            ]
+        }
+        self.var_manager.extra_vars = {
+            "monkeyble_scenario": "test_scenario",
+            "monkeyble_scenarios": {
+                "test_scenario": {
+                    "name": "{{ not_declared_anywhere }}"
+                }
+            }
+        }
+        with self.assertRaises(MonkeybleException):
+            self.test_callback.v2_playbook_on_play_start(self.play)
+            mock_exit.assert_called()
