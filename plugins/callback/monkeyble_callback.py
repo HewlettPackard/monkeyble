@@ -64,6 +64,7 @@ class CallbackModule(CallbackBase):
         self.extra_vars = vm.extra_vars
         monkeyble_scenario = self.extra_vars.get("monkeyble_scenario")
         monkeyble_scenarios = self.extra_vars.get("monkeyble_scenarios")
+        monkeyble_shared_tasks = self.extra_vars.get("monkeyble_shared_tasks", [])
         if monkeyble_scenario is None:
             raise MonkeybleException("'monkeyble_scenario' need to be passed as extra_vars")
         if monkeyble_scenarios is None:
@@ -75,6 +76,8 @@ class CallbackModule(CallbackBase):
             raise MonkeybleException(f"The Monkeyble scenario name '{monkeyble_scenario}' "
                                      f"not found in 'monkeyble_scenarios'")
 
+        # add shared task to the config
+        loaded_monkeyble_config["monkeyble_shared_tasks"] = monkeyble_shared_tasks
         # variable placed into the monkeyble config need to be instantiated with extra vars
         templar = Templar(loader=DataLoader(), variables=self.extra_vars)
         try:

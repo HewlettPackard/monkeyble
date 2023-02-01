@@ -62,6 +62,10 @@ class TestMonkeybleCallback(BaseTestMonkeybleCallback):
         self.var_manager.extra_vars = {
             "my_extra_variable": "value1",
             "monkeyble_scenario": "test_scenario",
+            "monkeyble_shared_tasks": [
+                {"task": "shared_task_1"},
+                {"task": "{{ my_extra_variable }}"},
+            ],
             "monkeyble_scenarios": {
                 "test_scenario": {
                     "name": "{{ my_extra_variable }}"
@@ -70,7 +74,11 @@ class TestMonkeybleCallback(BaseTestMonkeybleCallback):
         }
         self.test_callback.v2_playbook_on_play_start(self.play)
         expected_monkeyble_config = {
-            "name": "value1"
+            "name": "value1",
+            "monkeyble_shared_tasks": [
+                {"task": "shared_task_1"},
+                {"task": "value1"},
+            ],
         }
         self.assertDictEqual(expected_monkeyble_config, self.test_callback.monkeyble_config)
 

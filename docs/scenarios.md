@@ -57,6 +57,8 @@ ANSIBLE_CONFIG="ansible.cfg" ansible-playbook playbook.yml \
 
 ## Re-using test code
 
+### Using Jinja in extra vars
+
 As the configuration is passed as an extra var, usage of jinja template is available to reuse some part of your configuration
 
 E.g:
@@ -107,6 +109,41 @@ ANSIBLE_CONFIG="ansible.cfg" ansible-playbook playbook.yml \
 -e "@monkeyble.yml" \
 -e "monkeyble_scenario=validate_test_1"
 ```
+
+### Using 'monkeyble_shared_tasks'
+
+The 'monkeyble_shared_tasks' is a variable that can be used to place test configuration that will always be available in every executed scenario.
+
+As an example. We have a role, which is used in a lot of playbook, that call Hashicorp Vault server to get a token from a Github token. Here is the ansible code of the task:
+
+```yaml
+- name: Get a vault token from github token
+  uri:
+    url: "{{ vault_address }}/v1/auth/github/login"
+    method: POST
+    headers:
+      Content-Type: application/json
+    body_format: json
+    body:
+      token: "{{ vault_github_token }}"
+  register: get_vault_token
+```
+
+The mock configuration of this particular task can be placed in the `monkeyble_shared_tasks` variable and passed as extra var, so it's always available 
+without having to declare it in the `tasks_to_test` list of each scenario.
+```yaml
+monkeyble_shared_tasks:
+  - task: "Get a vault token from github token"
+    mock:
+      config:
+        monkeyble_module:
+          consider_changed: true
+          result_dict:
+            json:
+              auth:
+                client_token: fake_token
+```
+
 
 ## Ansible native test components
 
