@@ -11,7 +11,6 @@ from ansible.parsing.dataloader import DataLoader
 from ansible.plugins.callback import CallbackBase
 from ansible.template import Templar
 from ansible.utils.display import Display
-from monkeyble._version import __version__
 
 
 BASE_DIR = os.path.abspath(
@@ -23,6 +22,7 @@ if BASE_DIR not in sys.path:
 from plugins.module_utils.utils import str_to_bool, switch_test_method, get_task_config
 from plugins.module_utils.const import PASSED_TEST, FAILED_TEST
 from plugins.module_utils.exceptions import MonkeybleException
+from plugins.module_utils._version import __version__
 
 global_display = Display()
 
