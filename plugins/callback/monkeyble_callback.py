@@ -11,6 +11,7 @@ from ansible.parsing.dataloader import DataLoader
 from ansible.plugins.callback import CallbackBase
 from ansible.template import Templar
 from ansible.utils.display import Display
+from monkeyble._version import __version__
 
 
 BASE_DIR = os.path.abspath(
@@ -59,7 +60,7 @@ class CallbackModule(CallbackBase):
         global_display.display(msg=msg, color=C.COLOR_OK)
 
     def v2_playbook_on_play_start(self, play):
-        self.display_message_ok(msg="🐵 Starting Monkeyble callback")
+        self.display_message_ok(msg=f"🐵 Starting Monkeyble callback {__version__}")
         vm = play.get_variable_manager()
         self.extra_vars = vm.extra_vars
         monkeyble_scenario = self.extra_vars.get("monkeyble_scenario")
