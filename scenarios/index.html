@@ -293,6 +293,26 @@
     Re-using test code
   </a>
   
+    <nav class="md-nav" aria-label="Re-using test code">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-jinja-in-extra-vars" class="md-nav__link">
+    Using Jinja in extra vars
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-monkeyble_shared_tasks" class="md-nav__link">
+    Using 'monkeyble_shared_tasks'
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -490,6 +510,26 @@
     Re-using test code
   </a>
   
+    <nav class="md-nav" aria-label="Re-using test code">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-jinja-in-extra-vars" class="md-nav__link">
+    Using Jinja in extra vars
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-monkeyble_shared_tasks" class="md-nav__link">
+    Using 'monkeyble_shared_tasks'
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -565,6 +605,7 @@ by the playbook to test as well as the Monkeyble configuration placed in the <co
 -e <span class="s2">&quot;monkeyble_scenario=validate_test_1&quot;</span>
 </code></pre></div></p>
 <h2 id="re-using-test-code">Re-using test code</h2>
+<h3 id="using-jinja-in-extra-vars">Using Jinja in extra vars</h3>
 <p>As the configuration is passed as an extra var, usage of jinja template is available to reuse some part of your configuration</p>
 <p>E.g:
 <div class="highlight"><pre><span></span><code><span class="nt">test_input_config</span><span class="p">:</span><span class="w"></span>
@@ -605,6 +646,33 @@ by the playbook to test as well as the Monkeyble configuration placed in the <co
 -e <span class="s2">&quot;@monkeyble.yml&quot;</span> <span class="se">\</span>
 -e <span class="s2">&quot;monkeyble_scenario=validate_test_1&quot;</span>
 </code></pre></div>
+<h3 id="using-monkeyble_shared_tasks">Using 'monkeyble_shared_tasks'</h3>
+<p>The 'monkeyble_shared_tasks' is a variable that can be used to place test configuration that will always be available in every executed scenario.</p>
+<p>As an example. We have a role, which is used in a lot of playbook, that call Hashicorp Vault server to get a token from a Github token. Here is the ansible code of the task:</p>
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Get a vault token from github token</span><span class="w"></span>
+<span class="w">  </span><span class="nt">uri</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">vault_address</span><span class="nv"> </span><span class="s">}}/v1/auth/github/login&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">POST</span><span class="w"></span>
+<span class="w">    </span><span class="nt">headers</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">Content-Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">application/json</span><span class="w"></span>
+<span class="w">    </span><span class="nt">body_format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">json</span><span class="w"></span>
+<span class="w">    </span><span class="nt">body</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">token</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">vault_github_token</span><span class="nv"> </span><span class="s">}}&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="nt">register</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">get_vault_token</span><span class="w"></span>
+</code></pre></div>
+<p>The mock configuration of this particular task can be placed in the <code>monkeyble_shared_tasks</code> variable and passed as extra var, so it's always available 
+without having to declare it in the <code>tasks_to_test</code> list of each scenario.
+<div class="highlight"><pre><span></span><code><span class="nt">monkeyble_shared_tasks</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">task</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Get</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">vault</span><span class="nv"> </span><span class="s">token</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">github</span><span class="nv"> </span><span class="s">token&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">mock</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">config</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="nt">monkeyble_module</span><span class="p">:</span><span class="w"></span>
+<span class="w">          </span><span class="nt">consider_changed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="w">          </span><span class="nt">result_dict</span><span class="p">:</span><span class="w"></span>
+<span class="w">            </span><span class="nt">json</span><span class="p">:</span><span class="w"></span>
+<span class="w">              </span><span class="nt">auth</span><span class="p">:</span><span class="w"></span>
+<span class="w">                </span><span class="nt">client_token</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fake_token</span><span class="w"></span>
+</code></pre></div></p>
 <h2 id="ansible-native-test-components">Ansible native test components</h2>
 <p>The following Ansible components may be placed into playbooks and roles to prevent from failure:</p>
 <ul>
