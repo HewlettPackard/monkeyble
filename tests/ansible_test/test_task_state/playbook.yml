@@ -34,3 +34,9 @@
       debug:
         msg: "destroy the death star"
       ignore_errors: true
+
+    - when: var_false
+      name: "skipped_but_should_have_failed"
+      fail:
+        msg: "save Palpatine"
+      ignore_errors: true

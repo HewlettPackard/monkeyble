@@ -24,10 +24,10 @@ function assert_playbook_fail () {
     -e "@${VARS_PATH}" \
     -e "monkeyble_scenario=$scenario"
     then
-      printf  "❌ ${RED}Monkeyble scenario '$scenario' has not failed as expected${NC}\n"
+      printf  "❌ ${RED} Monkeyble scenario '$scenario' has not failed as expected${NC}\n"
       exit 1
     else
-      printf  "✔️${GREEN}Monkeyble check fail success${NC}\n"
+      printf  "✔️${GREEN} Monkeyble check fail success${NC}\n"
     fi
     echo "###########################"
   done
@@ -71,6 +71,7 @@ LIST_SCENARIO=(
   "should_not_be_skipped"
   "should_fail"
   "should_not_failed"
+  skipped_but_should_have_failed
 )
 PLAYBOOK_PATH="test_task_state/playbook.yml"
 VARS_PATH="test_task_state/test_state_failed/vars.yml"
