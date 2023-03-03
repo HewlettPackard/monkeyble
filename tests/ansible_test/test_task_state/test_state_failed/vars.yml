@@ -30,6 +30,6 @@ monkeyble_scenarios:
         should_fail: true
 
   skipped_but_should_have_failed:
-    task_to_tests:
+    tasks_to_test:
       - task: "skipped_but_should_have_failed"
         should_fail: true

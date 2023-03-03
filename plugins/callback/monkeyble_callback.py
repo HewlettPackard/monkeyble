@@ -178,6 +178,8 @@ class CallbackModule(CallbackBase):
                         templar = Templar(loader=DataLoader(), variables=context)
                         try:
                             templated_value = templar.template(template_string)
+                            if templated_value == "" and test_name == "assert_is_none":
+                                templated_value = None
                         except AnsibleUndefinedVariable as e:
                             raise MonkeybleException(message=str(e),
                                                      scenario_description=self.monkeyble_scenario_description)

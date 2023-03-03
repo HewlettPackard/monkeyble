@@ -133,6 +133,22 @@ class TestMonkeybleModule(unittest.TestCase):
                           "scenario3")
             mock_run_ansible.assert_has_calls([call_1, call_2, call_3])
 
+    def test_run_monkeyble_test_with_limit_run_ansible_called(self):
+        monkeyble_config = {
+            "monkeyble_global_extra_vars": ['mocks.yml'],
+            "monkeyble_test_suite": [
+                {
+                    "playbook": "playbook1.yml",
+                    "inventory": "my_inventory1",
+                    "extra_vars": ["extra_vars1.yml", "extra_vars2.yml"],
+                    "scenarios": ["scenario1", "scenario2"]
+                }
+            ]
+        }
+        with mock.patch("monkeyble.cli.monkeyble_cli.run_ansible") as mock_run_ansible:
+            run_monkeyble_test(monkeyble_config, scenario_name_limit="scenario1")
+            self.assertEqual(mock_run_ansible.call_count, 1)
+
     @patch("subprocess.Popen")
     def test_run_ansible(self, mock_subproc_popen):
         mock_subproc_popen.return_value.stdout = io.BytesIO(MONKEYBLE_CALLBACK_STARTED.encode("utf-8"))
