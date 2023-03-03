@@ -23,7 +23,7 @@ logger = logging.getLogger(MONKEYBLE)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 # actions available
-ACTION_LIST = ["test"]
+ACTION_LIST = ["test", "list"]
 
 
 def run_ansible(ansible_cmd, playbook, inventory, extra_vars, scenario):
@@ -60,7 +60,8 @@ def run_ansible(ansible_cmd, playbook, inventory, extra_vars, scenario):
         return TEST_FAILED
 
 
-def run_monkeyble_test(monkeyble_config):
+def run_monkeyble_test(monkeyble_config, scenario_name_limit=None):
+    scenario_name_limit = scenario_name_limit if scenario_name_limit else list()
     ansible_cmd = MONKEYBLE_DEFAULT_ANSIBLE_CMD
     if "monkeyble_test_suite" not in monkeyble_config:
         raise MonkeybleCLIException(message="No 'monkeyble_test_suite' variable defined")
@@ -84,6 +85,8 @@ def run_monkeyble_test(monkeyble_config):
         Utils.print_info(f"Monkeyble - current path: {pathlib.Path().resolve()}")
         list_scenario_result = list()
         for scenario in scenarios:
+            if len(scenario_name_limit) > 0 and scenario not in scenario_name_limit:
+                continue
             scenario_result = ScenarioResult(scenario)
             scenario_result.result = run_ansible(ansible_cmd, playbook, inventory, extra_vars, scenario)
             list_scenario_result.append(scenario_result)
@@ -166,7 +169,8 @@ def parse_args(args):
     """
     # create arguments
     parser = argparse.ArgumentParser(description=MONKEYBLE)
-    parser.add_argument("action", help="[test]")
+    parser.add_argument("action", help="[test,list]")
+    parser.add_argument("--limit", nargs="+")
     parser.add_argument("-c", "--config",
                         help="Path to the monkeyble config")
     parser.add_argument('-v', '--version', action='version',
@@ -174,6 +178,16 @@ def parse_args(args):
 
     # parse arguments from script parameters
     return parser.parse_args(args)
+
+
+def list_config(config):
+    headers = ["Playbook", "Scenario"]
+    table = list()
+    for monkeyble_test in config["monkeyble_test_suite"]:
+        row = [monkeyble_test["playbook"], '\n'.join(str(x) for x in monkeyble_test["scenarios"])]
+        table.append(row)
+    print("")
+    print(tabulate(table, headers=headers, tablefmt="presto"))
 
 
 def main():
@@ -191,9 +205,12 @@ def main():
 
     if parser.action == "test":
         start_time = time.monotonic()
-        test_results = run_monkeyble_test(config)
+        test_results = run_monkeyble_test(config, parser.limit)
         print_result_table(test_results)
         do_exit(test_results, start_time)
+
+    if parser.action == "list":
+        list_config(config)
 
 
 if __name__ == '__main__':

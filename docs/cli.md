@@ -18,14 +18,14 @@ pipx inject ansible --include-apps monkeyble
 
 ### From sources
 
-Run the Python setup 
+Run the Python setup
 ```bash
 python3 setup.py install
 ```
 
 ## Configuration file
 
-The CLI expect to find monkeyble configuration file. The file will be searched for in the following order:
+The CLI expect to find Monkeyble configuration file. The file will be searched for in the following order:
 
 - `-c CONFIG` as a cli argument
 - `MONKEYBLE_CONFIG` placed as an environment variable
@@ -81,6 +81,22 @@ monkeyble_test_suite:
 
 ## Commands
 
+### monkeyble list
+
+List playbook and scenario declared in the Monkeyble configuration file.
+
+Command:
+```
+ANSIBLE_CONFIG='monkeyble.cfg' monkeyble list 
+```
+
+```
+ Playbook          | Scenario
+-------------------+-----------------
+ test_playbook.yml | validate_test_1
+                   | validate_test_2
+```
+
 ### monkeyble test
 
 The monkeyble test command executes all the test declared in the `monkeyble_test_suite` configuration flag and provides
@@ -103,4 +119,13 @@ Playbook   | Scenario        | Test passed
  play2.yml | validate_that   | ✅
  
  🐵 Monkeyble test result - Tests passed: 4 of 4 tests
+```
+
+#### limit
+
+Limit the execution to a list of scenario name. Use the `--limit` flag by passing space separated list of scenario.
+
+Command:
+```
+ANSIBLE_CONFIG='monkeyble.cfg' monkeyble test --limit validate_this validate_that
 ```
