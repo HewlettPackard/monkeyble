@@ -156,6 +156,7 @@ class CallbackModule(CallbackBase):
     def v2_runner_on_skipped(self, result, **kwargs):
         self._display.debug("Run v2_runner_on_skipped")
         self.check_if_task_should_have_been_skipped(task_has_been_actually_skipped=True)
+        self.check_if_task_should_have_failed(task_has_actually_failed=False)
 
     def test_output(self, result_dict):
 
