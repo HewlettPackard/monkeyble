@@ -1,3 +1,17 @@
+# 1.4.0 2023-03-06
+
+## Feature
+
+- CLI: add `monkeyble list` + `monkeyble test --limit`
+
+## Fix
+
+- Fix error message on should_fail
+
+## Enhancement
+
+- check if task should have failed when actually skipped
+
 # 1.3.0 2023-02-02
 
 ## Fix
