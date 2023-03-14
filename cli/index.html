@@ -442,9 +442,29 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#monkeyble-list" class="md-nav__link">
+    monkeyble list
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#monkeyble-test" class="md-nav__link">
     monkeyble test
   </a>
+  
+    <nav class="md-nav" aria-label="monkeyble test">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#limit" class="md-nav__link">
+    limit
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -580,9 +600,29 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#monkeyble-list" class="md-nav__link">
+    monkeyble list
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#monkeyble-test" class="md-nav__link">
     monkeyble test
   </a>
+  
+    <nav class="md-nav" aria-label="monkeyble test">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#limit" class="md-nav__link">
+    limit
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -622,11 +662,11 @@
 <div class="highlight"><pre><span></span><code>pipx inject ansible --include-apps monkeyble
 </code></pre></div></p>
 <h3 id="from-sources">From sources</h3>
-<p>Run the Python setup 
+<p>Run the Python setup
 <div class="highlight"><pre><span></span><code>python3 setup.py install
 </code></pre></div></p>
 <h2 id="configuration-file">Configuration file</h2>
-<p>The CLI expect to find monkeyble configuration file. The file will be searched for in the following order:</p>
+<p>The CLI expect to find Monkeyble configuration file. The file will be searched for in the following order:</p>
 <ul>
 <li><code>-c CONFIG</code> as a cli argument</li>
 <li><code>MONKEYBLE_CONFIG</code> placed as an environment variable</li>
@@ -697,6 +737,16 @@ A test definition contains information about the playbook to test with all scena
 have one file declared in the <code>extra_vars</code> list and one scenario name placed in <code>scenarios</code>.</p>
 </div>
 <h2 id="commands">Commands</h2>
+<h3 id="monkeyble-list">monkeyble list</h3>
+<p>List playbook and scenario declared in the Monkeyble configuration file.</p>
+<p>Command:
+<div class="highlight"><pre><span></span><code>ANSIBLE_CONFIG=&#39;monkeyble.cfg&#39; monkeyble list 
+</code></pre></div></p>
+<div class="highlight"><pre><span></span><code> Playbook          | Scenario
+-------------------+-----------------
+ test_playbook.yml | validate_test_1
+                   | validate_test_2
+</code></pre></div>
 <h3 id="monkeyble-test">monkeyble test</h3>
 <p>The monkeyble test command executes all the test declared in the <code>monkeyble_test_suite</code> configuration flag and provides
 a test result summary.</p>
@@ -714,6 +764,11 @@ Playbook   | Scenario        | Test passed
  play2.yml | validate_that   | ✅
 
  🐵 Monkeyble test result - Tests passed: 4 of 4 tests
+</code></pre></div></p>
+<h4 id="limit">limit</h4>
+<p>Limit the execution to a list of scenario name. Use the <code>--limit</code> flag by passing space separated list of scenario.</p>
+<p>Command:
+<div class="highlight"><pre><span></span><code>ANSIBLE_CONFIG=&#39;monkeyble.cfg&#39; monkeyble test --limit validate_this validate_that
 </code></pre></div></p>
 
 
