@@ -106,7 +106,8 @@ class CallbackModule(CallbackBase):
         task_copy.name = templated_task_name
         task_copy._name = templated_task_name
         self._last_task_name = templated_task_name
-        self._last_task_ignore_errors = task.ignore_errors
+        templated_task_ignore_errors = templar.template(task.ignore_errors)
+        self._last_task_ignore_errors = templated_task_ignore_errors
 
         # get a monkeyble config for the current task
         self._last_task_config = get_task_config(ansible_task=task_copy, monkeyble_config=self.monkeyble_config)
