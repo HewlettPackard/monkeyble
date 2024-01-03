@@ -50,7 +50,7 @@
 
     - name: "assert_dict_equal"
       uri:
-        url: https://www.hpe.com
+        url: https://github.com
         headers:
           key1: value1
           key2: value2
