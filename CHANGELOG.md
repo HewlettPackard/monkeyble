@@ -1,3 +1,10 @@
+# 1.4.1 2024-01-05
+
+## Fix
+
+- variable are now handled when using ignore_error
+- fix test (new url)
+
 # 1.4.0 2023-03-06
 
 ## Feature
