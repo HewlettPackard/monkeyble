@@ -252,7 +252,11 @@ class CallbackModule(CallbackBase):
         message = f"🙉 Monkeyble mock module - Before: '{original_module_name}' Now: '{new_action_name}'"
         self.display_message_ok(msg=str(message))
         ansible_task.action = new_action_name
-        if new_action_name == "monkeyble_module":
+        monkeyble_action_names = [
+            "monkeyble_module",
+            "hpe.monkeyble.monkeyble_module",
+        ]
+        if new_action_name in monkeyble_action_names:
             consider_changed = self._last_task_config["mock"]["config"][new_action_name].get("consider_changed", False)
             result_dict = self._last_task_config["mock"]["config"][new_action_name].get("result_dict", {})
             ansible_task.args = {"task_name": ansible_task.name,
