@@ -50,9 +50,6 @@ Create a dedicated `ansible.cfg` config file that use the "Monkeyble" callback a
 ```ini
 [defaults]
 collections_paths = /home/my_user/Documents
-library = /home/my_user/Documents/ansible_collections/hpe/monkeyble/plugins/module
-module_utils = /home/my_user/Documents/ansible_collections/hpe/monkeyble/plugins/module_utils
-callback_plugins = /home/my_user/Documents/ansible_collections/hpe/monkeyble/plugins/callback
-callbacks_enabled = monkeyble_callback
+callbacks_enabled = hpe.monkeyble.monkeyble_callback
 jinja2_native = True
 ```
