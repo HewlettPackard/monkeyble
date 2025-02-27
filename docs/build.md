@@ -2,6 +2,16 @@
 
 ## Ansible collection
 
+Update the version in `galaxy.yml`. E.g:
+```yaml
+version: 1.4.3
+```
+
+same in file `plugins/module_utils/_version.py`
+```
+__version__ = "1.4.3"
+```
+
 Build the collection
 ```
 ansible-galaxy collection build
