@@ -237,8 +237,8 @@ A test case method expect two arguments:
 - task: "test_dict_equal"
   test_input:
     - assert_dict_equal:
-      arg_name: headers
-      expected:
-        key1: value1
-        key2: value2
+        arg_name: headers
+        expected:
+          key1: value1
+          key2: value2
 ```
