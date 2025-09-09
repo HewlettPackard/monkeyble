@@ -10,7 +10,7 @@ from ansible.module_utils.common.collections import ImmutableDict
 from ansible.parsing.dataloader import DataLoader
 from ansible.playbook.play import Play
 from ansible.vars.manager import VariableManager
-
+from ansible.plugins.loader import init_plugin_loader
 # Create a callback plugin so we can capture the output
 from plugins.callback.monkeyble_callback import CallbackModule as MonkeybleCallback
 
@@ -27,6 +27,7 @@ def main():
     if len(host_list) == 1:
         sources += ','
 
+    init_plugin_loader([])
     # initialize needed objects
     loader = DataLoader()  # Takes care of finding and reading yaml, json and ini files
     passwords = dict(vault_pass='secret')
