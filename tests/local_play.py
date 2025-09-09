@@ -3,6 +3,9 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+import os
+
+import ansible
 from ansible import context
 from ansible.executor.task_queue_manager import TaskQueueManager
 from ansible.inventory.manager import InventoryManager
@@ -11,16 +14,21 @@ from ansible.parsing.dataloader import DataLoader
 from ansible.playbook.play import Play
 from ansible.vars.manager import VariableManager
 from ansible.plugins.loader import init_plugin_loader
+builtin_module_path = os.path.join(os.path.dirname(ansible.__file__), "modules")
+builtin_collection_path = os.path.join(os.path.dirname(ansible.__file__), "collections")
 # Create a callback plugin so we can capture the output
 from plugins.callback.monkeyble_callback import CallbackModule as MonkeybleCallback
 
+print(builtin_module_path)
 
 def main():
     host_list = ['localhost']
     # since the API is constructed for CLI it expects certain options to always be set in the context object
-    context.CLIARGS = ImmutableDict(connection='local', module_path=['../plugins/module'], forks=10,
+    context.CLIARGS = ImmutableDict(connection='local',
+                                    module_path=['../plugins/modules', builtin_module_path],
+                                    collections_path =[builtin_collection_path],
                                     become=None, become_method=None, become_user=None, check=False, diff=False,
-                                    verbosity=0)
+                                    verbosity=3)
     # required for
     # https://github.com/ansible/ansible/blob/devel/lib/ansible/inventory/manager.py#L204
     sources = ','.join(host_list)
@@ -42,28 +50,28 @@ def main():
     # variable manager takes care of merging all the different sources to give you a unified view of variables
     # available in each context
     extra_vars = {
-        "task_name": "test_name2",
-        "test_var": "updated !",
-        "list_var": [
-            "item1",
-            "item2",
-        ],
-        "test_input_config_1": [
-            {
-                "assert_equal": {
-                    "arg_name": "msg",
-                    "expected": "general kenobi"
-                }
-            }
-        ],
-        "replace_debug_mock": {
-            "monkeyble_module": {
-                "consider_changed": True,
-                "result_dict": {
-                    "key1": "val1"
-                }
-            }
-        },
+        # "task_name": "test_name2",
+        # "test_var": "updated !",
+        # "list_var": [
+        #     "item1",
+        #     "item2",
+        # ],
+        # "test_input_config_1": [
+        #     {
+        #         "assert_equal": {
+        #             "arg_name": "msg",
+        #             "expected": "general kenobi"
+        #         }
+        #     }
+        # ],
+        # "replace_debug_mock": {
+        #     "monkeyble_module": {
+        #         "consider_changed": True,
+        #         "result_dict": {
+        #             "key1": "val1"
+        #         }
+        #     }
+        # },
         "monkeyble_scenario": "validate_test_1",
         "monkeyble_scenarios": {
             "validate_test_1": {
@@ -75,8 +83,21 @@ def main():
                         # "should_be_skipped": False,
                         # "should_fail": False,
                         # "test_input": "{{ test_input_config_1 }}",
-                        "mock": {"config": "{{ replace_debug_mock }}"}
+                        "mock": {
+                            "config": {
+                                # "debug": {
+                                #     "msg": "overwriten"
+                                # }
+                                "monkeyble_module": {
+                                    "consider_changed": True,
+                                    "result_dict": {
+                                        "key1": "val1"
+                                    }
+                                }
+                            }
+                        }
                     }
+
                 ]
                 # "tasks_to_test": [
                 #     {
@@ -123,14 +144,20 @@ def main():
         vars={
             "my_var": "general kenobi"
         },
+        module_defaults={
+            "debug":{
+                "hostname": ''
+            }
+        },
+
         tasks=[
             # dict(action=dict(module='shell', args='ls'), register='shell_out'),
             # dict(name="test_name2", action=dict(module='debug', args=dict(msg='{{ my_var }}')), when="my_var == 'to_be_updated'"),
-            dict(name="test_name", action=dict(module='set_fact', args=dict(key_test="{{ lookup('community.hashi_vault.hashi_vault', item) }}")), loop="{{ list_var }}", register="register1"),
-            dict(name="print register", action=dict(module='debug', args=dict(msg='{{ register1.results }}'))),
+            # dict(name="test_name", action=dict(module='set_fact', args=dict(key_test="{{ lookup('community.hashi_vault.hashi_vault', item) }}")), loop="{{ list_var }}", register="register1"),
+            # dict(name="print register", action=dict(module='debug', args=dict(msg='{{ register1.results }}'))),
             # dict(name="test_name3", action=dict(module='find', args=dict(path='/tmp'))),
             # dict(name="test_name3", action=dict(module='set_fact', args=dict(new_var='{{ test_var }}'))),
-            # dict(name="test_name1", action=dict(module='debug', args=dict(msg='{{ my_var }}'))),
+            dict(name="test_name", action=dict(module='ansible.builtin.debug', args=dict(msg='nico'))),
             # dict(action=dict(module='debug', args=dict(msg='{{shell_out.stdout}}'))),
             # dict(action=dict(module='command', args=dict(cmd='/usr/bin/uptime'))),
         ]
