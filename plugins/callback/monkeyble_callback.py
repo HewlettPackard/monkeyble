@@ -252,6 +252,7 @@ class CallbackModule(CallbackBase):
         message = f"🙉 Monkeyble mock module - Before: '{original_module_name}' Now: '{new_action_name}'"
         self.display_message_ok(msg=str(message))
         ansible_task.action = new_action_name
+        ansible_task.resolved_action = new_action_name
         monkeyble_action_names = [
             "monkeyble_module",
             "hpe.monkeyble.monkeyble_module",

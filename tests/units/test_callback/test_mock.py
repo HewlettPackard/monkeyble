@@ -33,6 +33,8 @@ class TestMonkeybleCallbackMock(BaseTestMonkeybleCallback):
         self.assertEqual("test_task", update_ansible_task.name)
         self.assertEqual("debug", update_ansible_task.args["original_module_name"])
         self.assertTrue(update_ansible_task.args["consider_changed"])
+        self.assertEqual(update_ansible_task.action, "monkeyble_module")
+        self.assertEqual(update_ansible_task.resolved_action, "monkeyble_module")
         expected_result_dict = {
             "msg": "output_value"
         }
