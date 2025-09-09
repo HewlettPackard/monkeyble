@@ -1,3 +1,15 @@
+# 1.4.4 2024-01-05
+
+## Fix
+
+- monkeyble mock module now work when module defaults are set #36
+
+# 1.4.3 2024-02-27
+
+## Enhancement
+
+- Support of Ansible 11
+
 # 1.4.1 2024-01-05
 
 ## Fix
