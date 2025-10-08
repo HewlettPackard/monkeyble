@@ -5,6 +5,8 @@ hello_there: "Hello Monkeyble"
 monkeyble_scenarios:
   validate_hello_monkey:
     name: "Monkeyble hello world"
+    extra_vars:
+      play_level_var: "scenario level var"
     tasks_to_test:
       - task: "First task"
         test_output:
@@ -46,22 +48,16 @@ monkeyble_scenarios:
       - task: "Rescue task"
         should_be_skipped: false
 
-#        play: "play"
-#        role: "ddzdz"
-#        should_be_changed: true
-#        should_be_skipped: true
-#        should_fail: true
-#        extra_vars:
-#          my_var: "general Organa"
-#        mock:
-#          config: "{{ replace_debug_mock }}"
-#        test_output:
-#          - assert_equal:
-#              value: "{{ monkeyble_result["key"] }}
-#              expected: "hello there"
-#      - task: "test_name3"
-#        test_output:
-#          - assert_dict_equal:
-#              result_key: "result.ansible_facts"
-#              expected:
-#                new_var: new_val
+      - task: "Print play var updated at scenario level"
+        test_input:
+          - assert_equal:
+              arg_name: msg
+              expected: "scenario level var"
+
+      - task: "Print play var updated at task level"
+        extra_vars:
+          play_level_var: "task level"
+        test_input:
+          - assert_equal:
+              arg_name: msg
+              expected: "task level"

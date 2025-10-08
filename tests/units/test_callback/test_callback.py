@@ -1,5 +1,7 @@
 from unittest.mock import patch
 
+from ansible.errors import AnsibleUndefinedVariable
+
 from plugins.callback.monkeyble_callback import MonkeybleException
 from tests.units.test_callback.base_test_callback import BaseTestMonkeybleCallback
 
@@ -82,6 +84,86 @@ class TestMonkeybleCallback(BaseTestMonkeybleCallback):
         }
         self.assertDictEqual(expected_monkeyble_config, self.test_callback.monkeyble_config)
 
+    def test_v2_runner_on_start_extra_var_overwrite_at_scenario_level(self):
+        self.test_callback.playbook_extra_vars = {
+            "variable_from_playbook_extra_var": "play_level_variable",
+        }
+        self.ansible_task_test.args = {
+            "msg": "{{ variable_from_playbook_extra_var }}"
+        }
+
+        self.test_callback.monkeyble_config = {
+            "name": "monkeyble_scenario",
+            "tasks_to_test": [
+                {
+                    "task": "test_task"
+                }
+            ]
+        }
+        self.test_callback.scenario_extra_vars = {
+                "variable_from_playbook_extra_var": "update_at_scenario_level",
+            }
+
+        self.test_callback.v2_runner_on_start(task=self.ansible_task_test, host=None)
+        expected_args = {
+            "msg": "update_at_scenario_level"
+        }
+        self.assertDictEqual(self.test_callback._current_task.args, expected_args)
+
+
+    def test_v2_runner_on_start_extra_var_overwrite_at_task_level(self):
+        self.test_callback.playbook_extra_vars = {
+            "variable_from_playbook_extra_var": "play_level_variable",
+        }
+        self.ansible_task_test.args = {
+            "msg": "{{ variable_from_playbook_extra_var }}"
+        }
+
+        self.test_callback.monkeyble_config = {
+            "name": "monkeyble_scenario",
+            "tasks_to_test": [
+                {
+                    "task": "test_task",
+                    "extra_vars": {
+                        "variable_from_playbook_extra_var": "update_at_task_level"
+                    }
+                }
+            ]
+        }
+        self.test_callback.v2_runner_on_start(task=self.ansible_task_test, host=None)
+        expected_args = {
+            "msg": "update_at_task_level"
+        }
+        self.assertDictEqual(self.test_callback._current_task.args, expected_args)
+
+    def test_v2_runner_on_start_extra_var_overwrite_at_task_level_over_scenario_level(self):
+        self.test_callback.playbook_extra_vars = {
+            "variable_from_playbook_extra_var": "play_level_variable",
+        }
+        self.ansible_task_test.args = {
+            "msg": "{{ variable_from_playbook_extra_var }}"
+        }
+
+        self.test_callback.monkeyble_config = {
+            "name": "monkeyble_scenario",
+            "extra_vars": {
+                "variable_from_playbook_extra_var": "update_at_scenario_level",
+            },
+            "tasks_to_test": [
+                {
+                    "task": "test_task",
+                    "extra_vars": {
+                        "variable_from_playbook_extra_var": "update_at_task_level"
+                    }
+                }
+            ]
+        }
+        self.test_callback.v2_runner_on_start(task=self.ansible_task_test, host=None)
+        expected_args = {
+            "msg": "update_at_task_level"
+        }
+        self.assertDictEqual(self.test_callback._current_task.args, expected_args)
+
     @patch('sys.exit')
     def test_v2_playbook_on_play_start_fail_when_monkeyble_scenario_name_does_not_match(self, mock_exit_playbook):
         self.var_manager.extra_vars = {
@@ -118,35 +200,41 @@ class TestMonkeybleCallback(BaseTestMonkeybleCallback):
         self.ansible_task_test.args = {
             "var_to_change": "{{ variable_from_playbook_extra_var }}"
         }
-        self.test_callback.extra_vars = {
+        self.test_callback.playbook_extra_vars = {
             "variable_from_playbook_extra_var": "value"
         }
-        self.test_callback._last_task_config["extra_vars"] = {
+        merged_extra_var = {
             "variable_from_playbook_extra_var": "hard_coded_value"
         }
-        self.test_callback.update_extra_var(ansible_task=self.ansible_task_test)
+        task = self.test_callback.update_extra_var(ansible_task=self.ansible_task_test, extra_var_to_merge=merged_extra_var)
         # we expect a merge
         expected_dict = {
             "var_to_change": "hard_coded_value"
         }
-        self.assertDictEqual(expected_dict, self.ansible_task_test.args)
+        self.assertDictEqual(expected_dict, task.args)
 
-    def test_update_extra_var_jinja_value(self):
+    def test_update_extra_var_jinja_value_keep_default(self):
         self.ansible_task_test.args = {
-            "var_to_change": "{{ variable_from_playbook_extra_var }}"
+            "msg": "{{ undefined_variable }}"
         }
-        self.test_callback.extra_vars = {
-            "variable_from_playbook_extra_var_key": "variable_from_playbook_extra_var_value"
-        }
-        self.test_callback._last_task_config["extra_vars"] = {
-            "variable_from_playbook_extra_var": "{{ variable_from_playbook_extra_var_key }}"
-        }
-        self.test_callback.update_extra_var(ansible_task=self.ansible_task_test)
+
+        task = self.test_callback.update_extra_var(ansible_task=self.ansible_task_test, extra_var_to_merge={})
         # we expect a merge
         expected_dict = {
-            "var_to_change": "variable_from_playbook_extra_var_value"
+            "msg": "{{ undefined_variable }}"
         }
-        self.assertDictEqual(expected_dict, self.ansible_task_test.args)
+        self.assertDictEqual(expected_dict, task.args)
+
+    def test_update_extra_var_with_jinja_value(self):
+        self.ansible_task_test.args = {
+            "msg": "{{ undefined_variable }}"
+        }
+        extra_var_to_merge = {
+            "test": "{{ other_non_existing_variable }}"
+        }
+        with self.assertRaises(AnsibleUndefinedVariable):
+            task = self.test_callback.update_extra_var(ansible_task=self.ansible_task_test, extra_var_to_merge=extra_var_to_merge)
+
 
     @patch('plugins.callback.monkeyble_callback.CallbackModule.mock_task_module')
     @patch('plugins.callback.monkeyble_callback.CallbackModule.test_input')

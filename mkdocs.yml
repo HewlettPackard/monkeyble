@@ -35,7 +35,7 @@ nav:
   - Test states: states.md
   - Mock: mock.md
   - Task filters: task_filters.md
-  - Task extra vars: extra_vars.md
+  - Extra vars: extra_vars.md
   - CLI: cli.md
   - CI/CD: ci_cd.md
   - Dev env: dev_env.md
