@@ -280,38 +280,77 @@ class CallbackModule(CallbackBase):
         ansible_task.args = templated_module_args
         return ansible_task
 
-    def test_input(self, ansible_task, playbook_vars=dict):
+    def test_input(self, ansible_task, playbook_vars: dict = None):
+        playbook_vars = playbook_vars or {}
         templar = Templar(loader=DataLoader(), variables=playbook_vars)
-        templated_module_args = templar.template(ansible_task.args)
+        test_result = {PASSED_TEST: [], FAILED_TEST: []}
 
-        test_result = {
-            PASSED_TEST: [],
-            FAILED_TEST: []
-        }
-        for arg_to_test in self._last_task_config["test_input"]:
-            for test_name, value_and_expected in arg_to_test.items():
-                try:
-                    argument_value = templated_module_args[value_and_expected['arg_name']]
-                except KeyError:
-                    # the key specified in arg name does not exist. exit with error monkeyble
-                    raise MonkeybleException(message=str(f"arg_name '{value_and_expected['arg_name']}' not present in "
-                                                         f"the list of argument when executing the "
-                                                         f"module '{ansible_task.action}'"),
-                                             scenario_description=self.monkeyble_scenario_description)
-                try:
-                    expected = value_and_expected['expected']
-                except KeyError:
-                    expected = None
-                returned_tuple = switch_test_method(test_name, argument_value, expected)
-                test_result[returned_tuple[0]].append(returned_tuple[1])
+        def get_argument_value(module_args, arg_name):
+            try:
+                return module_args[arg_name]
+            except KeyError:
+                raise MonkeybleException(
+                    message=(
+                        f"arg_name '{arg_name}' not present in the list of arguments "
+                        f"when executing module '{ansible_task.action}'"
+                    ),
+                    scenario_description=self.monkeyble_scenario_description,
+                )
+
+        def run_test(test_name, arg_name, expected, module_args):
+            argument_value = get_argument_value(module_args, arg_name)
+            status, result = switch_test_method(test_name, argument_value, expected)
+            return status, result
+
+        for arg_tests in self._last_task_config.get("test_input", []):
+            for test_name, value_and_expected in arg_tests.items():
+                expected = value_and_expected.get("expected")
+                arg_name = value_and_expected["arg_name"]
+
+                if ansible_task.loop:
+                    tested_values = []
+                    found_match = False
+
+                    for loop_value in ansible_task.loop:
+                        playbook_vars.update({ansible_task.loop_control.loop_var: loop_value})
+                        templar = Templar(loader=DataLoader(), variables=playbook_vars)
+                        module_args = templar.template(ansible_task.args)
+
+                        try:
+                            argument_value = get_argument_value(module_args, arg_name)
+                        except MonkeybleException:
+                            raise  # Preserve existing behavior
+
+                        tested_values.append(argument_value)
+                        status, result = run_test(test_name, arg_name, expected, module_args)
+                        if status == PASSED_TEST:
+                            found_match = True
+                            test_result[status].append(result)
+                            break
+
+                    if not found_match:
+                        test_result[FAILED_TEST].append({
+                            "test_name": test_name,
+                            "tested_value": tested_values,
+                            "expected": expected,
+                        })
+                else:
+                    module_args = templar.template(ansible_task.args)
+                    status, result = run_test(test_name, arg_name, expected, module_args)
+                    test_result[status].append(result)
+
+        # Save and display results
         self._last_check_input_result = test_result
-
         json_test_result = json.dumps(test_result)
-        if len(test_result[FAILED_TEST]) >= 1:
-            raise MonkeybleException(message=str(json_test_result),
-                                     scenario_description=self.monkeyble_scenario_description)
+
+        if test_result[FAILED_TEST]:
+            raise MonkeybleException(
+                message=json_test_result,
+                scenario_description=self.monkeyble_scenario_description,
+            )
+
         self.display_message_ok(msg="🙈 Monkeyble test input passed ✔")
-        self.display_message_ok(msg=str(json_test_result))
+        self.display_message_ok(msg=json_test_result)
 
     def _get_playbook_vars(self, host, task):
         # inventory + host vars + group vars
