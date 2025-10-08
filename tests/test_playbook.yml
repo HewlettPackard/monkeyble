@@ -29,3 +29,20 @@
         body:
           who: "{{ who }}"
         body_format: json
+
+    - name: "Test loop"
+      debug:
+        msg: "{{ item }}"
+      loop:
+        - "general kenobi"
+        - "master kenobi"
+
+    - name: "Block rescue"
+      block:
+        - name: "This should fail"
+          fail:
+            msg: "Expected fail"
+      rescue:
+        - name: "Rescue task"
+          debug:
+              msg: "rescue executed"
