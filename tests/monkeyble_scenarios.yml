@@ -31,6 +31,21 @@ monkeyble_scenarios:
                   id: 10
                   message: "monkey added"
 
+      - task: "Test loop"
+        test_input:
+          - assert_equal:
+              arg_name: msg
+              expected: "general kenobi"
+          - assert_equal:
+              arg_name: msg
+              expected: "master kenobi"
+
+      - task: "This should fail"
+        should_fail: true
+
+      - task: "Rescue task"
+        should_be_skipped: false
+
 #        play: "play"
 #        role: "ddzdz"
 #        should_be_changed: true

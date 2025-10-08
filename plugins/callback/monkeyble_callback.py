@@ -152,7 +152,8 @@ class CallbackModule(CallbackBase):
         self._display.debug("Run v2_runner_on_failed")
         host = result._host
         self.host_failed[host.get_name()] = result
-        self.check_if_task_should_have_failed(task_has_actually_failed=True)
+        has_rescue = result._task._parent.rescue
+        self.check_if_task_should_have_failed(task_has_actually_failed=True, has_rescue=has_rescue)
 
     def v2_runner_on_skipped(self, result, **kwargs):
         self._display.debug("Run v2_runner_on_skipped")
@@ -214,7 +215,7 @@ class CallbackModule(CallbackBase):
                                         task_config=self._last_task_config,
                                         actual_state=task_has_been_actually_changed)
 
-    def check_if_task_should_have_failed(self, task_has_actually_failed):
+    def check_if_task_should_have_failed(self, task_has_actually_failed, has_rescue=False):
         self._display.debug("Monkeyble check_if_task_should_have_failed called")
 
         result = self._compare_boolean_to_config(task_name=self._last_task_name,
@@ -224,7 +225,7 @@ class CallbackModule(CallbackBase):
         if result is not None and result:
             # if we reach this line, it means that the task was expected to fail.
             # We exit with code 0 to prevent a CI to fail if the task does not ignore error
-            if not self._last_task_ignore_errors:
+            if not self._last_task_ignore_errors and not has_rescue:
                 message = f"🐵 Monkeyble - Task '{self._last_task_name}' failed as expected"
                 raise MonkeybleException(message=message,
                                          scenario_description=self.monkeyble_scenario_description,

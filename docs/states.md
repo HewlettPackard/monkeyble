@@ -17,6 +17,32 @@ monkeyble_scenarios:
         should_fail: false
 ```
 
+## Block/rescue test
+
+Testing states allows to test a block/rescue:
+
+```yaml
+# Task example
+- name: "Block rescue"
+  block:
+    - name: "This should fail"
+      fail:
+        msg: "Expected fail"
+  rescue:
+    - name: "Rescue task"
+      debug:
+          msg: "rescue executed"
+```
+
+```yaml
+# Monkeyble config
+- task: "This should fail"
+  should_fail: true
+
+- task: "Rescue task"
+  should_be_skipped: false
+```
+
 ## States
 
 ### should_be_changed
