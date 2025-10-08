@@ -52,12 +52,6 @@ def main():
     # variable manager takes care of merging all the different sources to give you a unified view of variables
     # available in each context
     extra_vars = {
-        # "task_name": "test_name2",
-        # "test_var": "updated !",
-        "list_var": [
-            "item1",
-            "item2",
-        ],
         "test_input_config_1": [
             {
                 "assert_equal": {
@@ -66,35 +60,42 @@ def main():
                 }
             }
         ],
-        # "replace_debug_mock": {
-        #     "monkeyble_module": {
-        #         "consider_changed": True,
-        #         "result_dict": {
-        #             "key1": "val1"
-        #         }
-        #     }
-        # },
         "monkeyble_scenario": "validate_test_1",
         "monkeyble_scenarios": {
             "validate_test_1": {
                 "name": "Validate that bla bla",
+                "extra_vars": {
+                    "var_to_update": "scenario_level_var"
+                },
                 "tasks_to_test": [
                     {
+                        "task": "test_name3",
+                        "test_output": [
+                            {
+                                "assert_equal": {
+                                    "result_key": "result.ansible_facts.hello_to_who",
+                                    "expected": "hello monkey"
+                                }
+                            }
+                        ]
+                    },
+                    {
                         "task": "test_name",
+                        "extra_vars": {
+                            "var_to_update": "task_level_var"
+                        },
                         # "should_be_changed": True,
                         # "should_be_skipped": False,
                         # "should_fail": False,
                         # "test_input": "{{ test_input_config_1 }}",
-                        "test_input": [
-                            {"assert_equal": {
-                                "arg_name": "msg",
-                                "expected": "hello item2"
-                            }},
-                            {"assert_equal": {
-                                "arg_name": "msg",
-                                "expected": "hello item4"
-                            }}
-                        ],
+                        # "test_input": [
+                        #     {
+                        #         "assert_equal": {
+                        #             "arg_name": "msg",
+                        #             "expected": "scenario_level_var"
+                        #         }
+                        #     }
+                        # ],
                         # "test_output": [
                         #     {
                         #         "assert_equal":{
@@ -103,32 +104,33 @@ def main():
                         #         }
                         #     }
                         # ]
-                        # "mock": {
-                        #     "config": {
-                        #         # "debug": {
-                        #         #     "msg": "overwriten"
-                        #         # }
-                        #         "monkeyble_module": {
-                        #             "consider_changed": True,
-                        #             "result_dict": {
-                        #                 "key1": "val1"
-                        #             }
-                        #         }
-                        #     }
-                        # }
+                        "mock": {
+                            "config": {
+                                # "debug": {
+                                #     "msg": "overwriten"
+                                # }
+                                "monkeyble_module": {
+                                    "consider_changed": True,
+                                    "result_dict": {
+                                        "key1": "val1"
+                                    }
+                                }
+                            }
+                        }
                     },
-                    # {
-                    #     "task": "test_name66",
-                    #     "test_input": [
-                    #         {"assert_equal": {
-                    #             "arg_name": "msg",
-                    #             "expected": "general kenobi"
-                    #         }}
-                    #     ],
-                    # }
+                    {
+                        "task": "test_name4",
+                        "test_input": [
+                            {
+                                "assert_equal": {
+                                    "arg_name": "msg",
+                                    "expected": "hello monkey"
+                                }
+                            }
+                        ]
 
+                    }
                 ]
-
             }
         }
     }
@@ -155,12 +157,13 @@ def main():
         hosts=host_list,
         gather_facts='no',
         vars={
-            "api_vip_cidr": "10.162.48.103/22",
+            "who": "monkey",
             "my_var": "general kenobi",
             "list_var": [
                 "obi wan",
                 "r2d2"
-            ]
+            ],
+            "var_to_update": "play_level_var"
         },
         # module_defaults={
         #     "debug":{
@@ -174,12 +177,12 @@ def main():
             # dict(name="test_name", action=dict(module='set_fact', args=dict(key_test="{{ lookup('community.hashi_vault.hashi_vault', item) }}")), loop="{{ list_var }}", register="register1"),
             # dict(name="print register", action=dict(module='debug', args=dict(msg='{{ register1.results }}'))),
             # dict(name="test_name3", action=dict(module='find', args=dict(path='/tmp'))),
-            # dict(name="test_name3", action="set_fact", args=dict(api_vip='{{ api_vip_cidr | ansible.utils.ipaddr(\'address\') }}')),
-            # dict(name="test_name4", action="debug", args=dict(msg='api_vip')),
-            # dict(name="test_name66", action="debug", args={"msg": '{{ my_var }}'}),
+            dict(name="test_name3", action="set_fact", args=dict(hello_to_who='hello {{ who }}')),
+            dict(name="test_name", action="debug", args=dict(msg='{{ hello_to_who }}')),
+            # dict(name="test_name", action="debug", args={"msg": '{{ var_to_update }}'}),
             # dict(name="test_name222", action="debug", args={"msg": 'test'}),
-            dict(name="test_name", action=dict(module='ansible.builtin.debug', args=dict(msg='hello {{ item }}')), loop=["item1", "item2"]),
-            # dict(name="test_name", action=dict(module='ansible.builtin.debug', args=dict(msg='hello {{ my_var }}', loop=["item1", "item2"]))),
+            # dict(name="test_name", action=dict(module='ansible.builtin.debug', args=dict(msg="hello {{ item }}")), loop=["item1", "item2"]),
+            # dict(name="test_name", action=dict(module='ansible.builtin.debug', args=dict(msg='hello {{ item }}', loop=["item1", "item2"]))),
             # dict(action=dict(module='debug', args=dict(msg='{{shell_out.stdout}}'))),
             # dict(action=dict(module='command', args=dict(cmd='/usr/bin/uptime'))),
         ]

@@ -7,6 +7,7 @@
   become: false
   vars:
     who: "Monkeyble"
+    play_level_var: "default play var"
 
   tasks:
     - name: "First task"
@@ -46,3 +47,15 @@
         - name: "Rescue task"
           debug:
               msg: "rescue executed"
+
+    - name: "Print play var non updated"
+      debug:
+        msg: "{{ play_level_var }}"
+
+    - name: "Print play var updated at scenario level"
+      debug:
+        msg: "{{ play_level_var }}"
+
+    - name: "Print play var updated at task level"
+      debug:
+        msg: "{{ play_level_var }}"

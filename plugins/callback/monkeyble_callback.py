@@ -52,8 +52,11 @@ class CallbackModule(CallbackBase):
         self._last_task_name = None
         self._last_check_output_result = dict()
         self._last_check_input_result = dict()
-        self.extra_vars = None
+        self.playbook_extra_vars = dict()
         self._last_task_ignore_errors = None
+        self._current_task = None
+        self.scenario_extra_vars = dict()
+        self.playbook_vars = None
 
     @staticmethod
     def display_message_ok(msg):
@@ -62,10 +65,10 @@ class CallbackModule(CallbackBase):
     def v2_playbook_on_play_start(self, play):
         self.display_message_ok(msg=f"🐵 Starting Monkeyble callback {__version__}")
         vm = play.get_variable_manager()
-        self.extra_vars = vm.extra_vars
-        monkeyble_scenario = self.extra_vars.get("monkeyble_scenario")
-        monkeyble_scenarios = self.extra_vars.get("monkeyble_scenarios")
-        monkeyble_shared_tasks = self.extra_vars.get("monkeyble_shared_tasks", [])
+        self.playbook_extra_vars = vm.extra_vars
+        monkeyble_scenario = self.playbook_extra_vars.get("monkeyble_scenario")
+        monkeyble_scenarios = self.playbook_extra_vars.get("monkeyble_scenarios")
+        monkeyble_shared_tasks = self.playbook_extra_vars.get("monkeyble_shared_tasks", [])
         if monkeyble_scenario is None:
             raise MonkeybleException("'monkeyble_scenario' need to be passed as extra_vars")
         if monkeyble_scenarios is None:
@@ -80,7 +83,7 @@ class CallbackModule(CallbackBase):
         # add shared task to the config
         loaded_monkeyble_config["monkeyble_shared_tasks"] = monkeyble_shared_tasks
         # variable placed into the monkeyble config need to be instantiated with extra vars
-        templar = Templar(loader=DataLoader(), variables=self.extra_vars)
+        templar = Templar(loader=DataLoader(), variables=self.playbook_extra_vars)
         try:
             self.monkeyble_config = templar.template(loaded_monkeyble_config)
         except Exception as e:
@@ -94,14 +97,17 @@ class CallbackModule(CallbackBase):
             self.monkeyble_scenario_description = self.monkeyble_config['name']
             self.display_message_ok(f"Monkeyble scenario: {self.monkeyble_scenario_description}")
 
+        if "extra_vars" in self.monkeyble_config:
+            self.scenario_extra_vars = self.monkeyble_config["extra_vars"]
+
         return play
 
     def v2_runner_on_start(self, host, task):
-        playbook_vars = self._get_playbook_vars(host=host, task=task)
+        self.playbook_vars = self._get_playbook_vars(host=host, task=task)
 
         # template the task name
         task_copy = copy(task)
-        templar = Templar(loader=DataLoader(), variables=playbook_vars)
+        templar = Templar(loader=DataLoader(), variables=self.playbook_vars)
         templated_task_name = templar.template(task.name)
         task_copy.name = templated_task_name
         task_copy._name = templated_task_name
@@ -114,15 +120,19 @@ class CallbackModule(CallbackBase):
 
         if self._last_task_config is not None:
             # apply extra vars from the tested task
+            task_extra_vars = self.scenario_extra_vars
             if "extra_vars" in self._last_task_config:
-                task = self.update_extra_var(ansible_task=task)
+                task_extra_vars.update(self._last_task_config["extra_vars"])
+
+            task = self.update_extra_var(ansible_task=task, extra_var_to_merge=task_extra_vars)
 
             # check input
             if "test_input" in self._last_task_config:
-                self.test_input(ansible_task=task, playbook_vars=playbook_vars)
+                self.test_input(ansible_task=task, playbook_vars=self.playbook_vars)
 
             if "mock" in self._last_task_config:
                 task = self.mock_task_module(ansible_task=task)
+        self._current_task= task
         return super(CallbackModule, self).v2_runner_on_start(host, task)
 
     def v2_playbook_on_stats(self, stats):
@@ -271,14 +281,20 @@ class CallbackModule(CallbackBase):
             ansible_task.args = self._last_task_config["mock"]["config"][new_action_name]
         return ansible_task
 
-    def update_extra_var(self, ansible_task):
+    def update_extra_var(self, ansible_task, extra_var_to_merge=None):
         # first template our extra vars with extra vars from the playbook
-        templar = Templar(loader=DataLoader(), variables=self.extra_vars)
-        templated_task_extra_vars = templar.template(self._last_task_config["extra_vars"])
+        # if extra_var_to_merge is None or extra_var_to_merge == {}:
+        #     return ansible_task
+        templar = Templar(loader=DataLoader(), variables=self.playbook_vars)
+        templated_task_extra_vars = templar.template(extra_var_to_merge)
         # then template the module args
         templar = Templar(loader=DataLoader(), variables=templated_task_extra_vars)
-        templated_module_args = templar.template(ansible_task.args)
-        ansible_task.args = templated_module_args
+        try:
+            templated_module_args = templar.template(ansible_task.args)
+            ansible_task.args = templated_module_args
+        except AnsibleUndefinedVariable:
+            pass
+        # remove keys from
         return ansible_task
 
     def test_input(self, ansible_task, playbook_vars: dict = None):
@@ -359,5 +375,5 @@ class CallbackModule(CallbackBase):
         # add play vars
         playbook_vars.update(task.play.vars)
         # add extra vars
-        playbook_vars.update(self.extra_vars)
+        playbook_vars.update(self.playbook_extra_vars)
         return playbook_vars
