@@ -26,6 +26,35 @@ A test case method expect two arguments:
 - **arg_name**: The name of the module argument where monkeyble will check the instantiated value
 - **expected**: The expected instantiated value passed to the task when executed
 
+## With loop
+
+When using an Ansible loop, the same **arg_name** may be used to validate each "item".
+
+```yaml
+# Task example
+- name: "test_assert_equal"
+  debug:
+    msg: "{{ item }}"
+  loop:
+    - "general kenobi"
+    - "master kenobi"
+```
+
+```yaml
+# Monkeyble config
+monkeyble_scenarios:
+  validate_test_1:
+    name: "Monkeyble hello world"
+    tasks_to_test:
+      - task: "test_assert_equal"
+        test_input:
+          - assert_equal:
+              arg_name: msg
+              expected: "general kenobi"
+          - assert_equal:
+              arg_name: msg
+              expected: "master kenobi"
+```
 
 ## Test case methods
 

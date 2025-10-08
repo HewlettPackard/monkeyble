@@ -4,6 +4,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import os
+from pprint import pprint
 
 import ansible
 from ansible import context
@@ -11,6 +12,7 @@ from ansible.executor.task_queue_manager import TaskQueueManager
 from ansible.inventory.manager import InventoryManager
 from ansible.module_utils.common.collections import ImmutableDict
 from ansible.parsing.dataloader import DataLoader
+from ansible.playbook import task
 from ansible.playbook.play import Play
 from ansible.vars.manager import VariableManager
 from ansible.plugins.loader import init_plugin_loader
@@ -52,18 +54,18 @@ def main():
     extra_vars = {
         # "task_name": "test_name2",
         # "test_var": "updated !",
-        # "list_var": [
-        #     "item1",
-        #     "item2",
-        # ],
-        # "test_input_config_1": [
-        #     {
-        #         "assert_equal": {
-        #             "arg_name": "msg",
-        #             "expected": "general kenobi"
-        #         }
-        #     }
-        # ],
+        "list_var": [
+            "item1",
+            "item2",
+        ],
+        "test_input_config_1": [
+            {
+                "assert_equal": {
+                    "arg_name": "msg",
+                    "expected": "nico"
+                }
+            }
+        ],
         # "replace_debug_mock": {
         #     "monkeyble_module": {
         #         "consider_changed": True,
@@ -83,40 +85,50 @@ def main():
                         # "should_be_skipped": False,
                         # "should_fail": False,
                         # "test_input": "{{ test_input_config_1 }}",
-                        "mock": {
-                            "config": {
-                                # "debug": {
-                                #     "msg": "overwriten"
-                                # }
-                                "monkeyble_module": {
-                                    "consider_changed": True,
-                                    "result_dict": {
-                                        "key1": "val1"
-                                    }
-                                }
-                            }
-                        }
-                    }
+                        "test_input": [
+                            {"assert_equal": {
+                                "arg_name": "msg",
+                                "expected": "hello item2"
+                            }},
+                            {"assert_equal": {
+                                "arg_name": "msg",
+                                "expected": "hello item4"
+                            }}
+                        ],
+                        # "test_output": [
+                        #     {
+                        #         "assert_equal":{
+                        #             "result_key": "result.var",
+                        #             "expected": "10.162.48.103"
+                        #         }
+                        #     }
+                        # ]
+                        # "mock": {
+                        #     "config": {
+                        #         # "debug": {
+                        #         #     "msg": "overwriten"
+                        #         # }
+                        #         "monkeyble_module": {
+                        #             "consider_changed": True,
+                        #             "result_dict": {
+                        #                 "key1": "val1"
+                        #             }
+                        #         }
+                        #     }
+                        # }
+                    },
+                    # {
+                    #     "task": "test_name66",
+                    #     "test_input": [
+                    #         {"assert_equal": {
+                    #             "arg_name": "msg",
+                    #             "expected": "general kenobi"
+                    #         }}
+                    #     ],
+                    # }
 
                 ]
-                # "tasks_to_test": [
-                #     {
-                #         "task": "{{ task_name }}",
-                #         "extra_vars": {
-                #             "my_var": "{{ test_var }}"
-                #         },
-                #         # "test_output": [
-                #         #     {
-                #         #         "assert_dict_equal": {
-                #         #             "result_key": "result.ansible_facts",
-                #         #             "expected": {
-                #         #                 "new_var": "{{ test_var }}"
-                #         #             }
-                #         #         }
-                #         #     }
-                #         # ]
-                #     }
-                # ]
+
             }
         }
     }
@@ -127,12 +139,13 @@ def main():
     # iterate over host list and tasks
     # IMPORTANT: This also adds library dirs paths to the module loader
     # IMPORTANT: and so it must be initialized before calling `Play.load()`.
+    # need to export ANSIBLE_CALLBACK_PLUGINS
     tqm = TaskQueueManager(
         inventory=inventory,
         variable_manager=variable_manager,
         loader=loader,
         passwords=passwords,
-        stdout_callback=results_callback,
+
     )
 
     # create data structure that represents our play, including tasks,
@@ -142,13 +155,18 @@ def main():
         hosts=host_list,
         gather_facts='no',
         vars={
-            "my_var": "general kenobi"
+            "api_vip_cidr": "10.162.48.103/22",
+            "my_var": "general kenobi",
+            "list_var": [
+                "obi wan",
+                "r2d2"
+            ]
         },
-        module_defaults={
-            "debug":{
-                "hostname": ''
-            }
-        },
+        # module_defaults={
+        #     "debug":{
+        #         "hostname": ''
+        #     }
+        # },
 
         tasks=[
             # dict(action=dict(module='shell', args='ls'), register='shell_out'),
@@ -156,8 +174,12 @@ def main():
             # dict(name="test_name", action=dict(module='set_fact', args=dict(key_test="{{ lookup('community.hashi_vault.hashi_vault', item) }}")), loop="{{ list_var }}", register="register1"),
             # dict(name="print register", action=dict(module='debug', args=dict(msg='{{ register1.results }}'))),
             # dict(name="test_name3", action=dict(module='find', args=dict(path='/tmp'))),
-            # dict(name="test_name3", action=dict(module='set_fact', args=dict(new_var='{{ test_var }}'))),
-            dict(name="test_name", action=dict(module='ansible.builtin.debug', args=dict(msg='nico'))),
+            # dict(name="test_name3", action="set_fact", args=dict(api_vip='{{ api_vip_cidr | ansible.utils.ipaddr(\'address\') }}')),
+            # dict(name="test_name4", action="debug", args=dict(msg='api_vip')),
+            # dict(name="test_name66", action="debug", args={"msg": '{{ my_var }}'}),
+            # dict(name="test_name222", action="debug", args={"msg": 'test'}),
+            dict(name="test_name", action=dict(module='ansible.builtin.debug', args=dict(msg='hello {{ item }}')), loop=["item1", "item2"]),
+            # dict(name="test_name", action=dict(module='ansible.builtin.debug', args=dict(msg='hello {{ my_var }}', loop=["item1", "item2"]))),
             # dict(action=dict(module='debug', args=dict(msg='{{shell_out.stdout}}'))),
             # dict(action=dict(module='command', args=dict(cmd='/usr/bin/uptime'))),
         ]
@@ -182,14 +204,17 @@ def main():
     print("UP ***********")
     for host, result in results_callback.host_ok.items():
         print('{0} >>> {1}'.format(host, result._result))
+        pprint(result._result)
 
     print("FAILED *******")
     for host, result in results_callback.host_failed.items():
         print('{0} >>> {1}'.format(host, result._result))
+        pprint(result._result)
 
     print("DOWN *********")
     for host, result in results_callback.host_unreachable.items():
         print('{0} >>> {1}'.format(host, result._result))
+        pprint(result._result)
 
     # print("SKIPPED *********")
     # for host, result in results_callback.host_skipped.items():

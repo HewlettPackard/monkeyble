@@ -65,3 +65,90 @@ class TestMonkeybleCallbackInput(BaseTestMonkeybleCallback):
         with self.assertRaises(MonkeybleException):
             self.test_callback.test_input(self.ansible_task_test)
             mock_exit.assert_called()
+
+    def test_test_input_ok_with_loop(self):
+        self.ansible_task_test.args = {
+            "msg": "{{ item }}"
+        }
+        self.ansible_task_test.loop = ["item1", "item2"]
+        self.test_callback._last_task_config["test_input"] = [
+            {
+                "assert_equal": {
+                    "arg_name": "msg",
+                    "expected": "item1"
+                }
+            },
+            {
+                "assert_equal": {
+                    "arg_name": "msg",
+                    "expected": "item2"
+                }
+            }
+        ]
+
+        expected = {'monkeyble_passed_test': [{'test_name': 'assert_equal',
+                                               'tested_value': 'item1',
+                                               'expected': 'item1'},
+                                              {'test_name': 'assert_equal',
+                                               'tested_value': 'item2',
+                                               'expected': 'item2'}
+                                              ],
+                    'monkeyble_failed_test': []}
+        self.test_callback.test_input(self.ansible_task_test)
+        self.assertDictEqual(self.test_callback._last_check_input_result, expected)
+
+
+    def test_test_input_ok_with_loop_test_only_one_item(self):
+        self.ansible_task_test.args = {
+            "msg": "{{ item }}"
+        }
+        self.ansible_task_test.loop = ["item1", "item2"]
+        # here we test only that we have item 2 (we omit item 1)
+        self.test_callback._last_task_config["test_input"] = [
+            {
+                "assert_equal": {
+                    "arg_name": "msg",
+                    "expected": "item2"
+                }
+            }
+        ]
+
+        expected = {'monkeyble_passed_test': [{'test_name': 'assert_equal',
+                                               'tested_value': 'item2',
+                                               'expected': 'item2'}
+                                              ],
+                    'monkeyble_failed_test': []}
+        self.test_callback.test_input(self.ansible_task_test)
+        self.assertDictEqual(self.test_callback._last_check_input_result, expected)
+
+    @patch('sys.exit')
+    def test_test_input_nok_with_loop(self, mock_exit):
+        self.ansible_task_test.args = {
+            "msg": "{{ item }}"
+        }
+        self.ansible_task_test.loop = ["item1", "item2"]
+        # here we test only that we have item 2 (we omit item 1)
+        self.test_callback._last_task_config["test_input"] = [
+            {
+                "assert_equal": {
+                    "arg_name": "msg",
+                    "expected": "item1"
+                }
+            },
+            {
+                "assert_equal": {
+                    "arg_name": "msg",
+                    "expected": "item4"
+                }
+            }
+        ]
+
+        expected = {'monkeyble_passed_test': [{'test_name': 'assert_equal',
+                                               'tested_value': 'item1',
+                                               'expected': 'item1'}
+                                              ],
+                    'monkeyble_failed_test': [{"test_name": "assert_equal", "tested_value": ["item1", "item2"], "expected": "item4"}]}
+        with self.assertRaises(MonkeybleException):
+            self.test_callback.test_input(self.ansible_task_test)
+            self.assertDictEqual(self.test_callback._last_check_input_result, expected)
+            mock_exit.assert_called()
