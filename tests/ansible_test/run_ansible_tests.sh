@@ -3,9 +3,9 @@ set -e #
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
-ANSIBLE_CMD="ANSIBLE_CONFIG='../../ansible.cfg' ansible-playbook -v"
+ANSIBLE_CMD="ANSIBLE_CONFIG='../../ansible.cfg' poetry run ansible-playbook -v"
 
-ansible --version
+poetry run ansible --version
 
 function assert_playbook_fail () {
   # $1: playbook path
