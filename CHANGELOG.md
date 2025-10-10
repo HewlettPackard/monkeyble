@@ -1,3 +1,11 @@
+# 1.5.0 2025-10-10
+
+## Feature
+
+- Support of Ansible loop in tests
+- Support of rescue block 
+- Add extra vars at scenario level
+
 # 1.4.4 2024-01-05
 
 ## Fix
