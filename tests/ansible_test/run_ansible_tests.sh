@@ -5,6 +5,8 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 ANSIBLE_CMD="ANSIBLE_CONFIG='../../ansible.cfg' ansible-playbook -v"
 
+ansible --version
+
 function assert_playbook_fail () {
   # $1: playbook path
   # $2: vars path
@@ -52,6 +54,7 @@ LIST_SCENARIO=(
   "assert_is_not_none"
   "assert_list_equal"
   "assert_dict_equal"
+  "assert_loop_differ"
 )
 PLAYBOOK_PATH="test_input/playbook.yml"
 VARS_PATH="test_input/test_asserts_failed/vars.yml"

@@ -18,3 +18,9 @@ monkeyble_scenarios:
 
       - task: "should_not_failed"
         should_fail: false
+
+      - task: "block_should_fail"
+        should_fail: true
+
+      - task: "rescue_should_not_be_skipped"
+        should_be_skipped: false
