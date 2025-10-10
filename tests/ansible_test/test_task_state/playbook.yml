@@ -40,3 +40,13 @@
       fail:
         msg: "save Palpatine"
       ignore_errors: true
+
+    - name: "Block rescue"
+      block:
+        - name: "block_should_fail"
+          fail:
+            msg: "Expected fail"
+      rescue:
+        - name: "rescue_should_not_be_skipped"
+          debug:
+              msg: "rescue executed"

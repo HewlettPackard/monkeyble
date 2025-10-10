@@ -1,5 +1,7 @@
 monkeyble_scenarios:
   validate_test_passed:
+    extra_vars:
+      play_level_var: "scenario level var"
     tasks_to_test:
       - task: "test_assert_equal"
         test_input:
@@ -71,3 +73,26 @@ monkeyble_scenarios:
           - assert_equal:
               arg_name: msg
               expected: "extra_var_updated"
+
+      - task: "test_loop"
+        test_input:
+          - assert_equal:
+              arg_name: msg
+              expected: "general kenobi"
+          - assert_equal:
+              arg_name: msg
+              expected: "master kenobi"
+
+      - task: "Print play var updated at scenario level"
+        test_input:
+          - assert_equal:
+              arg_name: msg
+              expected: "scenario level var"
+
+      - task: "Print play var updated at task level"
+        extra_vars:
+          play_level_var: "task level"
+        test_input:
+          - assert_equal:
+              arg_name: msg
+              expected: "task level"

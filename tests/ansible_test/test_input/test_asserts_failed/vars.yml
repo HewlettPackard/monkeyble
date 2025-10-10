@@ -77,3 +77,14 @@ monkeyble_scenarios:
               arg_name: headers
               expected:
                 key3: value3
+
+  assert_loop_differ:
+    tasks_to_test:
+      - task: "test_loop"
+        test_input:
+          - assert_equal:
+              arg_name: msg
+              expected: "general kenobi"
+          - assert_equal:
+              arg_name: msg
+              expected: "vador"

@@ -10,6 +10,7 @@
       - "obi-wan"
     null_val: null
     default_extra_vars: "default_extra_vars"
+    play_level_var: "default play var"
 
   tasks:
     - name: "test_assert_equal"
@@ -59,3 +60,22 @@
       debug:
         msg: "{{ default_extra_vars }}"
       register: mock_test_register
+
+    - name: "test_loop"
+      debug:
+        msg: "{{ item }}"
+      loop:
+        - "general kenobi"
+        - "master kenobi"
+
+    - name: "Print play var non updated"
+      debug:
+        msg: "{{ play_level_var }}"
+
+    - name: "Print play var updated at scenario level"
+      debug:
+        msg: "{{ play_level_var }}"
+
+    - name: "Print play var updated at task level"
+      debug:
+        msg: "{{ play_level_var }}"
