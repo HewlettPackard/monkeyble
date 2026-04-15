@@ -45,12 +45,12 @@ monkeyble_global_extra_vars:
 The `monkeyble_test_suite` contains a list of Monkeyble test definition.
 A test definition contains information about the playbook to test with all scenario to validate.
 
-| Name       | Required | Description                       |
-|------------|----------|-----------------------------------|
-| playbook   | true     | path to the playbook to test      |
-| inventory  | false    | optional path to the inventory    |
-| extra_vars | false    | List of path to extra var file    |
-| scenarios  | true     | List of scenario name to validate |
+| Name       | Required | Description                        |
+|------------|----------|------------------------------------|
+| playbook   | true     | path to the playbook to test       |
+| inventory  | false    | optional path to the inventory     |
+| extra_vars | false    | List of paths to extra var files   |
+| scenarios  | true     | List of scenario names to validate |
 
 Configuration example:
 
@@ -78,6 +78,8 @@ monkeyble_test_suite:
 
     As the monkeyble [scenario configuration](scenarios.md) is passed as `extra_vars` you should at least 
     have one file declared in the `extra_vars` list and one scenario name placed in `scenarios`.
+
+    Files can use [globbing](https://docs.python.org/3/library/glob.html#glob.glob) syntax e.g. `- "test/**/*.yml"`
 
 ## Commands
 
