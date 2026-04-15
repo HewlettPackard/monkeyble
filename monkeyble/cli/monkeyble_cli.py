@@ -83,8 +83,7 @@ def run_monkeyble_test(monkeyble_config, scenario_name_limit=None):
         # expand path patterns to real paths
         extra_vars_file_paths = []
         for file_pattern in extra_vars:
-            for file_path in glob.glob(file_pattern):
-                extra_vars_file_paths.append(file_path)
+            extra_vars_file_paths.extend(glob.glob(file_pattern))
 
         scenarios = test_config.get("scenarios", None)
         if scenarios is None:
