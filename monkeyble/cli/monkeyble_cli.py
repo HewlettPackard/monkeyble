@@ -1,4 +1,5 @@
 import argparse
+import glob
 import logging
 import os
 import pathlib
@@ -36,8 +37,9 @@ def run_ansible(ansible_cmd, playbook, inventory, extra_vars, scenario):
         cmd.append(inventory)
     if extra_vars is not None:
         for extra_var_path in extra_vars:
-            cmd.append("-e")
-            cmd.append(f"@{extra_var_path}")
+            for file_path in glob.glob(extra_var_path):
+                cmd.append("-e")
+                cmd.append(f"@{file_path}")
     cmd.append("-e")
     cmd.append(f"monkeyble_scenario={scenario}")
     Utils.print_info(f"Monkeyble - exec: '{cmd}'")
