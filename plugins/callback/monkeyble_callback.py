@@ -228,11 +228,12 @@ class CallbackModule(CallbackBase):
     def check_if_task_should_have_failed(self, task_has_actually_failed, has_rescue=False):
         self._display.debug("Monkeyble check_if_task_should_have_failed called")
 
+        expected = self._last_task_config.get("should_fail", False)
         result = self._compare_boolean_to_config(task_name=self._last_task_name,
                                                  config_flag_name="should_fail",
                                                  task_config=self._last_task_config,
                                                  actual_state=task_has_actually_failed)
-        if result is not None and result:
+        if result is not None and result and expected:
             # if we reach this line, it means that the task was expected to fail.
             # We exit with code 0 to prevent a CI to fail if the task does not ignore error
             if not self._last_task_ignore_errors and not has_rescue:
