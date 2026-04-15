@@ -6,7 +6,8 @@ import unittest
 from unittest import mock
 from unittest.mock import patch, mock_open, call
 
-from monkeyble.cli.const import TEST_PASSED, TEST_FAILED, MONKEYBLE_DEFAULT_ANSIBLE_CMD, MONKEYBLE_CALLBACK_STARTED
+from monkeyble.cli.const import TEST_PASSED, TEST_FAILED, MONKEYBLE_DEFAULT_ANSIBLE_CMD, MONKEYBLE_CALLBACK_STARTED, MONKEYBLE_DEFAULT_CONFIG_PATH
+
 from monkeyble.cli.exceptions import MonkeybleCLIException
 
 from monkeyble.cli.models import MonkeybleResult, ScenarioResult
@@ -17,20 +18,36 @@ from monkeyble.cli.monkeyble_cli import load_monkeyble_config, do_exit, run_monk
 class TestMonkeybleModule(unittest.TestCase):
 
     def test_load_monkeyble_config_default_config(self):
-        with patch("builtins.open", mock_open(read_data="data")) as mock_open_file:
-            load_monkeyble_config(None)
+        with (
+            patch("builtins.open", mock_open(read_data="data")) as mock_open_file,
+            patch("glob.glob", return_value=["monkeyble.yml"]) as mock_glob,
+            patch("os.path.isfile", return_value=True),
+            patch("os.access", return_value=True),
+            ):
+                load_monkeyble_config(None)
         mock_open_file.assert_called_with("monkeyble.yml", 'r')
+        mock_glob.assert_called_with(MONKEYBLE_DEFAULT_CONFIG_PATH)
 
     @mock.patch.dict(os.environ, {"MONKEYBLE_CONFIG": "monkeyble_from_env.yml"})
     def test_load_monkeyble_config_from_env(self):
-        with patch("builtins.open", mock_open(read_data="data")) as mock_open_file:
+        with (patch("builtins.open", mock_open(read_data="data")) as mock_open_file,
+              patch("glob.glob", return_value=["monkeyble_from_env.yml"]) as mock_glob,
+              patch("os.path.isfile", return_value=True),
+              patch("os.access", return_value=True),
+              ):
             load_monkeyble_config(None)
         mock_open_file.assert_called_with("monkeyble_from_env.yml", 'r')
+        mock_glob.assert_called_with("monkeyble_from_env.yml")
 
     def test_load_monkeyble_config_from_args(self):
-        with patch("builtins.open", mock_open(read_data="data")) as mock_open_file:
+        with (patch("builtins.open", mock_open(read_data="data")) as mock_open_file,
+              patch("glob.glob", return_value=["/path/to/monkeyble.yml"]) as mock_glob,
+              patch("os.path.isfile", return_value=True),
+              patch("os.access", return_value=True),
+              ):
             load_monkeyble_config("/path/to/monkeyble.yml")
         mock_open_file.assert_called_with("/path/to/monkeyble.yml", 'r')
+        mock_glob.assert_called_with("/path/to/monkeyble.yml")
 
     # fix path when executed as standalone test
     @patch("monkeyble.cli.monkeyble_cli.MONKEYBLE_DEFAULT_CONFIG_PATH", "tests/units/test_config/monkeyble.yml")
