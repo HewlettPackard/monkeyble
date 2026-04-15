@@ -154,9 +154,10 @@ def load_monkeyble_config(arg_config_path):
 
     try:
         config_file_path = glob.glob(config_path)[0]
-    except IndexError as e:
+        assert os.path.isfile(config_file_path) and os.access(config_file_path, os.R_OK)
+    except (IndexError, AssertionError) as e:
         Utils.print_danger(f"Monkeyble - config not found: {config_path}")
-        sys.exit(1)
+        sys.exit(2)
 
     logger.debug(f"Try to open file {config_file_path}")
     with open(config_file_path, "r") as stream:
