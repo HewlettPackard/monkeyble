@@ -1,4 +1,5 @@
 import argparse
+import glob
 import logging
 import os
 import pathlib
@@ -78,6 +79,13 @@ def run_monkeyble_test(monkeyble_config, scenario_name_limit=None):
             raise MonkeybleCLIException(message="Missing 'playbook' key in a test")
         inventory = test_config.get("inventory", None)
         extra_vars.extend(test_config.get("extra_vars", []))
+
+        # expand path patterns to real paths
+        extra_vars_file_paths = []
+        for file_pattern in extra_vars:
+            for file_path in glob.glob(file_pattern):
+                extra_vars_file_paths.append(file_path)
+
         scenarios = test_config.get("scenarios", None)
         if scenarios is None:
             raise MonkeybleCLIException(message=f"No scenarios for playbook {playbook}")
@@ -88,7 +96,7 @@ def run_monkeyble_test(monkeyble_config, scenario_name_limit=None):
             if len(scenario_name_limit) > 0 and scenario not in scenario_name_limit:
                 continue
             scenario_result = ScenarioResult(scenario)
-            scenario_result.result = run_ansible(ansible_cmd, playbook, inventory, extra_vars, scenario)
+            scenario_result.result = run_ansible(ansible_cmd, playbook, inventory, extra_vars_file_paths, scenario)
             list_scenario_result.append(scenario_result)
         new_result.scenario_results = list_scenario_result
         list_result.append(new_result)
