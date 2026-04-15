@@ -1,4 +1,5 @@
 import argparse
+import glob
 import logging
 import os
 import pathlib
@@ -150,14 +151,21 @@ def load_monkeyble_config(arg_config_path):
     # load from cli args
     if arg_config_path is not None:
         config_path = arg_config_path
-    logger.debug(f"Try to open file {config_path}")
-    with open(config_path, "r") as stream:
+
+    try:
+        config_file_path = glob.glob(config_path)[0]
+    except IndexError as e:
+        Utils.print_danger(f"Monkeyble - config not found: {config_path}")
+        sys.exit(1)
+
+    logger.debug(f"Try to open file {config_file_path}")
+    with open(config_file_path, "r") as stream:
         try:
             monkeyble_config = yaml.full_load(stream)
         except yaml.YAMLError as exc:
             Utils.print_danger(exc)
             sys.exit(1)
-    Utils.print_info(f"Monkeyble - config path: {config_path}")
+    Utils.print_info(f"Monkeyble - config path: {config_file_path}")
     return monkeyble_config
 
 
