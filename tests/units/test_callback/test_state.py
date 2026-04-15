@@ -39,3 +39,12 @@ class TestMonkeybleCallbackState(BaseTestMonkeybleCallback):
         }
         self.test_callback.check_if_task_should_have_failed(task_has_actually_failed=True, has_rescue=True)
         mock_exit_playbook.assert_not_called()
+
+    @patch('sys.exit')
+    def test_check_if_task_should_not_have_failed(self, mock_exit_playbook):
+        self.test_callback._last_task_config = {
+            "task": "test_task",
+            "should_fail": False
+        }
+        self.test_callback.check_if_task_should_have_failed(task_has_actually_failed=False)
+        mock_exit_playbook.assert_not_called()
