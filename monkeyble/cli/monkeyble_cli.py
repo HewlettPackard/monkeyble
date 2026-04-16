@@ -64,7 +64,7 @@ def run_ansible(ansible_cmd, playbook, inventory, combined_config, scenario):
         return TEST_FAILED
 
 
-def run_monkeyble_test(monkeyble_config, scenario_name_limit=None):
+def run_monkeyble_test(monkeyble_config, scenario_name_limit=None, override_config_path=None):
     scenario_name_limit = scenario_name_limit if scenario_name_limit else list()
     ansible_cmd = MONKEYBLE_DEFAULT_ANSIBLE_CMD
     if "monkeyble_test_suite" not in monkeyble_config:
@@ -88,10 +88,13 @@ def run_monkeyble_test(monkeyble_config, scenario_name_limit=None):
         combined_config = {}
         for file_pattern in extra_vars:
             for file_path in glob.glob(file_pattern):
-                combined_config = mergedeep.merge(combined_config, yaml.safe_load(open(file_path)))
+                sub_config = yaml.safe_load(open(file_path))
+                # empty files can cause problems
+                if sub_config is not None:
+                    combined_config = mergedeep.merge(combined_config, sub_config)
 
         # write combined config out to temp file
-        combined_config_path = tempfile.mkstemp(prefix='monkeyble_config_')[1]
+        combined_config_path = override_config_path or tempfile.mkstemp(prefix='monkeyble_config_')[1]
         with open(combined_config_path, "w") as config_file:
             yaml.dump(combined_config, config_file)
 
@@ -111,7 +114,7 @@ def run_monkeyble_test(monkeyble_config, scenario_name_limit=None):
         list_result.append(new_result)
 
         # remove combined config file
-        # pathlib.Path(combined_config_path).unlink()
+        pathlib.Path(combined_config_path).unlink()
     return list_result
 
 
