@@ -11,6 +11,7 @@ from copy import copy
 from datetime import timedelta
 
 import yaml
+from mergedeep import mergedeep
 from tabulate import tabulate
 
 from monkeyble.cli.const import MONKEYBLE_DEFAULT_CONFIG_PATH, TEST_PASSED, TEST_FAILED, MONKEYBLE, \
@@ -87,10 +88,10 @@ def run_monkeyble_test(monkeyble_config, scenario_name_limit=None):
         combined_config = {}
         for file_pattern in extra_vars:
             for file_path in glob.glob(file_pattern):
-                combined_config.update(yaml.safe_load(open(file_path)))
+                combined_config = mergedeep.merge(combined_config, yaml.safe_load(open(file_path)))
 
         # write combined config out to temp file
-        combined_config_path = tempfile.mkstemp('monkeyble_config_')
+        combined_config_path = tempfile.mkstemp(prefix='monkeyble_config_')[1]
         with open(combined_config_path, "w") as config_file:
             yaml.dump(combined_config, config_file)
 
@@ -110,7 +111,7 @@ def run_monkeyble_test(monkeyble_config, scenario_name_limit=None):
         list_result.append(new_result)
 
         # remove combined config file
-        pathlib.Path(combined_config_path).unlink()
+        # pathlib.Path(combined_config_path).unlink()
     return list_result
 
 
