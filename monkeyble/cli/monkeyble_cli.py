@@ -5,6 +5,7 @@ import os
 import pathlib
 import subprocess
 import sys
+import tempfile
 import time
 from copy import copy
 from datetime import timedelta
@@ -27,7 +28,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 ACTION_LIST = ["test", "list"]
 
 
-def run_ansible(ansible_cmd, playbook, inventory, extra_vars, scenario):
+def run_ansible(ansible_cmd, playbook, inventory, combined_config, scenario):
     ansible_cmd = ansible_cmd.split()
     cmd = list()
     cmd.extend(ansible_cmd)
@@ -35,10 +36,11 @@ def run_ansible(ansible_cmd, playbook, inventory, extra_vars, scenario):
     if inventory is not None:
         cmd.append("-i")
         cmd.append(inventory)
-    if extra_vars is not None:
-        for extra_var_path in extra_vars:
-            cmd.append("-e")
-            cmd.append(f"@{extra_var_path}")
+
+    # add config to command
+    cmd.append("-e")
+    cmd.append(f"@{combined_config}")
+
     cmd.append("-e")
     cmd.append(f"monkeyble_scenario={scenario}")
     Utils.print_info(f"Monkeyble - exec: '{cmd}'")
@@ -80,10 +82,17 @@ def run_monkeyble_test(monkeyble_config, scenario_name_limit=None):
         inventory = test_config.get("inventory", None)
         extra_vars.extend(test_config.get("extra_vars", []))
 
+        # load all extra_vars config files and build one big yaml document
         # expand path patterns to real paths
-        extra_vars_file_paths = []
+        combined_config = {}
         for file_pattern in extra_vars:
-            extra_vars_file_paths.extend(glob.glob(file_pattern))
+            for file_path in glob.glob(file_pattern):
+                combined_config.update(yaml.safe_load(open(file_path)))
+
+        # write combined config out to temp file
+        combined_config_path = tempfile.mkstemp('monkeyble_config_')
+        with open(combined_config_path, "w") as config_file:
+            yaml.dump(combined_config, config_file)
 
         scenarios = test_config.get("scenarios", None)
         if scenarios is None:
@@ -95,10 +104,13 @@ def run_monkeyble_test(monkeyble_config, scenario_name_limit=None):
             if len(scenario_name_limit) > 0 and scenario not in scenario_name_limit:
                 continue
             scenario_result = ScenarioResult(scenario)
-            scenario_result.result = run_ansible(ansible_cmd, playbook, inventory, extra_vars_file_paths, scenario)
+            scenario_result.result = run_ansible(ansible_cmd, playbook, inventory, combined_config_path, scenario)
             list_scenario_result.append(scenario_result)
         new_result.scenario_results = list_scenario_result
         list_result.append(new_result)
+
+        # remove combined config file
+        pathlib.Path(combined_config_path).unlink()
     return list_result
 
 
