@@ -38,7 +38,7 @@ pyyaml = "^6.0.2"
 optional = true
 
 [tool.poetry.group.dev.dependencies]
-ansible = "<12.0"
+ansible = ">=11.0,<13.0"
 mkdocs = "^1.6.1"
 mkdocs-material = "^9.6.5"
 mike = "^2.1.3"

@@ -17,6 +17,9 @@ class TestMonkeybleModule(unittest.TestCase):
         self.mock_module_helper.start()
         self.addCleanup(self.mock_module_helper.stop)
 
+        if hasattr(basic, '_ANSIBLE_PROFILE'):
+            basic._ANSIBLE_PROFILE = 'legacy'
+
     def test_argument_ok(self):
         with self.assertRaises(AnsibleExitJson) as result:
             set_module_args({
