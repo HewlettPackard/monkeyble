@@ -31,6 +31,7 @@ class BaseTestMonkeybleCallback(unittest.TestCase):
         self.ansible_task_test._role._role_name = None
         self.ansible_task_test.get_name.return_value = "test_task"
         self.ansible_task_test.action = "debug"
+        self.ansible_task_test.ignore_errors = False
         self.ansible_task_test.args = {
             "msg": "my_message"
         }
@@ -46,6 +47,7 @@ class BaseTestMonkeybleCallback(unittest.TestCase):
         self.ansible_task_test_2._role._role_name = None
         self.ansible_task_test_2.get_name.return_value = self.ansible_task_test_2.name
         self.ansible_task_test_2.action = "debug"
+        self.ansible_task_test_2.ignore_errors = False
         self.ansible_task_test_2.args = {
             "msg": "my_message"
         }
