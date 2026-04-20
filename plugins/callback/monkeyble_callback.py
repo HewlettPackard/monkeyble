@@ -235,7 +235,8 @@ class CallbackModule(CallbackBase):
 
     def check_if_task_should_have_failed(self, task_has_actually_failed, has_rescue=False):
         self._display.debug("Monkeyble check_if_task_should_have_failed called")
-
+        if self._last_task_config is None:
+            return
         should_fail = self._last_task_config.get("should_fail", False)
 
         # case 1: task has not failed and was expected to fail
