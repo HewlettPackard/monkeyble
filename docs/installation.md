@@ -14,12 +14,13 @@ library = /path/to/monkeyble/plugins/module
 module_utils = /path/to/monkeyble/plugins/module_utils
 callback_plugins = /path/to/monkeyble/plugins/callback
 callbacks_enabled = monkeyble_callback
-jinja2_native = True
+; jinja2_native is native starting from Ansible 2.19, but it is mandatory to interpret correctly null values when using Ansible < 2.19.
+;jinja2_native = True
 ```
 
 !!!note
 
-    `jinja2_native` is mandatory to interpret correctly null values
+    `jinja2_native` is mandatory to interpret correctly null values when using Ansible < 2.19.
 
 That's it. Monkeyble is installed. See now the [Hello world](hello_world.md) section to learn the basics.
 
