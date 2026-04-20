@@ -48,3 +48,21 @@ class TestMonkeybleCallbackState(BaseTestMonkeybleCallback):
         }
         self.test_callback.check_if_task_should_have_failed(task_has_actually_failed=False)
         mock_exit_playbook.assert_not_called()
+
+    @patch('sys.exit')
+    def test_check_if_task_should_have_failed_but_succeeded(self, mock_exit_playbook):
+        self.test_callback._last_task_config = {
+            "task": "test_task",
+            "should_fail": True
+        }
+        with self.assertRaises(MonkeybleException):
+            self.test_callback.check_if_task_should_have_failed(task_has_actually_failed=False)
+
+    @patch('sys.exit')
+    def test_check_if_task_should_not_have_failed_but_did(self, mock_exit_playbook):
+        self.test_callback._last_task_config = {
+            "task": "test_task",
+            "should_fail": False
+        }
+        with self.assertRaises(MonkeybleException):
+            self.test_callback.check_if_task_should_have_failed(task_has_actually_failed=True)
