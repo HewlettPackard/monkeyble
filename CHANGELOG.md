@@ -1,3 +1,13 @@
+# 1.6.0 2026-04-20
+
+## Enhancement
+
+- Support Ansible 12 (Core 2.19)
+
+## Fix 
+
+- don't raise when we expected a task to fail (should_fail: true) and it actually failed
+
 # 1.5.0 2025-10-10
 
 ## Feature
