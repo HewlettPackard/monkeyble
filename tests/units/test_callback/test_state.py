@@ -66,3 +66,12 @@ class TestMonkeybleCallbackState(BaseTestMonkeybleCallback):
         }
         with self.assertRaises(MonkeybleException):
             self.test_callback.check_if_task_should_have_failed(task_has_actually_failed=True)
+
+    @patch('sys.exit')
+    def test_check_if_task_failed_without_should_fail_configured(self, mock_exit_playbook):
+        """When should_fail is not in config at all, a failing task should not raise"""
+        self.test_callback._last_task_config = {
+            "task": "test_task"
+        }
+        self.test_callback.check_if_task_should_have_failed(task_has_actually_failed=True)
+        mock_exit_playbook.assert_not_called()
