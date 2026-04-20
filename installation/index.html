@@ -601,11 +601,12 @@
 <span class="na">module_utils</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/path/to/monkeyble/plugins/module_utils</span>
 <span class="na">callback_plugins</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">/path/to/monkeyble/plugins/callback</span>
 <span class="na">callbacks_enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">monkeyble_callback</span>
-<span class="na">jinja2_native</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">True</span>
+<span class="c1">; jinja2_native is native starting from Ansible 2.19, but it is mandatory to interpret correctly null values when using Ansible &lt; 2.19.</span>
+<span class="c1">;jinja2_native = True</span>
 </code></pre></div></p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><code>jinja2_native</code> is mandatory to interpret correctly null values</p>
+<p><code>jinja2_native</code> is mandatory to interpret correctly null values when using Ansible &lt; 2.19.</p>
 </div>
 <p>That's it. Monkeyble is installed. See now the <a href="../hello_world/">Hello world</a> section to learn the basics.</p>
 <h2 id="using-ansible-galaxy">Using Ansible Galaxy</h2>
