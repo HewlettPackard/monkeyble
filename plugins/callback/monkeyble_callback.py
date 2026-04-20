@@ -137,9 +137,8 @@ class CallbackModule(CallbackBase):
 
             if "mock" in self._last_task_config:
                 if _ANSIBLE_2_19_PLUS:
-                    task = self.mock_task_module(ansible_task=MockedTask.from_task(task))
-                else:
-                    task = self.mock_task_module(ansible_task=task)
+                    task.__class__ = MockedTask
+                self.mock_task_module(ansible_task=task)
         self._current_task = task
         return super(CallbackModule, self).v2_runner_on_start(host, task)
 
