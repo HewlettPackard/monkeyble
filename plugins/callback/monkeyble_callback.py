@@ -235,9 +235,9 @@ class CallbackModule(CallbackBase):
             message = f"🐵 Monkeyble - Task '{self._last_task_name}' was expected to fail but succeeded"
             raise MonkeybleException(message=message,
                                      scenario_description=self.monkeyble_scenario_description)
-        # case 2: task has failed and was not expected to fail
-        if task_has_actually_failed and not should_fail:
-            message = f"🐵 Monkeyble - Task '{self._last_task_name}' fail  and was not expected"
+        # case 2: task has failed and was explicitly expected not to fail
+        if task_has_actually_failed and "should_fail" in self._last_task_config and not should_fail:
+            message = f"🐵 Monkeyble - Task '{self._last_task_name}' failed and was not expected to"
             raise MonkeybleException(message=message,
                                      scenario_description=self.monkeyble_scenario_description)
         # case 3: task has failed and was expected to fail
