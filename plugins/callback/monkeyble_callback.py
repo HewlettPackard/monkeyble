@@ -228,12 +228,20 @@ class CallbackModule(CallbackBase):
     def check_if_task_should_have_failed(self, task_has_actually_failed, has_rescue=False):
         self._display.debug("Monkeyble check_if_task_should_have_failed called")
 
-        expected = self._last_task_config.get("should_fail", False)
-        result = self._compare_boolean_to_config(task_name=self._last_task_name,
-                                                 config_flag_name="should_fail",
-                                                 task_config=self._last_task_config,
-                                                 actual_state=task_has_actually_failed)
-        if result is not None and result and expected:
+        should_fail = self._last_task_config.get("should_fail", False)
+
+        # case 1: task has not failed and was expected to fail
+        if not task_has_actually_failed and should_fail:
+            message = f"🐵 Monkeyble - Task '{self._last_task_name}' was expected to fail but succeeded"
+            raise MonkeybleException(message=message,
+                                     scenario_description=self.monkeyble_scenario_description)
+        # case 2: task has failed and was not expected to fail
+        if task_has_actually_failed and not should_fail:
+            message = f"🐵 Monkeyble - Task '{self._last_task_name}' fail  and was not expected"
+            raise MonkeybleException(message=message,
+                                     scenario_description=self.monkeyble_scenario_description)
+        # case 3: task has failed and was expected to fail
+        if task_has_actually_failed and should_fail:
             # if we reach this line, it means that the task was expected to fail.
             # We exit with code 0 to prevent a CI to fail if the task does not ignore error
             if not self._last_task_ignore_errors and not has_rescue:
@@ -241,6 +249,9 @@ class CallbackModule(CallbackBase):
                 raise MonkeybleException(message=message,
                                          scenario_description=self.monkeyble_scenario_description,
                                          exit_code=0)
+        # case 4: task has not failed and was not expected to fail. everything is normal
+        if not task_has_actually_failed and not should_fail:
+            self._display.debug(f"Monkeyble - Task '{self._last_task_name}' did not fail as expected")
 
     def _compare_boolean_to_config(self, task_name: str, config_flag_name: str, task_config: dict, actual_state: bool):
         if task_config is not None:
