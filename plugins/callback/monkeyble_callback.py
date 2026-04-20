@@ -16,7 +16,7 @@ from ansible.release import __version__ as ansible_version
 _ANSIBLE_2_19_PLUS = tuple(int(x) for x in ansible_version.split('.')[:2]) >= (2, 19)
 
 if _ANSIBLE_2_19_PLUS:
-    from .mocked_task import MockedTask
+    from plugins.module_utils.mocked_task import MockedTask
 
 BASE_DIR = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '../..')
