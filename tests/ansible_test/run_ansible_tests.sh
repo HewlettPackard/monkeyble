@@ -111,3 +111,9 @@ eval $ANSIBLE_CMD \
 test_mock_path_info/playbook.yml \
 -e "@test_mock_path_info/vars.yml" \
 -e "monkeyble_scenario=validate_test_passed"
+
+echo "Monkeyble test bug extra_vars leak..."
+eval $ANSIBLE_CMD \
+test_bugs/playbook_bug1.yml \
+-e "@test_bugs/vars_bug1.yml" \
+-e "monkeyble_scenario=bug1_extra_vars_leak"
