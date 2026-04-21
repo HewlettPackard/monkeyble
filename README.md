@@ -247,32 +247,28 @@ Playbook   | Scenario        | Test passed
 
 ## Do I need Monkeyble?
 
-The common testing strategy when using Ansible is to deploy to a staging environment that simulates the production.
-When a role or a playbook is updated, we usually run an integration test battery against staging again before pushing in production.
-In case of an update of the code base, a new execution will be required on the stating environment before the production one, etc...
+**Monkeyble and Molecule are complementary, not competing. You can use both.**
 
-But when our playbooks are exposed in an [Ansible Controller/AWX](https://www.ansible.com/products/controller) (ex Tower)
-or available as a service in a catalog like [Squest](https://github.com/HewlettPackard/squest), we need to be sure that we don't have any regressions 
-when updating the code base, especially when modifying a role used by multiple playbooks. Manually testing each playbook would be costly. We commonly give this kind of task to a CI/CD.
+[Molecule](https://molecule.readthedocs.io) is an integration testing framework: it provisions real infrastructure (containers, VMs), runs your role or playbook against it, and checks the resulting system state (is the package installed? is the service running?). It is excellent at answering *"did the role produce the expected system state?"*
 
-Furthermore, Ansible resources are models of desired-state. Ansible modules have their own unit tests and guarantee you of their correct functioning.
-As such, it's not necessary to test that services are started, packages are installed, or other such things. 
-Ansible is the system that will ensure these things are declaratively true.
+Monkeyble operates at a different level. It intercepts task execution **without** requiring any real infrastructure, and lets you assert on the internal logic of your playbook:
 
-So finally, what do we need to test? An Ansible playbook is commonly a bunch of data manipulation before calling a module that will perform a particular action.
-For example, we get data from an API endpoint, or from the result of a module, we register a variable, then use a filter transform the data like combining two dictionary, 
-transforming into a list, changing the type, extract a specific value, etc... to finally call another module in a new task with the transformed data..
+- Was a specific task actually reached, or did the play fail before it?
+- Was a module called with the exact arguments you expected (after all your variable manipulation and Jinja2 templating)?
+- Did a task produce the exact registered result you intended?
+- Was a task correctly skipped, changed, or marked as failed?
 
-Given a defined list of variable defined as input we want to be sure that a particular task: 
+Why this matters, an Ansible playbook is typically a pipeline of data transformations: you fetch data from an API, register variables, combine dictionaries, extract values, change types and only then call the module that does the actual work. 
+Molecule cannot easily tell you whether that pipeline is correct. It only sees the final system state.
 
-- is well executed (the playbook could have failed before)
-- is well called with the expected instantiated arguments
-- produced this exact result
-- has been skipped, changed or has failed
+Monkeyble fills that gap. Given a fixed set of input variables, it validates that every step of that pipeline behaves as expected, catching regressions in your logic before they ever reach a real system.
 
-Monkeyble is a tool that can help you to enhance the quality of your Ansible code base and can be coupled 
-with [official best practices](https://docs.ansible.com/ansible/latest/reference_appendices/test_strategies.html).
-Placed in a CI/CD it will be in charge of validating that the legacy code is always working as expected.
+This becomes critical when:
+- Playbooks are exposed through [Ansible Controller/AWX](https://www.ansible.com/products/controller) or a service catalog like [Squest](https://github.com/HewlettPackard/squest), where manual regression testing across many playbooks is impractical.
+- A shared role is updated and you need confidence that every playbook consuming it still works correctly.
+- You want fast feedback in CI/CD without spinning up full infrastructure for every pipeline run.
+
+Monkeyble can be coupled with [official Ansible test strategies](https://docs.ansible.com/ansible/latest/reference_appendices/test_strategies.html) and placed in a CI/CD pipeline to continuously guard against regressions in your playbook logic.
 
 ## Contribute
 
