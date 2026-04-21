@@ -1,0 +1,45 @@
+name: Build and push Execution Environment
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  IMAGE_NAME: quay.io/hewlettpackardenterprise/monkeyble
+
+jobs:
+  build-ee:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install ansible-builder
+        run: pip install ansible-builder
+
+      - name: Extract version from galaxy.yml
+        id: version
+        run: |
+          VERSION=$(grep '^version:' galaxy.yml | awk '{print $2}')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Build Execution Environment
+        run: |
+          ansible-builder build \
+            --file ee/execution-environment.yml \
+            --tag "${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}" \
+            --tag "${{ env.IMAGE_NAME }}:latest" \
+            --verbosity 2
+
+      - name: Log in to Quay.io
+        run: podman login quay.io -u "${{ secrets.QUAY_USERNAME }}" -p "${{ secrets.QUAY_PASSWORD }}"
+
+      - name: Push image
+        run: |
+          podman push "${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}"
+          podman push "${{ env.IMAGE_NAME }}:latest"
