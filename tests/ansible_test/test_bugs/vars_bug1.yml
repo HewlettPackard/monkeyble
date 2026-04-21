@@ -1,0 +1,17 @@
+monkeyble_scenarios:
+  bug1_extra_vars_leak:
+    tasks_to_test:
+      - task: "task1_with_extra_vars"
+        extra_vars:
+          play_var: "overridden_by_task1"
+        test_input:
+          - assert_equal:
+              arg_name: msg
+              expected: "overridden_by_task1"
+
+      - task: "task2_without_extra_vars"
+        # No extra_vars here, play_var should be "default"
+        test_input:
+          - assert_equal:
+              arg_name: msg
+              expected: "default"

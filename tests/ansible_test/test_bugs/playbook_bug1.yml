@@ -1,0 +1,23 @@
+# Bug #1: extra_vars leak between tasks
+# Task 1 overrides "play_var" via extra_vars.
+# Task 2 should NOT see this override, but it does
+# because scenario_extra_vars is mutated by reference.
+#
+# Expected (without bug): task 2 prints "default"
+# Actual (with bug):      task 2 prints "overridden_by_task1"
+- name: "Bug1 - extra_vars leak between tasks"
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    play_var: "default"
+
+  tasks:
+    - name: "task1_with_extra_vars"
+      debug:
+        msg: "{{ play_var }}"
+
+    - name: "task2_without_extra_vars"
+      debug:
+        msg: "{{ play_var }}"
