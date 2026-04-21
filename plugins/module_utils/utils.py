@@ -1,15 +1,9 @@
 # Copyright 2022 Hewlett Packard Enterprise Development LP
 import unittest
-from typing import Any
 
 from ansible.errors import AnsibleError
 from ansible.playbook.task import Task
 
-try:
-    from ansible._internal._datatag._tags import TrustedAsTemplate
-    _HAS_DATATAG = True
-except ImportError:
-    _HAS_DATATAG = False
 
 from plugins.module_utils.const import *
 from plugins.module_utils.exceptions import MonkeybleException
@@ -36,23 +30,6 @@ def str_to_bool(s):
                 or s == False:
             return False
     return False
-
-def tag_values(value: Any):
-    """
-    Recurse through a data structure and tag all strings
-    so they can be used in templates.
-    Only needed for Ansible >= 2.19 which introduced data tagging.
-    """
-    if not _HAS_DATATAG:
-        return value
-    if isinstance(value, list):
-        return [tag_values(v) for v in value]
-    elif isinstance(value, dict):
-        return {k: tag_values(v) for k, v in value.items()}
-    elif isinstance(value, str):
-        return TrustedAsTemplate().tag(value)
-    else:
-        return value
 
 def switch_test_method(test_name, tested_value, expected=None):
     if test_name not in SUPPORTED_TEST:

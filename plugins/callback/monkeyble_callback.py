@@ -7,15 +7,11 @@ from copy import copy
 
 from ansible import constants as C
 from ansible.errors import AnsibleUndefinedVariable
-from ansible.parsing.dataloader import DataLoader
 from ansible.plugins.callback import CallbackBase
-from ansible.template import Templar
 from ansible.utils.display import Display
-from ansible.release import __version__ as ansible_version
+from plugins.module_utils.ansible_compat import ANSIBLE_2_19_PLUS
 
-_ANSIBLE_2_19_PLUS = tuple(int(x) for x in ansible_version.split('.')[:2]) >= (2, 19)
-
-if _ANSIBLE_2_19_PLUS:
+if ANSIBLE_2_19_PLUS:
     from plugins.module_utils.mocked_task import MockedTask
 
 BASE_DIR = os.path.abspath(
@@ -24,7 +20,8 @@ BASE_DIR = os.path.abspath(
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
-from plugins.module_utils.utils import str_to_bool, switch_test_method, get_task_config, tag_values
+from plugins.module_utils.utils import str_to_bool, switch_test_method, get_task_config
+from plugins.module_utils.templar import MonkeybleTemplar
 from plugins.module_utils.const import PASSED_TEST, FAILED_TEST
 from plugins.module_utils.exceptions import MonkeybleException
 from plugins.module_utils._version import __version__
@@ -88,9 +85,9 @@ class CallbackModule(CallbackBase):
         # add shared task to the config
         loaded_monkeyble_config["monkeyble_shared_tasks"] = monkeyble_shared_tasks
         # variable placed into the monkeyble config need to be instantiated with extra vars
-        templar = Templar(loader=DataLoader(), variables=self.playbook_extra_vars)
+        templar = MonkeybleTemplar(variables=self.playbook_extra_vars)
         try:
-            self.monkeyble_config = templar.template(tag_values(loaded_monkeyble_config))
+            self.monkeyble_config = templar.template(loaded_monkeyble_config)
         except Exception as e:
             raise MonkeybleException(message=str(e),
                                      scenario_description=monkeyble_scenario)
@@ -112,12 +109,12 @@ class CallbackModule(CallbackBase):
 
         # template the task name
         task_copy = copy(task)
-        templar = Templar(loader=DataLoader(), variables=self.playbook_vars)
-        templated_task_name = templar.template(tag_values(task.name))
+        templar = MonkeybleTemplar(variables=self.playbook_vars)
+        templated_task_name = templar.template(task.name)
         task_copy.name = templated_task_name
         task_copy._name = templated_task_name
         self._last_task_name = templated_task_name
-        templated_task_ignore_errors = templar.template(tag_values(task.ignore_errors))
+        templated_task_ignore_errors = templar.template(task.ignore_errors)
         self._last_task_ignore_errors = templated_task_ignore_errors
 
         # get a monkeyble config for the current task
@@ -136,7 +133,7 @@ class CallbackModule(CallbackBase):
                 self.test_input(ansible_task=task, playbook_vars=self.playbook_vars)
 
             if "mock" in self._last_task_config:
-                if _ANSIBLE_2_19_PLUS:
+                if ANSIBLE_2_19_PLUS:
                     task.__class__ = MockedTask
                 self.mock_task_module(ansible_task=task)
         self._current_task = task
@@ -194,9 +191,9 @@ class CallbackModule(CallbackBase):
                         context = {
                             "result": result_dict
                         }
-                        templar = Templar(loader=DataLoader(), variables=context)
+                        templar = MonkeybleTemplar(variables=context)
                         try:
-                            templated_value = templar.template(tag_values(template_string))
+                            templated_value = templar.template(template_string)
                             if templated_value == "" and test_name == "assert_is_none":
                                 templated_value = None
                         except AnsibleUndefinedVariable as e:
@@ -305,12 +302,12 @@ class CallbackModule(CallbackBase):
         # first template our extra vars with extra vars from the playbook
         # if extra_var_to_merge is None or extra_var_to_merge == {}:
         #     return ansible_task
-        templar = Templar(loader=DataLoader(), variables=self.playbook_vars)
-        templated_task_extra_vars = templar.template(tag_values(extra_var_to_merge))
+        templar = MonkeybleTemplar(variables=self.playbook_vars)
+        templated_task_extra_vars = templar.template(extra_var_to_merge)
         # then template the module args
-        templar = Templar(loader=DataLoader(), variables=templated_task_extra_vars)
+        templar = MonkeybleTemplar(variables=templated_task_extra_vars)
         try:
-            templated_module_args = templar.template(tag_values(ansible_task.args))
+            templated_module_args = templar.template(ansible_task.args)
             ansible_task.args = templated_module_args
         except AnsibleUndefinedVariable:
             pass
@@ -319,7 +316,7 @@ class CallbackModule(CallbackBase):
 
     def test_input(self, ansible_task, playbook_vars: dict = None):
         playbook_vars = playbook_vars or {}
-        templar = Templar(loader=DataLoader(), variables=playbook_vars)
+        templar = MonkeybleTemplar(variables=playbook_vars)
         test_result = {PASSED_TEST: [], FAILED_TEST: []}
 
         def get_argument_value(module_args, arg_name):
@@ -350,8 +347,8 @@ class CallbackModule(CallbackBase):
 
                     for loop_value in ansible_task.loop:
                         loop_vars = {**playbook_vars, ansible_task.loop_control.loop_var: loop_value}
-                        templar = Templar(loader=DataLoader(), variables=loop_vars)
-                        module_args = templar.template(tag_values(ansible_task.args))
+                        templar = MonkeybleTemplar(variables=loop_vars)
+                        module_args = templar.template(ansible_task.args)
                         try:
                             argument_value = get_argument_value(module_args, arg_name)
                         except MonkeybleException:
