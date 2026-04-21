@@ -349,8 +349,8 @@ class CallbackModule(CallbackBase):
                     found_match = False
 
                     for loop_value in ansible_task.loop:
-                        playbook_vars.update({ansible_task.loop_control.loop_var: loop_value})
-                        templar = Templar(loader=DataLoader(), variables=playbook_vars)
+                        loop_vars = {**playbook_vars, ansible_task.loop_control.loop_var: loop_value}
+                        templar = Templar(loader=DataLoader(), variables=loop_vars)
                         module_args = templar.template(tag_values(ansible_task.args))
                         try:
                             argument_value = get_argument_value(module_args, arg_name)
