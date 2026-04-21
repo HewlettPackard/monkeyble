@@ -1,0 +1,4 @@
+---
+collections:
+  - name: hpe.monkeyble
+    version: ">=1.6.0"

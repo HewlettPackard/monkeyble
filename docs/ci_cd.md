@@ -2,51 +2,61 @@
 
 This documentation is an example of usage of Monkeyble in a CI/CD.
 
-## Create an Ansible execution environment
+## Official Execution Environment
 
-Create a [Ansible execution environment](https://docs.ansible.com/automation-controller/latest/html/userguide/execution_environments.html) that contains Monkeyble CLI and collections.
+An official prebuilt [Ansible Execution Environment](https://docs.ansible.com/automation-controller/latest/html/userguide/execution_environments.html) is available on Quay.io. It ships with the Monkeyble CLI, the `hpe.monkeyble` collection, and the callback plugin already enabled in `ansible.cfg`.
+
+```
+quay.io/hewlettpackardenterprise/monkeyble:latest
+```
+
+A version-pinned tag is also available for each release (e.g. `quay.io/hewlettpackardenterprise/monkeyble:1.6.0`).
+
+You can pull and use it directly:
+```bash
+docker pull quay.io/hewlettpackardenterprise/monkeyble:latest
+```
+
+Test locally against your Ansible repository:
+```bash
+docker run -it --rm \
+-v ${PWD}:/runner/project/ \
+-v /path/to/inventory_folder:/runner/inventory/ \
+-w /runner/project/ \
+quay.io/hewlettpackardenterprise/monkeyble:latest \
+monkeyble test
+```
+
+## Build your own Execution Environment
+
+If you need a custom image with additional collections or Python dependencies, you can build your own EE.
 
 Example of `execution-environment.yml`:
 ```yaml
-version: 1
+version: 3
+
+images:
+  base_image:
+    name: quay.io/hewlettpackardenterprise/monkeyble:latest
+
 dependencies:
-  galaxy: requirements.yml  # place here your required Ansible role and collections
-  python: requirements.txt  # place here your required python libraries
-  system: bindep.txt        # place here your required system packages
-
-ansible_config: 'ansible.cfg' 
-additional_build_steps:
-  prepend: |
-    RUN pip3 install --upgrade pip setuptools
-```
-
-In the `requirements.txt` we should retrieve a line with the [Monkeyble cli package](https://pypi.org/project/monkeyble/). E.g:
-```
-monkeyble==1.2.0  # check he last version before placing it here
-```
-
-In the `requirements.yml`  we should retrieve a line with the [Monkeyble collection](https://galaxy.ansible.com/hpe/monkeyble). E.g:
-```yaml
-collections:
-  - name: hpe.monkeyble
-    version: 1.2.0  # check the last version before placing it here
+  galaxy: requirements.yml  # place here your additional Ansible roles and collections
+  python: requirements.txt  # place here your additional Python libraries
 ```
 
 Build the execution environment:
 ```bash
 ansible-builder build --verbosity 3 \
---tag my_registry.example/repo/execution-environment-ansible \
---container-runtime docker
+--tag my_registry.example/repo/my-custom-ee
 ```
 
-You can test locally the image against your repository
+Test locally:
 ```bash
 docker run -it --rm \
 -v ${PWD}:/runner/project/ \
 -v /path/to/inventory_folder:/runner/inventory/ \
--e ANSIBLE_CONFIG='monkeyble-ci.cfg' \
 -w /runner/project/ \
-my_registry.example/repo/execution-environment-ansible \
+my_registry.example/repo/my-custom-ee \
 monkeyble test
 ```
 
@@ -54,11 +64,11 @@ monkeyble test
 
 ### Github action
 
-Here is a workflow example based on the built execution environment
+Here is a workflow example using the official Monkeyble execution environment:
 
 ```yaml
 name: On pull request
-on: [pull_request]  # set to this value when pushing in prod
+on: [pull_request]
 
 jobs:
   monkeyble-tests:
@@ -66,16 +76,15 @@ jobs:
 
     steps:
       - name: Checkout the Ansible repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Run Monkeyble tests
         run: |
           docker run --rm \
           -v ${PWD}:/runner/project/ \
           -v ${PWD}/inventories:/runner/inventory/ \
-          -e ANSIBLE_CONFIG='monkeyble-ci.cfg' \
           -e VAULT_GITHUB_TOKEN=$VAULT_GITHUB_TOKEN \
           -w /runner/project/ \
-          my_registry.example/repo/execution-environment-ansible \
+          quay.io/hewlettpackardenterprise/monkeyble:latest \
           monkeyble test
 ```

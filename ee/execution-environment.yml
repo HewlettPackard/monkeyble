@@ -1,0 +1,27 @@
+---
+version: 3
+
+images:
+  base_image:
+    name: quay.io/rockylinux/rockylinux:10
+
+dependencies:
+  ansible_core:
+    package_pip:
+      ## == Ansible 12 . Ref: https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-community-changelogs
+      ansible-core~=2.19.0
+  ansible_runner:
+    package_pip: ansible-runner~=2.4.3
+  galaxy: requirements.yml
+  python: requirements.txt
+
+additional_build_files:
+  - src: ansible.cfg
+    dest: configs
+
+additional_build_steps:
+  prepend_base:
+    - RUN dnf install -y gcc python3-devel
+    - RUN pip3 install --upgrade pip
+  append_final:
+    - COPY _build/configs/ansible.cfg /etc/ansible/ansible.cfg
