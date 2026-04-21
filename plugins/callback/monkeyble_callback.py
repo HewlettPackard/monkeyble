@@ -125,7 +125,7 @@ class CallbackModule(CallbackBase):
 
         if self._last_task_config is not None:
             # apply extra vars from the tested task
-            task_extra_vars = self.scenario_extra_vars
+            task_extra_vars = self.scenario_extra_vars.copy()
             if "extra_vars" in self._last_task_config:
                 task_extra_vars.update(self._last_task_config["extra_vars"])
 
