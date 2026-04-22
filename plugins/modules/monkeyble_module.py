@@ -27,6 +27,12 @@ def run_module():
     if module.params['result_dict']:
         result.update(module.params['result_dict'])
 
+    # Prevent AnsibleModule._return_formatted() from calling add_path_info().
+    # That method checks if a file at 'dest' or 'path' exists on the local filesystem
+    # and overwrites uid, gid, owner, group, mode, size, state with real values.
+    # This silently corrupts mock results when the target file happens to exist.
+    module.add_path_info = lambda kwargs: kwargs
+
     module.exit_json(**result)
 
 

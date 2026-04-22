@@ -1,0 +1,39 @@
+- name: "Test mock result_dict with dest key is not altered by filesystem"
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: "Ensure dest file exists to trigger the bug"
+      ansible.builtin.copy:
+        dest: /tmp/monkeyble_test_path_info.txt
+        content: "file exists on disk"
+        mode: "0644"
+
+    - name: "mock_copy_task"
+      ansible.builtin.copy:
+        dest: /tmp/monkeyble_test_path_info.txt
+        content: "this will be mocked"
+        mode: "0400"
+      register: mock_copy_result
+
+    - debug:
+        var: mock_copy_result
+
+    - name: "Assert mock result is returned exactly as defined"
+      assert:
+        that:
+          - "mock_copy_result['dest'] == '/tmp/monkeyble_mock_dest.txt'"
+          - "mock_copy_result['owner'] == 'mockowner'"
+          - "mock_copy_result['group'] == 'mockgroup'"
+          - "mock_copy_result['uid'] == 9999"
+          - "mock_copy_result['gid'] == 9999"
+          - "mock_copy_result['mode'] == '0400'"
+          - "mock_copy_result['size'] == 42"
+          - "mock_copy_result['state'] == 'file'"
+          - "mock_copy_result['changed'] == false"
+
+    - name: "Cleanup"
+      ansible.builtin.file:
+        path: /tmp/monkeyble_test_path_info.txt
+        state: absent
