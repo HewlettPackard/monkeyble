@@ -1,0 +1,19 @@
+monkeyble_scenarios:
+  validate_test_passed:
+    tasks_to_test:
+      - task: "mock_copy_task"
+        mock:
+          config:
+            monkeyble_module:
+              consider_changed: false
+              result_dict:
+                changed: false
+                dest: /tmp/monkeyble_mock_dest.txt
+                owner: mockowner
+                group: mockgroup
+                uid: 9999
+                gid: 9999
+                mode: "0400"
+                size: 42
+                state: file
+                checksum: abc123
