@@ -105,3 +105,9 @@ eval $ANSIBLE_CMD \
 test_mock/playbook.yml \
 -e "@test_mock/vars.yml" \
 -e "monkeyble_scenario=validate_test_passed"
+
+echo "Monkeyble test mock with dest/path key not altered by filesystem..."
+eval $ANSIBLE_CMD \
+test_mock_path_info/playbook.yml \
+-e "@test_mock_path_info/vars.yml" \
+-e "monkeyble_scenario=validate_test_passed"
