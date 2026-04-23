@@ -29,6 +29,11 @@ ansible-galaxy collection publish hpe-monkeyble-1.0.3.tar.gz
 
 ## Python package
 
+Update the version in `pyproject.toml`. E.g:
+```toml
+version = "1.4.3"
+```
+
 Build the CLI:
 ```
 poetry build

@@ -1,3 +1,23 @@
+# 1.7.0 2026-04-23
+
+## Feature
+
+- Official prebuilt Ansible Execution Environment available on `quay.io/hewlettpackardenterprise/monkeyble`
+- GitHub Actions workflow to build and push the EE on merge to master
+- GitHub Actions workflow to build and deploy documentation on merge to master
+
+## Fix
+
+- Prevent filesystem metadata from overwriting mock `result_dict` when `dest` or `path` key exists and the file is present on disk
+- Prevent `scenario_extra_vars` mutation across tasks
+- Prevent `playbook_vars` mutation during loop `test_input`
+
+## Enhancement
+
+- Refactor templating and version compatibility
+- Updated "Do I need Monkeyble?" section in README to clarify the difference with Molecule
+- Updated CI/CD documentation with official EE image usage
+
 # 1.6.0 2026-04-20
 
 ## Enhancement
