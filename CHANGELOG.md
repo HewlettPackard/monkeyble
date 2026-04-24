@@ -1,3 +1,9 @@
+# 1.7.1 2026-04-24
+
+## Fix
+
+- Fix broken import order in callback plugin that caused failure when `ansible_compat` was imported before `_version`
+
 # 1.7.0 2026-04-23
 
 ## Feature
