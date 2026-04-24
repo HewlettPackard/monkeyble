@@ -9,10 +9,6 @@ from ansible import constants as C
 from ansible.errors import AnsibleUndefinedVariable
 from ansible.plugins.callback import CallbackBase
 from ansible.utils.display import Display
-from plugins.module_utils.ansible_compat import ANSIBLE_2_19_PLUS
-
-if ANSIBLE_2_19_PLUS:
-    from plugins.module_utils.mocked_task import MockedTask
 
 BASE_DIR = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '../..')
@@ -25,6 +21,10 @@ from plugins.module_utils.templar import MonkeybleTemplar
 from plugins.module_utils.const import PASSED_TEST, FAILED_TEST
 from plugins.module_utils.exceptions import MonkeybleException
 from plugins.module_utils._version import __version__
+from plugins.module_utils.ansible_compat import ANSIBLE_2_19_PLUS
+
+if ANSIBLE_2_19_PLUS:
+    from plugins.module_utils.mocked_task import MockedTask
 
 global_display = Display()
 
