@@ -94,42 +94,111 @@ class TestMonkeybleModule(unittest.TestCase):
             run_monkeyble_test(monkeyble_config)
             mock_exit.assert_called_with(1)
 
-    def test_run_monkeyble_test_run_ansible_called(self):
+    def test_run_monkeyble_test_config_cleanup_run_ansible_called(self):
+        current_path = pathlib.Path(__file__).parent.resolve()
+        config_path = "/tmp/monkeyble_config_testing"
         monkeyble_config = {
             "monkeyble_global_extra_vars": ['mocks.yml'],
             "monkeyble_test_suite": [
                 {
                     "playbook": "playbook1.yml",
                     "inventory": "my_inventory1",
-                    "extra_vars": ["extra_vars1.yml", "extra_vars2.yml"],
+                    "extra_vars": [f"{current_path}/test_config/extra_vars1.yml", f"{current_path}/test_config/extra_vars2.yml"],
+                    "scenarios": ["scenario1"]
+                }
+            ]
+        }
+
+        with mock.patch("monkeyble.cli.monkeyble_cli.run_ansible") as mock_run_ansible:
+            run_monkeyble_test(monkeyble_config, override_config_path=config_path)
+            self.assertEqual(mock_run_ansible.call_count, 1)
+            call_1 = call(MONKEYBLE_DEFAULT_ANSIBLE_CMD,
+                          "playbook1.yml",
+                          "my_inventory1",
+                          config_path,
+                          "scenario1")
+            mock_run_ansible.assert_has_calls([call_1])
+            self.assertFalse(os.path.isfile(config_path))
+
+    def test_run_monkeyble_test_run_ansible_called(self):
+        current_path = pathlib.Path(__file__).parent.resolve()
+        config_path = "/tmp/monkeyble_config_testing"
+        monkeyble_config = {
+            "monkeyble_global_extra_vars": ['mocks.yml'],
+            "monkeyble_test_suite": [
+                {
+                    "playbook": "playbook1.yml",
+                    "inventory": "my_inventory1",
+                    "extra_vars": [f"{current_path}/test_config/extra_vars1.yml", f"{current_path}/test_config/extra_vars2.yml"],
                     "scenarios": ["scenario1", "scenario2"]
                 },
                 {
                     "playbook": "playbook2.yml",
                     "inventory": "my_inventory2",
-                    "extra_vars": ["extra_vars3.yml"],
+                    "extra_vars": [f"{current_path}/test_config/extra_vars3.yml"],
                     "scenarios": ["scenario3"]
                 }
             ]
         }
 
         with mock.patch("monkeyble.cli.monkeyble_cli.run_ansible") as mock_run_ansible:
-            run_monkeyble_test(monkeyble_config)
+            run_monkeyble_test(monkeyble_config, override_config_path=config_path)
             self.assertEqual(mock_run_ansible.call_count, 3)
             call_1 = call(MONKEYBLE_DEFAULT_ANSIBLE_CMD,
                           "playbook1.yml",
                           "my_inventory1",
-                          ["mocks.yml", "extra_vars1.yml", "extra_vars2.yml"],
+                          config_path,
                           "scenario1")
             call_2 = call(MONKEYBLE_DEFAULT_ANSIBLE_CMD,
                           "playbook1.yml",
                           "my_inventory1",
-                          ["mocks.yml", "extra_vars1.yml", "extra_vars2.yml"],
+                          config_path,
                           "scenario2")
             call_3 = call(MONKEYBLE_DEFAULT_ANSIBLE_CMD,
                           "playbook2.yml",
                           "my_inventory2",
-                          ["mocks.yml", "extra_vars3.yml"],
+                          config_path,
+                          "scenario3")
+            mock_run_ansible.assert_has_calls([call_1, call_2, call_3])
+
+    def test_run_monkeyble_test_with_globbing_run_ansible_called(self):
+        current_path = pathlib.Path(__file__).parent.resolve()
+        config_path = "/tmp/monkeyble_config_testing"
+        monkeyble_config = {
+            "monkeyble_global_extra_vars": [f"{current_path}/test_config/*_mocks.yml"],
+            "monkeyble_test_suite": [
+                {
+                    "playbook": "playbook1.yml",
+                    "inventory": "my_inventory1",
+                    "extra_vars": [f"{current_path}/test_config/extra_vars[1-2].yml"],
+                    "scenarios": ["scenario1", "scenario2"]
+                },
+                {
+                    "playbook": "playbook2.yml",
+                    "inventory": "my_inventory2",
+                    "extra_vars": [f"{current_path}/test_config/extra_vars*.yml"],
+                    "scenarios": ["scenario3"]
+                }
+            ]
+        }
+
+        with mock.patch("monkeyble.cli.monkeyble_cli.run_ansible") as mock_run_ansible:
+            run_monkeyble_test(monkeyble_config, override_config_path=config_path)
+            self.assertEqual(mock_run_ansible.call_count, 3)
+            call_1 = call(MONKEYBLE_DEFAULT_ANSIBLE_CMD,
+                          "playbook1.yml",
+                          "my_inventory1",
+                          config_path,
+                          "scenario1")
+            call_2 = call(MONKEYBLE_DEFAULT_ANSIBLE_CMD,
+                          "playbook1.yml",
+                          "my_inventory1",
+                          config_path,
+                          "scenario2")
+            call_3 = call(MONKEYBLE_DEFAULT_ANSIBLE_CMD,
+                          "playbook2.yml",
+                          "my_inventory2",
+                          config_path,
                           "scenario3")
             mock_run_ansible.assert_has_calls([call_1, call_2, call_3])
 
@@ -156,12 +225,12 @@ class TestMonkeybleModule(unittest.TestCase):
         run_ansible(MONKEYBLE_DEFAULT_ANSIBLE_CMD,
                     "playbook.yml",
                     "my_inventory",
-                    ["extra_vars1.yml", "extra_vars2.yml"],
+                    "extra_vars1.yml",
                     "scenario1")
         self.assertTrue(mock_subproc_popen.called)
 
         expected_call = call(['ansible-playbook', 'playbook.yml', '-i', 'my_inventory',
-                              '-e', '@extra_vars1.yml', '-e', '@extra_vars2.yml',
+                              '-e', '@extra_vars1.yml',
                               '-e', 'monkeyble_scenario=scenario1'], stdout=-1, stderr=-2)
         mock_subproc_popen.assert_has_calls([expected_call])
 
@@ -174,7 +243,7 @@ class TestMonkeybleModule(unittest.TestCase):
             run_ansible(MONKEYBLE_DEFAULT_ANSIBLE_CMD,
                         "playbook.yml",
                         "my_inventory",
-                        ["extra_vars1.yml", "extra_vars2.yml"],
+                        "extra_vars1.yml",
                         "scenario1")
             self.assertTrue(mock_subproc_popen.called)
             mock_exit.assert_called_with(1)

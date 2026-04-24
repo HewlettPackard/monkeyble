@@ -1,14 +1,17 @@
 import argparse
+import glob
 import logging
 import os
 import pathlib
 import subprocess
 import sys
+import tempfile
 import time
 from copy import copy
 from datetime import timedelta
 
 import yaml
+from mergedeep import mergedeep
 from tabulate import tabulate
 
 from monkeyble.cli.const import MONKEYBLE_DEFAULT_CONFIG_PATH, TEST_PASSED, TEST_FAILED, MONKEYBLE, \
@@ -26,7 +29,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 ACTION_LIST = ["test", "list"]
 
 
-def run_ansible(ansible_cmd, playbook, inventory, extra_vars, scenario):
+def run_ansible(ansible_cmd, playbook, inventory, combined_config, scenario):
     ansible_cmd = ansible_cmd.split()
     cmd = list()
     cmd.extend(ansible_cmd)
@@ -34,10 +37,11 @@ def run_ansible(ansible_cmd, playbook, inventory, extra_vars, scenario):
     if inventory is not None:
         cmd.append("-i")
         cmd.append(inventory)
-    if extra_vars is not None:
-        for extra_var_path in extra_vars:
-            cmd.append("-e")
-            cmd.append(f"@{extra_var_path}")
+
+    # add config to command
+    cmd.append("-e")
+    cmd.append(f"@{combined_config}")
+
     cmd.append("-e")
     cmd.append(f"monkeyble_scenario={scenario}")
     Utils.print_info(f"Monkeyble - exec: '{cmd}'")
@@ -60,7 +64,7 @@ def run_ansible(ansible_cmd, playbook, inventory, extra_vars, scenario):
         return TEST_FAILED
 
 
-def run_monkeyble_test(monkeyble_config, scenario_name_limit=None):
+def run_monkeyble_test(monkeyble_config, scenario_name_limit=None, override_config_path=None):
     scenario_name_limit = scenario_name_limit if scenario_name_limit else list()
     ansible_cmd = MONKEYBLE_DEFAULT_ANSIBLE_CMD
     if "monkeyble_test_suite" not in monkeyble_config:
@@ -78,6 +82,22 @@ def run_monkeyble_test(monkeyble_config, scenario_name_limit=None):
             raise MonkeybleCLIException(message="Missing 'playbook' key in a test")
         inventory = test_config.get("inventory", None)
         extra_vars.extend(test_config.get("extra_vars", []))
+
+        # load all extra_vars config files and build one big yaml document
+        # expand path patterns to real paths
+        combined_config = {}
+        for file_pattern in extra_vars:
+            for file_path in glob.glob(file_pattern):
+                sub_config = yaml.safe_load(open(file_path))
+                # empty files can cause problems
+                if sub_config is not None:
+                    combined_config = mergedeep.merge(combined_config, sub_config)
+
+        # write combined config out to temp file
+        combined_config_path = override_config_path or tempfile.mkstemp(prefix='monkeyble_config_')[1]
+        with open(combined_config_path, "w") as config_file:
+            yaml.dump(combined_config, config_file)
+
         scenarios = test_config.get("scenarios", None)
         if scenarios is None:
             raise MonkeybleCLIException(message=f"No scenarios for playbook {playbook}")
@@ -88,10 +108,13 @@ def run_monkeyble_test(monkeyble_config, scenario_name_limit=None):
             if len(scenario_name_limit) > 0 and scenario not in scenario_name_limit:
                 continue
             scenario_result = ScenarioResult(scenario)
-            scenario_result.result = run_ansible(ansible_cmd, playbook, inventory, extra_vars, scenario)
+            scenario_result.result = run_ansible(ansible_cmd, playbook, inventory, combined_config_path, scenario)
             list_scenario_result.append(scenario_result)
         new_result.scenario_results = list_scenario_result
         list_result.append(new_result)
+
+        # remove combined config file
+        pathlib.Path(combined_config_path).unlink()
     return list_result
 
 
